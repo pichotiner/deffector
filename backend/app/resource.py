@@ -106,10 +106,9 @@ def calculate(item, today: date, approaching_percent=80, warn_days=30):
         fractions[key] = used / life
         remaining[key] = max(round(life - used), 0)
         if elapsed_days and used > 0:
+            # по средней скорости расхода с точки отсчёта; если ресурс исчерпан — дата в прошлом
             per_day = used / elapsed_days
-            end_dates[key] = today + timedelta(days=round(max(life - used, 0) / per_day))
-        elif used >= life:
-            end_dates[key] = today
+            end_dates[key] = ref + timedelta(days=round(life / per_day))
 
     if not any(item.get(k) for k in ("life_years", "life_hours", "life_cycles")):
         missing.append("normative")
