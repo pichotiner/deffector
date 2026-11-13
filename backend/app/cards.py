@@ -42,13 +42,20 @@ def calc(item, today=None):
                               s["resource_approaching_percent"], s["maintenance_warning_days"])
 
 
-def attention(c, res, vis, params):
-    """Правило attention.level (README плана, 5.1). Причины — от серьёзных к менее серьёзным."""
+def attention(c, res, vis, params, open_defect=None):
+    """Правило attention.level (README плана, 5.1). Причины — от серьёзных к менее серьёзным.
+
+    Дополнение к 5.1: дефект, записанный инженером (запрос 9), считается открытым и даёт
+    уровень defect, пока по узлу не записано обслуживание или замена.
+    """
     maint = res.get("maintenance") or {}
     reasons = []  # (текст, действие)
     name_acc = lower_first(c["name"])
     m_action = c.get("maintenance_action") or "Провести плановое обслуживание"
 
+    if open_defect:
+        reasons.append((f"Зафиксирован дефект: {open_defect['comment']}",
+                        "Устранить дефект и зарегистрировать обслуживание или замену"))
     if maint.get("status") == "due":
         reasons.append(("Наступил срок обслуживания", m_action))
     if res["_life_due"]:
@@ -73,7 +80,7 @@ def attention(c, res, vis, params):
                         vis["recommendation"] or "Осмотреть узел"))
 
     status = res["status"]
-    if vis["category"] == "possible_defect" or status == "due" or deviations:
+    if open_defect or vis["category"] == "possible_defect" or status == "due" or deviations:
         level = "defect"
     elif vis["category"] == "check_recommended" or status == "approaching":
         level = "check"
@@ -108,6 +115,7 @@ class Card:
         self.components = repo.components(conn, eq_id)
         self.params = [evaluate(p) for p in repo.parameters(conn, eq_id)]
         self.visuals = repo.latest_visuals(conn, eq_id)
+        self.defects = repo.open_defects(conn, eq_id)
         self._built = {}
 
     @property
@@ -125,7 +133,8 @@ class Card:
         if c["id"] not in self._built:
             res = calc(c, self.today)
             vis = visual_block(self.visuals.get(c["id"]))
-            self._built[c["id"]] = (res, vis, attention(c, res, vis, self.params_of(c["id"])))
+            self._built[c["id"]] = (res, vis, attention(c, res, vis, self.params_of(c["id"]),
+                                                        self.defects.get(c["id"])))
         return self._built[c["id"]]
 
     def component(self, c, with_history=True):

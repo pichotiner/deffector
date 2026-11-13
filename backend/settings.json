@@ -3,6 +3,7 @@
   "ai_mode": "stub",
   "ai_url": "http://127.0.0.1:8001",
   "ai_timeout_seconds": 20,
+  "ai_detect_timeout_seconds": 3,
   "resource_approaching_percent": 80,
   "maintenance_warning_days": 30,
   "identify_threshold": 0.5,

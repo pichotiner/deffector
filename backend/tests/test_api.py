@@ -201,3 +201,16 @@ def test_openapi_json_is_up_to_date():
     path = Path(__file__).resolve().parent.parent / "openapi.json"
     assert json.loads(path.read_text(encoding="utf-8")) == app.openapi(), \
         "Обновите схему: python -m app.export_openapi"
+
+
+def test_9_recorded_defect_turns_component_red_until_fixed():
+    def level():
+        return client.get("/api/equipment/PU-001/components/C-04").json()["attention"]
+    assert level()["level"] == "none"
+    client.post("/api/equipment/PU-001/inspections",
+                json={"component_id": "C-04", "type": "defect", "comment": "Течь по сальнику"})
+    a = level()
+    assert a["level"] == "defect" and a["reasons"][0] == "Зафиксирован дефект: Течь по сальнику"
+    client.post("/api/equipment/PU-001/inspections",
+                json={"component_id": "C-04", "type": "maintenance", "comment": "Подтянут сальник"})
+    assert level()["level"] == "none"

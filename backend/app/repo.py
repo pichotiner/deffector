@@ -57,6 +57,19 @@ def last_inspection_dates(conn, eq_id):
         "WHERE equipment_id = ? AND component_id IS NOT NULL GROUP BY component_id", (eq_id,))}
 
 
+def open_defects(conn, eq_id):
+    """Последний записанный дефект по узлу, если после него не было обслуживания или замены."""
+    out = {}
+    for r in rows(conn.execute(
+            "SELECT * FROM inspection WHERE equipment_id = ? AND component_id IS NOT NULL "
+            "ORDER BY performed_at, id", (eq_id,))):
+        if r["type"] == "defect":
+            out[r["component_id"]] = r
+        elif r["type"] in ("maintenance", "replacement"):
+            out.pop(r["component_id"], None)
+    return out
+
+
 def add_visual(conn, eq_id, cid, v):
     conn.execute(
         "INSERT INTO visual_result (equipment_id, component_id, category, signs, explanation, "
