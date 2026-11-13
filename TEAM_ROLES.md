@@ -106,3 +106,7 @@ Owns the data, the calculations, and the integration of the three parts.
 | 4.5 Digital twin | card screens | — | **owner** |
 | 4.6 Recording inspection results | forms | — | storage and history |
 | 5. Presentation and architecture | app demo | AI section, limitations | **owner** |
+
+## Detailed plans
+
+Detailed work plans for each role (in Russian) are in [plan/](plan/README.md).
