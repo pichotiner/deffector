@@ -55,7 +55,7 @@ async def _validation_error(_: Request, exc: RequestValidationError):
 @app.exception_handler(ai_client.AiUnavailable)
 async def _ai_error(_: Request, exc: ai_client.AiUnavailable):
     return _error(503, "ai_unavailable",
-                  "ИИ-сервис не отвечает. Проверьте, что он запущен, и повторите")
+                  "ИИ-сервис не отвечает или вернул ошибку. Проверьте, что он запущен, и повторите")
 
 
 # ---------- вспомогательное ----------

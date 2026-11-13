@@ -36,6 +36,10 @@ def _multipart(fields, image):
     return b"".join(parts), f"multipart/form-data; boundary={boundary}"
 
 
+# Только локальная сеть: системные прокси (в Windows — из реестра) не используем.
+_OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))
+
+
 def _request(path, fields=None, image=None, timeout=None):
     url = config.SETTINGS["ai_url"].rstrip("/") + path
     timeout = timeout or config.SETTINGS["ai_timeout_seconds"]
@@ -45,7 +49,7 @@ def _request(path, fields=None, image=None, timeout=None):
         body, ctype = _multipart(fields or [], image)
         req = urllib.request.Request(url, data=body, headers={"Content-Type": ctype})
     try:
-        with urllib.request.urlopen(req, timeout=timeout) as r:
+        with _OPENER.open(req, timeout=timeout) as r:
             return json.loads(r.read().decode("utf-8"))
     except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
         raise AiUnavailable(str(e)) from e
@@ -73,13 +77,14 @@ def detect(image, equipment_id, classes):
     """→ [{bbox, cv_class, confidence}]"""
     if mode() == "stub":
         return [{**d, "bbox": _jitter(d["bbox"])} for d in ai_stub.DETECT.get(equipment_id, [])]
-    data = _request("/detect", [("classes", ",".join(classes))], image)
+    data = _request("/detect", [("classes", ",".join(classes))], image,
+                    timeout=config.SETTINGS["ai_detect_timeout_seconds"])
     items = data.get("detections", data) if isinstance(data, dict) else data
     out = []
     for d in items:
         try:
-            x, y, w, h = (float(v) for v in d["bbox"])
-            out.append({"bbox": [x, y, w, h], "cv_class": str(d["cv_class"]),
+            x, y, w, h = (min(max(float(v), 0.0), 1.0) for v in d["bbox"])
+            out.append({"bbox": [x, y, min(w, 1 - x), min(h, 1 - y)], "cv_class": str(d["cv_class"]),
                         "confidence": float(d["confidence"])})
         except (KeyError, TypeError, ValueError):
             continue
