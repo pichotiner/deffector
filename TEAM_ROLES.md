@@ -7,19 +7,20 @@ components needing attention over the camera image, and saves inspection results
 
 The work splits into three roles along the three natural seams of the system:
 what the engineer sees (app + AR), what the AI decides (vision), and what the
-system knows (data + calculations). Names are placeholders — assign by skills.
+system knows (data + calculations). Members 2 and 3 are still placeholders — assign by skills.
 
 | | Role | Owns requirements |
 |---|---|---|
-| Member 1 | Mobile & AR developer | 4.1 (identification UI), 4.4, 4.6 (UI) |
+| Pavel | Mobile & AR developer | 4.1 (identification UI), 4.4, 4.6 (UI) |
 | Member 2 | AI / computer vision engineer | 4.2 |
 | Member 3 | Backend, data & digital twin — also team lead and presenter | 4.3, 4.5, 4.1 and 4.6 (server side), section 5 presentation |
 
 ---
 
-## Member 1 — Mobile & AR developer
+## Pavel — Mobile & AR developer (Android)
 
-Owns everything the engineer touches on the phone or tablet.
+Owns everything the engineer touches on the phone or tablet. The app targets Android:
+Pavel has the only Android phone in the team, so his device is also the demo device.
 
 - Camera screen and equipment identification: QR code / marking / serial number scan.
 - Manual equipment selection when automatic recognition fails or is wrong.
@@ -43,7 +44,7 @@ Owns the vision pipeline and the wording of its conclusions.
   explicitly allows limiting scope) — for example corrosion, leaks, mechanical damage.
 - Collect and label the image set for the demo equipment.
 - Component recognition: detect components in the frame and return their positions
-  so Member 1 can draw the overlay.
+  so Pavel can draw the overlay.
 - Defect detection and classification into exactly three categories:
   "no visible problems found", "inspection recommended",
   "signs of a possible defect found".
@@ -87,16 +88,16 @@ Owns the data, the calculations, and the integration of the three parts.
 
 1. **Demo equipment** — one or two concrete samples everybody builds around.
 2. **Component list** — the same component IDs are used in the database (Member 3),
-   in the vision model's classes (Member 2) and in the overlay (Member 1).
-3. **Two contracts** — the backend API (Member 1 ↔ Member 3) and the analysis
-   response format (Member 2 ↔ Members 1 and 3). With these fixed, each member can
+   in the vision model's classes (Member 2) and in the overlay (Pavel).
+3. **Two contracts** — the backend API (Pavel ↔ Member 3) and the analysis
+   response format (Member 2 ↔ Pavel and Member 3). With these fixed, each member can
    work against mock data until the real parts are ready.
 4. **Status scheme** — one set of colours and icons for the three AI categories and
    the service-life states.
 
 ## Requirement coverage
 
-| Requirement | Member 1 | Member 2 | Member 3 |
+| Requirement | Pavel | Member 2 | Member 3 |
 |---|---|---|---|
 | 4.1 Equipment identification | scan and manual selection UI | recognition by image (optional) | lookup, card, parameter deviations |
 | 4.2 AI analysis of components | shows results | **owner** | supplies card data for matching |
