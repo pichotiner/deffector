@@ -18,7 +18,6 @@
     "valve": {
       "name": "Запорная арматура",
       "prompts": [
-        "a photo of a valve",
         "a photo of a gate valve",
         "a photo of a ball valve"
       ],
@@ -27,9 +26,10 @@
     "flange": {
       "name": "Фланцевое соединение",
       "prompts": [
-        "a photo of a pipe flange"
+        "a photo of a pipe flange",
+        "a photo of a flanged joint"
       ],
-      "threshold": 0.31
+      "threshold": 0.3
     }
   }
 }

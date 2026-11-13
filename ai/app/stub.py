@@ -60,6 +60,6 @@ def identify() -> dict:
         "recognized": True,
         "candidates": [
             {"equipment_id": "PU-001", "confidence": 0.82},
-            {"equipment_id": "CC-001", "confidence": 0.11},
+            {"equipment_id": "PU-002", "confidence": 0.11},
         ],
     }

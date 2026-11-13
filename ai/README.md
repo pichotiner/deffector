@@ -39,7 +39,8 @@ python ai/run.py --stub
    ```
 
 Сервис слушает `http://127.0.0.1:8001`. Готовность — `GET /health`: пока модели
-загружаются, `status` равен `loading`; когда всё готово — `ok` и `ready: true`.
+загружаются, ответ с кодом 503 и `status: "loading"`; когда всё готово — код 200,
+`status: "ok"` и `ready: true`. Стенд целиком запускается из корня: `python stand.py`.
 `run.py` сам запускает Ollama, если она ещё не запущена.
 
 Чтобы принимать запросы с другой машины сети: `python ai/run.py --host 0.0.0.0`.
@@ -103,7 +104,7 @@ Grounding DINO склеивал названия классов. OWLv2 верн�
     "identifier": {"name": "clip", "ready": true, "error": null, "load_seconds": 2.0}
   },
   "classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
-  "reference_photos": {"PU-001": 1},
+  "reference_photos": {"PU-001": 4, "PU-002": 3},
   "gpu": {"name": "…", "memory_total_mb": 12282, "memory_used_mb": 9100}
 }
 ```
@@ -142,7 +143,8 @@ Grounding DINO склеивал названия классов. OWLv2 верн�
 ```
 
 - `category` — строго `no_visible_issues`, `check_recommended` или `possible_defect`;
-- `signs` — только из списка: `коррозия`, `течь/подтёки`, `механическое повреждение`;
+- `signs` — только из списка: `коррозия`, `течь/подтёки`, `механическое повреждение`,
+  `следы перегрева` (последний — только для `electric_motor`, у других типов код его отбрасывает);
 - `assessment_confidence` — оценка самой модели, **не калиброванная вероятность**;
 - `image_quality` — `ok` или `poor`.
 
@@ -170,13 +172,14 @@ Grounding DINO склеивал названия классов. OWLv2 верн�
   "recognized": true,
   "candidates": [
     {"equipment_id": "PU-001", "confidence": 0.82},
-    {"equipment_id": "CC-001", "confidence": 0.11}
+    {"equipment_id": "PU-002", "confidence": 0.11}
   ]
 }
 ```
 
-Оценка образца — среднее сходство с тремя самыми похожими эталонами. `recognized: true`,
-если лучшая оценка не ниже порога (`AI_IDENTIFY_THRESHOLD`, по умолчанию 0,70).
+Оценка образца — сходство кадра с ближайшим эталоном этого образца. `recognized: true`,
+если лучшая оценка не ниже порога (`AI_IDENTIFY_THRESHOLD`, по умолчанию 0,66).
+Какие эталоны лежат и как их подготовить к показу — [demo/reference/README.md](../demo/reference/README.md).
 `confidence` — доля образца среди кандидатов, умноженная на близость к эталонам:
 у постороннего предмета она близка к нулю у всех кандидатов. Эталоны читаются при
 старте — после добавления фото сервис нужно перезапустить.
@@ -192,7 +195,7 @@ Grounding DINO склеивал названия классов. OWLv2 верн�
 | `/analyze`, `component_type=pressure_gauge` | `check_recommended`, признак «коррозия» |
 | `/analyze`, `component_type=flange` | `possible_defect`, признак «течь/подтёки» |
 | `/analyze`, `component_type=valve` | плохой снимок: `image_quality: "poor"`, `check_recommended` |
-| `/identify` | `PU-001` — 0,82, `CC-001` — 0,11, `recognized: true` |
+| `/identify` | `PU-001` — 0,82, `PU-002` — 0,11, `recognized: true` |
 
 Примеры ответов `/detect` в заглушке:
 
@@ -226,7 +229,7 @@ Grounding DINO склеивал названия классов. OWLv2 верн�
 | `AI_VLM_MODEL` | `qwen2.5vl:7b` | модель в Ollama |
 | `AI_OLLAMA_URL` | `http://127.0.0.1:11434` | адрес Ollama |
 | `AI_ANALYZE_TIMEOUT_S` | `15` | предел времени на `/analyze` |
-| `AI_IDENTIFY_THRESHOLD` | `0.70` | порог распознавания образца |
+| `AI_IDENTIFY_THRESHOLD` | `0.66` | порог распознавания образца |
 | `AI_DETECTOR_MAX_AREA` | `0.85` | рамки больше этой доли кадра отбрасываются |
 | `AI_MIN_BRIGHTNESS`, `AI_MIN_SHARPNESS`, `AI_MIN_SIDE_PX` | `30`, `15`, `64` | пороги проверки качества снимка |
 
@@ -275,7 +278,8 @@ ai/.venv/Scripts/python ai/tools/evaluate.py --draw eval_out
 - на посторонних фото (комната, автомобиль) рамок нет; `/identify` на них отвечает
   `recognized: false`;
 - сходство кадра с эталоном насоса: тот же образец с поворотом, обрезкой, затемнением
-  и на постороннем фоне — 0,8 и выше; другие насосы и узлы — не выше 0,59. Порог 0,70;
+  и на постороннем фоне — 0,8 и выше; другие насосы и узлы — не выше 0,59 (замер на первом
+  наборе эталонов; результаты на эталонах `PU-001` и `PU-002` — в `demo/reference/README.md`);
 - младшая модель `qwen2.5vl:3b` для `/analyze` не годится: на всех снимках объявила
   качество плохим и выдумывала трещины.
 
@@ -298,7 +302,7 @@ ai/.venv/Scripts/python ai/tools/evaluate.py --draw eval_out
   на «автоматический анализ не выполнен»);
 - дополнить набор `demo/photos` своими снимками (в плане — 20–30): сейчас в нём 15 открытых
   фото, нет кадров с течью и механическим повреждением и нет шкафа управления;
-- положить эталонные фото в `demo/reference/CC-001/` и добавить фото в
+- положить эталонные фото в `demo/reference/PU-002/` и добавить фото в
   `demo/reference/PU-001/` (сейчас одно), подобрать порог идентификации на них;
 - проверить вживую с телефона: распечатки, фото на мониторе, разное освещение.
 

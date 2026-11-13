@@ -18,7 +18,12 @@ SIGNS = {
     "corrosion": "коррозия",
     "leak": "течь/подтёки",
     "mechanical_damage": "механическое повреждение",
+    "overheating": "следы перегрева",
 }
+
+# Признаки, которые имеют смысл только для некоторых типов узлов (перечень дефектов заказчика:
+# следы перегрева — у электродвигателя). Для остальных типов код такой признак отбрасывает.
+SIGN_TYPES = {"overheating": {"electric_motor"}}
 
 # Слова, которыми результат подавать нельзя: утверждение исправности, диагноз,
 # внутренняя неисправность. Проверяются по началу слова, без учёта регистра.
@@ -95,6 +100,8 @@ def template_recommendation(category: str, signs: list[str]) -> str:
         parts.append("проверить герметичность соединений и уплотнений")
     if SIGNS["mechanical_damage"] in signs:
         parts.append("осмотреть место повреждения и проверить целостность корпуса")
+    if SIGNS["overheating"] in signs:
+        parts.append("проверить нагрев корпуса и состояние клеммной коробки и изоляции кабелей")
     if not parts:
         return "Осмотреть узел на месте."
     text = "; ".join(parts) + "."
@@ -177,8 +184,15 @@ def parse_model_answer(raw: dict) -> Assessment:
     )
 
 
-def enforce(assessment: Assessment, component_name: str) -> Assessment:
+def allowed_signs(component_type: str) -> list[str]:
+    """Коды признаков, допустимые для типа узла."""
+    return [code for code in SIGNS if code not in SIGN_TYPES or component_type in SIGN_TYPES[code]]
+
+
+def enforce(assessment: Assessment, component_name: str, component_type: str = "") -> Assessment:
     """Приводит разобранный ответ модели к правилам классификации и формулировок."""
+    allowed = {SIGNS[code] for code in allowed_signs(component_type)}
+    assessment = Assessment(**{**assessment.__dict__, "signs": [s for s in assessment.signs if s in allowed]})
     if assessment.image_quality == "poor":
         result = poor_quality(None)
         explanation = _clean_text(assessment.explanation)

@@ -34,7 +34,7 @@ def test_valid_answer_kept():
         {"category": "broken"},
         {"category": None},
         {"image_quality": "bad"},
-        {"signs": ["overheating"]},
+        {"signs": ["vibration"]},
         {"signs": "corrosion"},
         {"assessment_confidence": "высокая"},
         {"assessment_confidence": True},
@@ -151,3 +151,18 @@ def test_no_issues_recommendation_is_template():
                    recommendation="Ничего делать не нужно.")
     assert result.recommendation == rules.template_recommendation("no_visible_issues", [])
     assert result.explanation == "Корпус чистый, стекло целое."
+
+
+def test_overheating_only_for_motor():
+    raw = rules.parse_model_answer(answer(signs=["overheating"], category="possible_defect"))
+    motor = rules.enforce(raw, "Электродвигатель", "electric_motor")
+    assert motor.signs == ["следы перегрева"] and motor.category == "possible_defect"
+    assert "клеммной коробки" in rules.template_recommendation("possible_defect", motor.signs)
+    valve = rules.enforce(raw, "Задвижка", "valve")
+    assert valve.signs == [] and valve.category == "check_recommended"
+
+
+def test_allowed_signs():
+    assert "overheating" in rules.allowed_signs("electric_motor")
+    assert "overheating" not in rules.allowed_signs("flange")
+    assert rules.allowed_signs("flange") == ["corrosion", "leak", "mechanical_damage"]

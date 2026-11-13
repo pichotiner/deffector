@@ -218,7 +218,9 @@ def create_app() -> FastAPI:
 
     @app.get("/health")
     def health():
-        return service.health()
+        info = service.health()
+        # пока модели загружаются — 503: бэкенд и стенд считают сервис готовым по коду 200
+        return JSONResponse(status_code=503 if info["status"] == "loading" else 200, content=info)
 
     @app.post("/detect")
     async def detect(image: UploadFile = File(...), classes: list[str] | None = Form(None)):

@@ -71,8 +71,8 @@ class Settings:
 
     # Идентификация по изображению
     clip_dir: str = "clip"
-    identify_threshold: float = 0.70
-    identify_top_k: int = 3
+    identify_threshold: float = 0.66
+    identify_top_k: int = 1
     identify_temperature: float = 0.03
 
     # Проверка качества снимка кодом
@@ -128,8 +128,8 @@ def load_settings() -> Settings:
         vlm_num_ctx=int(_env("VLM_NUM_CTX", "4096")),
         warmup=_env_bool("WARMUP", True),
         clip_dir=_env("CLIP_DIR", "clip"),
-        identify_threshold=float(_env("IDENTIFY_THRESHOLD", "0.70")),
-        identify_top_k=int(_env("IDENTIFY_TOP_K", "3")),
+        identify_threshold=float(_env("IDENTIFY_THRESHOLD", "0.66")),
+        identify_top_k=int(_env("IDENTIFY_TOP_K", "1")),
         identify_temperature=float(_env("IDENTIFY_TEMPERATURE", "0.03")),
         min_side_px=int(_env("MIN_SIDE_PX", "64")),
         min_brightness=float(_env("MIN_BRIGHTNESS", "30")),

@@ -19,7 +19,7 @@ import httpx
 from PIL import Image, ImageDraw
 
 REPO = Path(__file__).resolve().parents[2]
-SIGN_TEXT = {"corrosion": "коррозия", "leak": "течь/подтёки", "mechanical_damage": "механическое повреждение"}
+SIGN_TEXT = {"corrosion": "коррозия", "leak": "течь/подтёки", "mechanical_damage": "механическое повреждение", "overheating": "следы перегрева"}
 COLORS = {"electric_motor": "#e6194b", "pressure_gauge": "#3cb44b", "valve": "#4363d8", "flange": "#f58231"}
 
 
@@ -70,14 +70,17 @@ def main() -> None:
         detect_ms.append((time.perf_counter() - started) * 1000)
         counts = Counter(d["cv_class"] for d in detections)
         for cv_class in classes:
+            if cv_class in label.get("skip", []):
+                continue
             want, got = label["nodes"].get(cv_class, 0), counts.get(cv_class, 0)
             labeled[cv_class] += want
             found[cv_class] += min(want, got)
             false_boxes += max(0, got - want)
         entry = {"detections": detections}
-        line = f"{name}: рамки {dict(counts)} (ожидалось {label['nodes']})"
+        line = f"{Path(name).name}: рамки {dict(counts)} (ожидалось {label['nodes']})"
         if args.draw:
-            draw(args.photos / name, detections, args.draw / name)
+            flat = name.replace("../", "").replace("/", "__")  # фото заказчика лежат вне папки набора
+            draw(args.photos / name, detections, args.draw / Path(flat).with_suffix(".jpg"))
 
         task = label.get("analyze")
         if task and not args.skip_analyze:
@@ -105,7 +108,7 @@ def main() -> None:
                 clean_as_defect += category == "possible_defect"
             line += f"\n    анализ: {category} {signs} — {result.get('explanation')}"
         report[name] = entry
-        print(line)
+        print(line, flush=True)
 
     def ms(values: list[float]) -> str:
         if not values:
