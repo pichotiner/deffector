@@ -7,13 +7,13 @@ components needing attention over the camera image, and saves inspection results
 
 The work splits into three roles along the three natural seams of the system:
 what the engineer sees (app + AR), what the AI decides (vision), and what the
-system knows (data + calculations). Members 2 and 3 are still placeholders — assign by skills.
+system knows (data + calculations). 
 
 | | Role | Owns requirements |
 |---|---|---|
 | Pavel | Mobile & AR developer | 4.1 (identification UI), 4.4, 4.6 (UI) |
-| Member 2 | AI / computer vision engineer | 4.2 |
-| Member 3 | Backend, data & digital twin — also team lead and presenter | 4.3, 4.5, 4.1 and 4.6 (server side), section 5 presentation |
+| Andrey | AI / computer vision engineer | 4.2 |
+| Timofey | Backend, data & digital twin — also team lead and presenter | 4.3, 4.5, 4.1 and 4.6 (server side), section 5 presentation |
 
 ---
 
@@ -36,7 +36,7 @@ Pavel has the only Android phone in the team, so his device is also the demo dev
 
 **Delivers:** the installable app that runs the full 10-step user scenario.
 
-## Member 2 — AI / computer vision engineer
+## Andrey — AI / computer vision engineer
 
 Owns the vision pipeline and the wording of its conclusions.
 
@@ -57,7 +57,7 @@ Owns the vision pipeline and the wording of its conclusions.
 **Delivers:** an analysis service — image in; components, positions, category,
 confidence, explanation out.
 
-## Member 3 — Backend, data & digital twin (team lead, presenter)
+## Timofey — Backend, data & digital twin (team lead, presenter)
 
 Owns the data, the calculations, and the integration of the three parts.
 
@@ -74,7 +74,7 @@ Owns the data, the calculations, and the integration of the three parts.
 - Keep three things separate in the data and in the API response: standard service
   life, calculated remaining life, and the result of the visual analysis. When data
   is insufficient for a reliable estimate, return that limitation explicitly.
-- Combine the life calculation with Member 2's visual result into one status per
+- Combine the life calculation with Andrey's visual result into one status per
   component.
 - Saving inspections, defects, maintenance and replacements into the equipment history.
 - Integration, deployment of the demo, and the final presentation: architecture,
@@ -87,17 +87,17 @@ Owns the data, the calculations, and the integration of the three parts.
 ## Agree on this first (all three, before coding)
 
 1. **Demo equipment** — one or two concrete samples everybody builds around.
-2. **Component list** — the same component IDs are used in the database (Member 3),
-   in the vision model's classes (Member 2) and in the overlay (Pavel).
-3. **Two contracts** — the backend API (Pavel ↔ Member 3) and the analysis
-   response format (Member 2 ↔ Pavel and Member 3). With these fixed, each member can
+2. **Component list** — the same component IDs are used in the database (Timofey),
+   in the vision model's classes (Andrey) and in the overlay (Pavel).
+3. **Two contracts** — the backend API (Pavel ↔ Timofey) and the analysis
+   response format (Andrey ↔ Pavel and Timofey). With these fixed, each member can
    work against mock data until the real parts are ready.
 4. **Status scheme** — one set of colours and icons for the three AI categories and
    the service-life states.
 
 ## Requirement coverage
 
-| Requirement | Pavel | Member 2 | Member 3 |
+| Requirement | Pavel | Andrey | Timofey |
 |---|---|---|---|
 | 4.1 Equipment identification | scan and manual selection UI | recognition by image (optional) | lookup, card, parameter deviations |
 | 4.2 AI analysis of components | shows results | **owner** | supplies card data for matching |
