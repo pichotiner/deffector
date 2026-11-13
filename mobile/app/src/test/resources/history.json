@@ -1,0 +1,138 @@
+{
+  "items": [
+    {
+      "id": 14,
+      "component_id": "C-02",
+      "type": "defect",
+      "comment": "Тест мобильного клиента",
+      "performed_by": "Тест",
+      "performed_at": "2026-11-13T16:46:47+03:00",
+      "visual": {
+        "category": "check_recommended",
+        "signs": [
+          "следы коррозии"
+        ],
+        "explanation": "На поверхности узла видны рыжие пятна, похожие на коррозию",
+        "recommendation": "Осмотреть узел вблизи, оценить глубину коррозии",
+        "detection_confidence": null,
+        "assessment_confidence": 0.65,
+        "analyzed_at": "2026-11-13T16:46:47+03:00",
+        "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+        "note": null
+      },
+      "recommendation": "Осмотреть узел вблизи, оценить глубину коррозии"
+    },
+    {
+      "id": 9,
+      "component_id": "C-04",
+      "type": "checked",
+      "comment": "Задвижка осмотрена, замечаний нет",
+      "performed_by": "Инженер Петров",
+      "performed_at": "2026-11-12T16:32:00+03:00",
+      "visual": {
+        "category": "no_visible_issues",
+        "signs": [],
+        "explanation": "Корпус и шток задвижки чистые, подтёков и повреждений не видно",
+        "recommendation": "Продолжить плановые осмотры",
+        "detection_confidence": 0.91,
+        "assessment_confidence": 0.8,
+        "analyzed_at": "2026-11-12T16:30:00+03:00",
+        "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+        "note": null
+      },
+      "recommendation": "Продолжить плановые осмотры"
+    },
+    {
+      "id": 8,
+      "component_id": "N-02",
+      "type": "remark",
+      "comment": "Пятна ржавчины у лап крепления двигателя",
+      "performed_by": "Инженер Петров",
+      "performed_at": "2026-11-12T16:22:00+03:00",
+      "visual": {
+        "category": "possible_defect",
+        "signs": [
+          "следы коррозии на корпусе"
+        ],
+        "explanation": "На корпусе двигателя у лап крепления видны рыжие пятна, похожие на коррозию",
+        "recommendation": "Осмотреть корпус и лапы крепления, оценить глубину коррозии",
+        "detection_confidence": 0.93,
+        "assessment_confidence": 0.7,
+        "analyzed_at": "2026-11-12T16:20:00+03:00",
+        "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+        "note": null
+      },
+      "recommendation": "Оценить глубину коррозии при ближайшем ТО"
+    },
+    {
+      "id": 7,
+      "component_id": "N-01",
+      "type": "maintenance",
+      "comment": "ТО-1: течей через уплотнения нет, нагрев и шум в норме, фланцы подтянуты",
+      "performed_by": "Инженер Петров",
+      "performed_at": "2026-06-04T09:30:00+03:00",
+      "visual": null,
+      "recommendation": "Следующее ТО-1 через 4000 ч (≈ 167 суток)"
+    },
+    {
+      "id": 6,
+      "component_id": "C-09",
+      "type": "maintenance",
+      "comment": "ТО-2: зазор муфты 5 мм, уплотнительные кольца заменены, крышка вентилятора очищена",
+      "performed_by": "Инженер Петров",
+      "performed_at": "2026-01-20T09:30:00+03:00",
+      "visual": null,
+      "recommendation": "Следующее ТО-2 через 8000 ч"
+    },
+    {
+      "id": 5,
+      "component_id": "C-03",
+      "type": "checked",
+      "comment": "Ход задвижки плавный, течи по сальнику нет",
+      "performed_by": "Инженер Сидоров",
+      "performed_at": "2026-01-15T14:00:00+03:00",
+      "visual": null,
+      "recommendation": "Подготовить замену при выработке 90 % ресурса по циклам"
+    },
+    {
+      "id": 4,
+      "component_id": "C-02",
+      "type": "maintenance",
+      "comment": "Поверка манометра",
+      "performed_by": "Инженер Иванов",
+      "performed_at": "2025-11-02T10:00:00+03:00",
+      "visual": null,
+      "recommendation": "Следующая поверка через 12 месяцев"
+    },
+    {
+      "id": 3,
+      "component_id": "C-06",
+      "type": "replacement",
+      "comment": "Замена торцевого уплотнения после сухого хода — обязательна по документации Wilo",
+      "performed_by": "Инженер Сидоров",
+      "performed_at": "2025-01-20T10:00:00+03:00",
+      "visual": null,
+      "recommendation": "Не допускать сухого хода: проверить защиту по уровню во всасывающей ёмкости"
+    },
+    {
+      "id": 2,
+      "component_id": "C-02",
+      "type": "replacement",
+      "comment": "Замена манометра: разбито стекло",
+      "performed_by": "Инженер Иванов",
+      "performed_at": "2024-11-05T11:00:00+03:00",
+      "visual": null,
+      "recommendation": null
+    },
+    {
+      "id": 1,
+      "component_id": null,
+      "type": "checked",
+      "comment": "Ввод в эксплуатацию: направление вращения верное, течей нет, воздух удалён",
+      "performed_by": "Инженер Петров",
+      "performed_at": "2024-03-01T10:00:00+03:00",
+      "visual": null,
+      "recommendation": "Регламент Wilo: ТО-1 каждые 4000 ч, ТО-2 — 8000 ч, ревизия — 15 000–16 000 ч"
+    }
+  ]
+}

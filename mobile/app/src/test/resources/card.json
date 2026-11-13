@@ -1,0 +1,1250 @@
+{
+  "id": "PU-001",
+  "name": "Насосный агрегат",
+  "model": "Wilo CronoLine-IL 65/160-5,5/2",
+  "manufacturer": "WILO SE",
+  "serial_number": "SN2024-004587",
+  "marking": "PU-001",
+  "qr_code": "KST:PU-001",
+  "location": "Насосная станция, зал 1",
+  "commissioned_at": "2024-03-01",
+  "characteristics": [
+    {
+      "name": "Тип",
+      "value": "центробежный, inline, с сухим ротором",
+      "unit": null
+    },
+    {
+      "name": "Подача",
+      "value": "47",
+      "unit": "м³/ч"
+    },
+    {
+      "name": "Напор",
+      "value": "31,7",
+      "unit": "м"
+    },
+    {
+      "name": "Мощность двигателя",
+      "value": "5,5",
+      "unit": "кВт"
+    },
+    {
+      "name": "Частота вращения",
+      "value": "2900",
+      "unit": "об/мин"
+    },
+    {
+      "name": "Фланцы",
+      "value": "DN 65, PN 16",
+      "unit": null
+    },
+    {
+      "name": "Среда",
+      "value": "вода, водогликолевые смеси до 40 %",
+      "unit": null
+    }
+  ],
+  "normative": {
+    "life_years": null,
+    "life_hours": null,
+    "life_cycles": null,
+    "maintenance_interval_days": 167
+  },
+  "usage": {
+    "operating_hours": 20600.0,
+    "cycles": null
+  },
+  "resource": {
+    "status": "approaching",
+    "used_percent": null,
+    "remaining": {
+      "years": null,
+      "hours": null,
+      "cycles": null
+    },
+    "estimated_end_date": null,
+    "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+    "missing_data": [
+      "normative"
+    ],
+    "maintenance": {
+      "next_due_date": "2026-11-18",
+      "status": "approaching",
+      "overdue_days": null,
+      "days_left": 5
+    },
+    "message": "До обслуживания 5 дней"
+  },
+  "parameters": [
+    {
+      "id": "P-01",
+      "equipment_id": "PU-001",
+      "component_id": "C-02",
+      "name": "Давление на выходе",
+      "value": 4.4,
+      "unit": "бар",
+      "setpoint_min": 2.5,
+      "setpoint_max": 4.0,
+      "measured_at": "2026-11-13T09:40:00+03:00",
+      "status": "deviation",
+      "message": "Выше верхней уставки на 0,4 бар"
+    },
+    {
+      "id": "P-02",
+      "equipment_id": "PU-001",
+      "component_id": "C-08",
+      "name": "Вибрация на оборотной частоте (1x)",
+      "value": 0.8,
+      "unit": "мм/с",
+      "setpoint_min": null,
+      "setpoint_max": 2.8,
+      "measured_at": "2026-11-13T09:00:00+03:00",
+      "status": "normal",
+      "message": "В норме"
+    },
+    {
+      "id": "P-03",
+      "equipment_id": "PU-001",
+      "component_id": "N-01",
+      "name": "Виброскорость общая (СКЗ)",
+      "value": 0.99,
+      "unit": "мм/с",
+      "setpoint_min": null,
+      "setpoint_max": 1.8,
+      "measured_at": "2026-11-13T09:00:00+03:00",
+      "status": "normal",
+      "message": "В норме"
+    },
+    {
+      "id": "P-04",
+      "equipment_id": "PU-001",
+      "component_id": "C-09",
+      "name": "Вибрация на удвоенной частоте (2x)",
+      "value": 0.22,
+      "unit": "мм/с",
+      "setpoint_min": null,
+      "setpoint_max": 1.8,
+      "measured_at": "2026-11-13T09:00:00+03:00",
+      "status": "normal",
+      "message": "В норме"
+    },
+    {
+      "id": "P-05",
+      "equipment_id": "PU-001",
+      "component_id": "C-07",
+      "name": "Высокочастотный шум",
+      "value": 0.13,
+      "unit": "g",
+      "setpoint_min": null,
+      "setpoint_max": 2.5,
+      "measured_at": "2026-11-13T09:00:00+03:00",
+      "status": "normal",
+      "message": "В норме"
+    },
+    {
+      "id": "P-06",
+      "equipment_id": "PU-001",
+      "component_id": "N-01",
+      "name": "Температура подшипника насоса",
+      "value": 50.1,
+      "unit": "°C",
+      "setpoint_min": null,
+      "setpoint_max": 75.0,
+      "measured_at": "2026-11-13T09:00:00+03:00",
+      "status": "normal",
+      "message": "В норме"
+    },
+    {
+      "id": "P-07",
+      "equipment_id": "PU-001",
+      "component_id": "N-02",
+      "name": "Температура обмоток электродвигателя",
+      "value": 65.0,
+      "unit": "°C",
+      "setpoint_min": null,
+      "setpoint_max": 90.0,
+      "measured_at": "2026-11-13T09:00:00+03:00",
+      "status": "normal",
+      "message": "В норме"
+    },
+    {
+      "id": "P-08",
+      "equipment_id": "PU-001",
+      "component_id": "N-02",
+      "name": "Частота вращения",
+      "value": 2948.0,
+      "unit": "об/мин",
+      "setpoint_min": null,
+      "setpoint_max": null,
+      "measured_at": "2026-11-13T09:00:00+03:00",
+      "status": "normal",
+      "message": "В норме"
+    },
+    {
+      "id": "P-09",
+      "equipment_id": "PU-001",
+      "component_id": "C-03",
+      "name": "Давление на входе",
+      "value": null,
+      "unit": "бар",
+      "setpoint_min": 0.5,
+      "setpoint_max": null,
+      "measured_at": null,
+      "status": "no_data",
+      "message": "Нет данных"
+    }
+  ],
+  "deviations_count": 1,
+  "components": [
+    {
+      "id": "N-02",
+      "parent_id": null,
+      "kind": "node",
+      "name": "Электродвигатель 5,5 кВт",
+      "type": "electric_motor",
+      "type_name": "Электродвигатель",
+      "order": 0,
+      "characteristics": [
+        {
+          "name": "Мощность",
+          "value": "5,5",
+          "unit": "кВт"
+        },
+        {
+          "name": "Класс энергоэффективности",
+          "value": "IE2",
+          "unit": null
+        },
+        {
+          "name": "Частота вращения",
+          "value": "2900",
+          "unit": "об/мин"
+        },
+        {
+          "name": "Класс изоляции",
+          "value": "F",
+          "unit": null
+        },
+        {
+          "name": "Степень защиты",
+          "value": "IP 55",
+          "unit": null
+        }
+      ],
+      "installed_at": "2024-03-01",
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": null,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": 20600.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "insufficient_data",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+        "missing_data": [
+          "normative"
+        ],
+        "maintenance": null,
+        "message": "Недостаточно данных для оценки ресурса"
+      },
+      "visual": {
+        "category": "possible_defect",
+        "signs": [
+          "следы коррозии на корпусе"
+        ],
+        "explanation": "На корпусе двигателя у лап крепления видны рыжие пятна, похожие на коррозию",
+        "recommendation": "Осмотреть корпус и лапы крепления, оценить глубину коррозии",
+        "detection_confidence": 0.93,
+        "assessment_confidence": 0.7,
+        "analyzed_at": "2026-11-12T16:20:00+03:00",
+        "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+        "note": null
+      },
+      "attention": {
+        "level": "defect",
+        "reasons": [
+          "Обнаружены признаки возможного дефекта: следы коррозии на корпусе"
+        ],
+        "recommended_action": "Осмотреть корпус и лапы крепления, оценить глубину коррозии"
+      },
+      "parameters": [
+        "P-07",
+        "P-08"
+      ],
+      "previous_results": [
+        {
+          "id": 8,
+          "component_id": "N-02",
+          "type": "remark",
+          "comment": "Пятна ржавчины у лап крепления двигателя",
+          "performed_by": "Инженер Петров",
+          "performed_at": "2026-11-12T16:22:00+03:00",
+          "visual": {
+            "category": "possible_defect",
+            "signs": [
+              "следы коррозии на корпусе"
+            ],
+            "explanation": "На корпусе двигателя у лап крепления видны рыжие пятна, похожие на коррозию",
+            "recommendation": "Осмотреть корпус и лапы крепления, оценить глубину коррозии",
+            "detection_confidence": 0.93,
+            "assessment_confidence": 0.7,
+            "analyzed_at": "2026-11-12T16:20:00+03:00",
+            "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+            "note": null
+          },
+          "recommendation": "Оценить глубину коррозии при ближайшем ТО"
+        }
+      ]
+    },
+    {
+      "id": "N-03",
+      "parent_id": null,
+      "kind": "node",
+      "name": "Трубопроводная обвязка DN 65",
+      "type": "pipeline",
+      "type_name": "Трубопроводная обвязка",
+      "order": 1,
+      "characteristics": [
+        {
+          "name": "Условный проход",
+          "value": "65",
+          "unit": "мм"
+        },
+        {
+          "name": "Условное давление",
+          "value": "16",
+          "unit": "бар"
+        }
+      ],
+      "installed_at": "2024-03-01",
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": 25.0,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": null,
+        "cycles": null
+      },
+      "resource": {
+        "status": "ok",
+        "used_percent": 11,
+        "remaining": {
+          "years": 22.3,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": "2049-03-01",
+        "basis": "Оценка по календарному сроку от даты установки",
+        "missing_data": [],
+        "maintenance": null,
+        "message": "Ресурс в норме"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился"
+        ],
+        "recommended_action": "Осмотреть узел"
+      },
+      "parameters": [],
+      "previous_results": []
+    },
+    {
+      "id": "N-01",
+      "parent_id": null,
+      "kind": "node",
+      "name": "Насос Wilo CronoLine-IL 65/160",
+      "type": "pump",
+      "type_name": "Насос",
+      "order": 2,
+      "characteristics": [
+        {
+          "name": "Подача",
+          "value": "47",
+          "unit": "м³/ч"
+        },
+        {
+          "name": "Напор",
+          "value": "31,7",
+          "unit": "м"
+        },
+        {
+          "name": "Корпус и рабочее колесо",
+          "value": "серый чугун EN-GJL-250/200",
+          "unit": null
+        },
+        {
+          "name": "Максимальное давление",
+          "value": "16",
+          "unit": "бар"
+        }
+      ],
+      "installed_at": "2024-03-01",
+      "last_replaced_at": null,
+      "last_maintenance_at": "2026-06-04",
+      "normative": {
+        "life_years": null,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": 167
+      },
+      "usage": {
+        "operating_hours": 20600.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "approaching",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+        "missing_data": [
+          "normative"
+        ],
+        "maintenance": {
+          "next_due_date": "2026-11-18",
+          "status": "approaching",
+          "overdue_days": null,
+          "days_left": 5
+        },
+        "message": "До обслуживания 5 дней"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "check",
+        "reasons": [
+          "До обслуживания 5 дней"
+        ],
+        "recommended_action": "Провести ТО-1: уплотнения, нагрев, шум, вибрация, затяжка фланцев до 18.11.2026"
+      },
+      "parameters": [
+        "P-03",
+        "P-06"
+      ],
+      "previous_results": [
+        {
+          "id": 7,
+          "component_id": "N-01",
+          "type": "maintenance",
+          "comment": "ТО-1: течей через уплотнения нет, нагрев и шум в норме, фланцы подтянуты",
+          "performed_by": "Инженер Петров",
+          "performed_at": "2026-06-04T09:30:00+03:00",
+          "visual": null,
+          "recommendation": "Следующее ТО-1 через 4000 ч (≈ 167 суток)"
+        }
+      ]
+    },
+    {
+      "id": "C-03",
+      "parent_id": "N-03",
+      "kind": "part",
+      "name": "Задвижка на всасывающей линии 30с41нж Ду65",
+      "type": "valve",
+      "type_name": "Запорная арматура",
+      "order": 1,
+      "characteristics": [
+        {
+          "name": "Условный проход",
+          "value": "65",
+          "unit": "мм"
+        },
+        {
+          "name": "Условное давление",
+          "value": "16",
+          "unit": "бар"
+        }
+      ],
+      "installed_at": "2024-03-01",
+      "last_replaced_at": null,
+      "last_maintenance_at": "2026-01-15",
+      "normative": {
+        "life_years": 10.0,
+        "life_hours": null,
+        "life_cycles": 2000.0,
+        "maintenance_interval_days": 365
+      },
+      "usage": {
+        "operating_hours": null,
+        "cycles": 1780.0
+      },
+      "resource": {
+        "status": "approaching",
+        "used_percent": 89,
+        "remaining": {
+          "years": 7.3,
+          "hours": null,
+          "cycles": 220.0
+        },
+        "estimated_end_date": "2027-03-15",
+        "basis": "Оценка по календарному сроку и числу циклов от даты установки",
+        "missing_data": [],
+        "maintenance": {
+          "next_due_date": "2027-01-15",
+          "status": "ok",
+          "overdue_days": null,
+          "days_left": 63
+        },
+        "message": "Выработано 89 % ресурса по числу циклов"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "check",
+        "reasons": [
+          "Выработано 89 % ресурса"
+        ],
+        "recommended_action": "Запланировать замену: задвижка на всасывающей линии 30с41нж Ду65"
+      },
+      "parameters": [
+        "P-09"
+      ],
+      "previous_results": [
+        {
+          "id": 5,
+          "component_id": "C-03",
+          "type": "checked",
+          "comment": "Ход задвижки плавный, течи по сальнику нет",
+          "performed_by": "Инженер Сидоров",
+          "performed_at": "2026-01-15T14:00:00+03:00",
+          "visual": null,
+          "recommendation": "Подготовить замену при выработке 90 % ресурса по циклам"
+        }
+      ]
+    },
+    {
+      "id": "C-02",
+      "parent_id": "N-03",
+      "kind": "part",
+      "name": "Манометр на напорном патрубке МП-100",
+      "type": "pressure_gauge",
+      "type_name": "Манометр",
+      "order": 3,
+      "characteristics": [
+        {
+          "name": "Диапазон",
+          "value": "0–6",
+          "unit": "бар"
+        },
+        {
+          "name": "Класс точности",
+          "value": "1,5",
+          "unit": null
+        }
+      ],
+      "installed_at": "2024-03-01",
+      "last_replaced_at": "2024-11-05",
+      "last_maintenance_at": "2025-11-02",
+      "normative": {
+        "life_years": 8.0,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": 365
+      },
+      "usage": {
+        "operating_hours": null,
+        "cycles": null
+      },
+      "resource": {
+        "status": "due",
+        "used_percent": 25,
+        "remaining": {
+          "years": 6.0,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": "2032-11-05",
+        "basis": "Оценка по календарному сроку от даты последней замены",
+        "missing_data": [],
+        "maintenance": {
+          "next_due_date": "2026-11-02",
+          "status": "due",
+          "overdue_days": 11,
+          "days_left": null
+        },
+        "message": "Срок обслуживания наступил 11 дней назад"
+      },
+      "visual": {
+        "category": "check_recommended",
+        "signs": [
+          "подтёки на штуцере"
+        ],
+        "explanation": "У резьбового соединения манометра видны тёмные следы, похожие на подтёки",
+        "recommendation": "Проверить герметичность резьбового соединения манометра",
+        "detection_confidence": 0.87,
+        "assessment_confidence": 0.6,
+        "analyzed_at": "2026-11-12T16:25:00+03:00",
+        "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+        "note": null
+      },
+      "attention": {
+        "level": "defect",
+        "reasons": [
+          "Наступил срок обслуживания",
+          "Давление на выходе: выше верхней уставки на 0,4 бар",
+          "Рекомендуется проверка: подтёки на штуцере"
+        ],
+        "recommended_action": "Провести поверку манометра"
+      },
+      "parameters": [
+        "P-01"
+      ],
+      "previous_results": [
+        {
+          "id": 4,
+          "component_id": "C-02",
+          "type": "maintenance",
+          "comment": "Поверка манометра",
+          "performed_by": "Инженер Иванов",
+          "performed_at": "2025-11-02T10:00:00+03:00",
+          "visual": null,
+          "recommendation": "Следующая поверка через 12 месяцев"
+        },
+        {
+          "id": 2,
+          "component_id": "C-02",
+          "type": "replacement",
+          "comment": "Замена манометра: разбито стекло",
+          "performed_by": "Инженер Иванов",
+          "performed_at": "2024-11-05T11:00:00+03:00",
+          "visual": null,
+          "recommendation": null
+        }
+      ]
+    },
+    {
+      "id": "C-04",
+      "parent_id": "N-03",
+      "kind": "part",
+      "name": "Задвижка на напорной линии 30с41нж Ду65",
+      "type": "valve",
+      "type_name": "Запорная арматура",
+      "order": 4,
+      "characteristics": [
+        {
+          "name": "Условный проход",
+          "value": "65",
+          "unit": "мм"
+        },
+        {
+          "name": "Условное давление",
+          "value": "16",
+          "unit": "бар"
+        }
+      ],
+      "installed_at": "2024-03-01",
+      "last_replaced_at": null,
+      "last_maintenance_at": "2026-04-01",
+      "normative": {
+        "life_years": 10.0,
+        "life_hours": null,
+        "life_cycles": 2000.0,
+        "maintenance_interval_days": 365
+      },
+      "usage": {
+        "operating_hours": null,
+        "cycles": 310.0
+      },
+      "resource": {
+        "status": "ok",
+        "used_percent": 27,
+        "remaining": {
+          "years": 7.3,
+          "hours": null,
+          "cycles": 1690.0
+        },
+        "estimated_end_date": "2034-03-01",
+        "basis": "Оценка по календарному сроку и числу циклов от даты установки",
+        "missing_data": [],
+        "maintenance": {
+          "next_due_date": "2027-04-01",
+          "status": "ok",
+          "overdue_days": null,
+          "days_left": 139
+        },
+        "message": "Ресурс в норме"
+      },
+      "visual": {
+        "category": "no_visible_issues",
+        "signs": [],
+        "explanation": "Корпус и шток задвижки чистые, подтёков и повреждений не видно",
+        "recommendation": "Продолжить плановые осмотры",
+        "detection_confidence": 0.91,
+        "assessment_confidence": 0.8,
+        "analyzed_at": "2026-11-12T16:30:00+03:00",
+        "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+        "note": "Отсутствие видимых дефектов не подтверждает исправность оборудования"
+      },
+      "attention": {
+        "level": "none",
+        "reasons": [],
+        "recommended_action": "Продолжить плановые осмотры"
+      },
+      "parameters": [],
+      "previous_results": [
+        {
+          "id": 9,
+          "component_id": "C-04",
+          "type": "checked",
+          "comment": "Задвижка осмотрена, замечаний нет",
+          "performed_by": "Инженер Петров",
+          "performed_at": "2026-11-12T16:32:00+03:00",
+          "visual": {
+            "category": "no_visible_issues",
+            "signs": [],
+            "explanation": "Корпус и шток задвижки чистые, подтёков и повреждений не видно",
+            "recommendation": "Продолжить плановые осмотры",
+            "detection_confidence": 0.91,
+            "assessment_confidence": 0.8,
+            "analyzed_at": "2026-11-12T16:30:00+03:00",
+            "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+            "note": null
+          },
+          "recommendation": "Продолжить плановые осмотры"
+        }
+      ]
+    },
+    {
+      "id": "C-05",
+      "parent_id": "N-03",
+      "kind": "part",
+      "name": "Фланцевое соединение напорного патрубка DN 65",
+      "type": "flange",
+      "type_name": "Фланцевое соединение",
+      "order": 5,
+      "characteristics": [
+        {
+          "name": "Фланцы",
+          "value": "PN 16, DIN EN 1092-2",
+          "unit": null
+        },
+        {
+          "name": "Прокладка",
+          "value": "паронит",
+          "unit": null
+        }
+      ],
+      "installed_at": null,
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": 6.0,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": null,
+        "cycles": null
+      },
+      "resource": {
+        "status": "insufficient_data",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: дата установки",
+        "missing_data": [
+          "installed_at"
+        ],
+        "maintenance": null,
+        "message": "Недостаточно данных для оценки ресурса"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился",
+          "Недостаточно данных для оценки ресурса"
+        ],
+        "recommended_action": "Провести визуальный анализ узла"
+      },
+      "parameters": [],
+      "previous_results": []
+    },
+    {
+      "id": "C-06",
+      "parent_id": "N-01",
+      "kind": "part",
+      "name": "Торцевое уплотнение MG12/24-G60 AQ1EGG",
+      "type": "mechanical_seal",
+      "type_name": "Торцевое уплотнение",
+      "order": null,
+      "characteristics": [
+        {
+          "name": "Пара трения",
+          "value": "графит × карбид кремния",
+          "unit": null
+        },
+        {
+          "name": "Сильфон",
+          "value": "EPDM",
+          "unit": null
+        },
+        {
+          "name": "Давление",
+          "value": "до 16",
+          "unit": "бар"
+        }
+      ],
+      "installed_at": "2024-03-01",
+      "last_replaced_at": "2025-01-20",
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": null,
+        "life_hours": 15000.0,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": 13300.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "approaching",
+        "used_percent": 89,
+        "remaining": {
+          "years": null,
+          "hours": 1700.0,
+          "cycles": null
+        },
+        "estimated_end_date": "2027-02-06",
+        "basis": "Оценка по наработке от даты последней замены",
+        "missing_data": [],
+        "maintenance": null,
+        "message": "Выработано 89 % ресурса по наработке"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "check",
+        "reasons": [
+          "Выработано 89 % ресурса"
+        ],
+        "recommended_action": "Запланировать замену: торцевое уплотнение MG12/24-G60 AQ1EGG"
+      },
+      "parameters": [],
+      "previous_results": [
+        {
+          "id": 3,
+          "component_id": "C-06",
+          "type": "replacement",
+          "comment": "Замена торцевого уплотнения после сухого хода — обязательна по документации Wilo",
+          "performed_by": "Инженер Сидоров",
+          "performed_at": "2025-01-20T10:00:00+03:00",
+          "visual": null,
+          "recommendation": "Не допускать сухого хода: проверить защиту по уровню во всасывающей ёмкости"
+        }
+      ]
+    },
+    {
+      "id": "C-07",
+      "parent_id": "N-02",
+      "kind": "part",
+      "name": "Подшипники электродвигателя",
+      "type": "bearing",
+      "type_name": "Подшипник",
+      "order": null,
+      "characteristics": [
+        {
+          "name": "Ресурс по документации",
+          "value": "20 000 ч для 2-полюсных двигателей",
+          "unit": null
+        }
+      ],
+      "installed_at": "2024-03-01",
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": null,
+        "life_hours": 20000.0,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": 20600.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "due",
+        "used_percent": 103,
+        "remaining": {
+          "years": null,
+          "hours": 0.0,
+          "cycles": null
+        },
+        "estimated_end_date": "2026-10-15",
+        "basis": "Оценка по наработке от даты установки",
+        "missing_data": [],
+        "maintenance": null,
+        "message": "Наступил срок замены: выработано 103 % ресурса"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "defect",
+        "reasons": [
+          "Наступил срок замены"
+        ],
+        "recommended_action": "Заменить подшипники электродвигателя"
+      },
+      "parameters": [
+        "P-05"
+      ],
+      "previous_results": []
+    },
+    {
+      "id": "C-08",
+      "parent_id": "N-01",
+      "kind": "part",
+      "name": "Рабочее колесо",
+      "type": "impeller",
+      "type_name": "Рабочее колесо",
+      "order": null,
+      "characteristics": [
+        {
+          "name": "Материал",
+          "value": "серый чугун EN-GJL-200",
+          "unit": null
+        },
+        {
+          "name": "Замена",
+          "value": "при эрозии или задевании о корпус",
+          "unit": null
+        }
+      ],
+      "installed_at": "2024-03-01",
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": null,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": 20600.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "insufficient_data",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+        "missing_data": [
+          "normative"
+        ],
+        "maintenance": null,
+        "message": "Недостаточно данных для оценки ресурса"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился",
+          "Недостаточно данных для оценки ресурса"
+        ],
+        "recommended_action": "Осмотреть узел"
+      },
+      "parameters": [
+        "P-02"
+      ],
+      "previous_results": []
+    },
+    {
+      "id": "C-09",
+      "parent_id": "N-01",
+      "kind": "part",
+      "name": "Соединительная муфта",
+      "type": "coupling",
+      "type_name": "Соединительная муфта",
+      "order": null,
+      "characteristics": [
+        {
+          "name": "Зазор фонарь — муфта",
+          "value": "5",
+          "unit": "мм"
+        }
+      ],
+      "installed_at": "2024-03-01",
+      "last_replaced_at": null,
+      "last_maintenance_at": "2026-01-20",
+      "normative": {
+        "life_years": null,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": 333
+      },
+      "usage": {
+        "operating_hours": null,
+        "cycles": null
+      },
+      "resource": {
+        "status": "insufficient_data",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+        "missing_data": [
+          "normative"
+        ],
+        "maintenance": {
+          "next_due_date": "2026-12-19",
+          "status": "ok",
+          "overdue_days": null,
+          "days_left": 36
+        },
+        "message": "Недостаточно данных для оценки ресурса"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился",
+          "Недостаточно данных для оценки ресурса"
+        ],
+        "recommended_action": "Осмотреть узел"
+      },
+      "parameters": [
+        "P-04"
+      ],
+      "previous_results": [
+        {
+          "id": 6,
+          "component_id": "C-09",
+          "type": "maintenance",
+          "comment": "ТО-2: зазор муфты 5 мм, уплотнительные кольца заменены, крышка вентилятора очищена",
+          "performed_by": "Инженер Петров",
+          "performed_at": "2026-01-20T09:30:00+03:00",
+          "visual": null,
+          "recommendation": "Следующее ТО-2 через 8000 ч"
+        }
+      ]
+    }
+  ],
+  "history": [
+    {
+      "id": 9,
+      "component_id": "C-04",
+      "type": "checked",
+      "comment": "Задвижка осмотрена, замечаний нет",
+      "performed_by": "Инженер Петров",
+      "performed_at": "2026-11-12T16:32:00+03:00",
+      "visual": {
+        "category": "no_visible_issues",
+        "signs": [],
+        "explanation": "Корпус и шток задвижки чистые, подтёков и повреждений не видно",
+        "recommendation": "Продолжить плановые осмотры",
+        "detection_confidence": 0.91,
+        "assessment_confidence": 0.8,
+        "analyzed_at": "2026-11-12T16:30:00+03:00",
+        "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+        "note": null
+      },
+      "recommendation": "Продолжить плановые осмотры"
+    },
+    {
+      "id": 8,
+      "component_id": "N-02",
+      "type": "remark",
+      "comment": "Пятна ржавчины у лап крепления двигателя",
+      "performed_by": "Инженер Петров",
+      "performed_at": "2026-11-12T16:22:00+03:00",
+      "visual": {
+        "category": "possible_defect",
+        "signs": [
+          "следы коррозии на корпусе"
+        ],
+        "explanation": "На корпусе двигателя у лап крепления видны рыжие пятна, похожие на коррозию",
+        "recommendation": "Осмотреть корпус и лапы крепления, оценить глубину коррозии",
+        "detection_confidence": 0.93,
+        "assessment_confidence": 0.7,
+        "analyzed_at": "2026-11-12T16:20:00+03:00",
+        "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+        "note": null
+      },
+      "recommendation": "Оценить глубину коррозии при ближайшем ТО"
+    },
+    {
+      "id": 7,
+      "component_id": "N-01",
+      "type": "maintenance",
+      "comment": "ТО-1: течей через уплотнения нет, нагрев и шум в норме, фланцы подтянуты",
+      "performed_by": "Инженер Петров",
+      "performed_at": "2026-06-04T09:30:00+03:00",
+      "visual": null,
+      "recommendation": "Следующее ТО-1 через 4000 ч (≈ 167 суток)"
+    },
+    {
+      "id": 6,
+      "component_id": "C-09",
+      "type": "maintenance",
+      "comment": "ТО-2: зазор муфты 5 мм, уплотнительные кольца заменены, крышка вентилятора очищена",
+      "performed_by": "Инженер Петров",
+      "performed_at": "2026-01-20T09:30:00+03:00",
+      "visual": null,
+      "recommendation": "Следующее ТО-2 через 8000 ч"
+    },
+    {
+      "id": 5,
+      "component_id": "C-03",
+      "type": "checked",
+      "comment": "Ход задвижки плавный, течи по сальнику нет",
+      "performed_by": "Инженер Сидоров",
+      "performed_at": "2026-01-15T14:00:00+03:00",
+      "visual": null,
+      "recommendation": "Подготовить замену при выработке 90 % ресурса по циклам"
+    },
+    {
+      "id": 4,
+      "component_id": "C-02",
+      "type": "maintenance",
+      "comment": "Поверка манометра",
+      "performed_by": "Инженер Иванов",
+      "performed_at": "2025-11-02T10:00:00+03:00",
+      "visual": null,
+      "recommendation": "Следующая поверка через 12 месяцев"
+    },
+    {
+      "id": 3,
+      "component_id": "C-06",
+      "type": "replacement",
+      "comment": "Замена торцевого уплотнения после сухого хода — обязательна по документации Wilo",
+      "performed_by": "Инженер Сидоров",
+      "performed_at": "2025-01-20T10:00:00+03:00",
+      "visual": null,
+      "recommendation": "Не допускать сухого хода: проверить защиту по уровню во всасывающей ёмкости"
+    },
+    {
+      "id": 2,
+      "component_id": "C-02",
+      "type": "replacement",
+      "comment": "Замена манометра: разбито стекло",
+      "performed_by": "Инженер Иванов",
+      "performed_at": "2024-11-05T11:00:00+03:00",
+      "visual": null,
+      "recommendation": null
+    },
+    {
+      "id": 1,
+      "component_id": null,
+      "type": "checked",
+      "comment": "Ввод в эксплуатацию: направление вращения верное, течей нет, воздух удалён",
+      "performed_by": "Инженер Петров",
+      "performed_at": "2024-03-01T10:00:00+03:00",
+      "visual": null,
+      "recommendation": "Регламент Wilo: ТО-1 каждые 4000 ч, ТО-2 — 8000 ч, ревизия — 15 000–16 000 ч"
+    }
+  ]
+}

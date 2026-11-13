@@ -1,0 +1,865 @@
+{
+  "id": "PU-002",
+  "name": "Насосный агрегат винтовой",
+  "model": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+  "manufacturer": "ООО «Альтернативные механические системы»",
+  "serial_number": "21031004-1",
+  "marking": "PU-002",
+  "qr_code": "KST:PU-002",
+  "location": "Насосная откачки нефтешлама",
+  "commissioned_at": "2023-08-15",
+  "characteristics": [
+    {
+      "name": "Тип",
+      "value": "одновинтовой эксцентриковый",
+      "unit": null
+    },
+    {
+      "name": "Подача",
+      "value": "5–20",
+      "unit": "м³/ч"
+    },
+    {
+      "name": "Давление",
+      "value": "до 10",
+      "unit": "бар"
+    },
+    {
+      "name": "Частота вращения ротора",
+      "value": "260",
+      "unit": "об/мин"
+    },
+    {
+      "name": "Мощность двигателя",
+      "value": "11",
+      "unit": "кВт"
+    },
+    {
+      "name": "Среда",
+      "value": "обводнённый нефтепродукт",
+      "unit": null
+    },
+    {
+      "name": "Масса",
+      "value": "430",
+      "unit": "кг"
+    }
+  ],
+  "normative": {
+    "life_years": 20.0,
+    "life_hours": 11000.0,
+    "life_cycles": null,
+    "maintenance_interval_days": 90
+  },
+  "usage": {
+    "operating_hours": 6800.0,
+    "cycles": null
+  },
+  "resource": {
+    "status": "approaching",
+    "used_percent": 62,
+    "remaining": {
+      "years": 16.8,
+      "hours": 4200.0,
+      "cycles": null
+    },
+    "estimated_end_date": "2028-11-15",
+    "basis": "Оценка по календарному сроку и наработке от даты ввода в эксплуатацию",
+    "missing_data": [],
+    "maintenance": {
+      "next_due_date": "2026-11-30",
+      "status": "approaching",
+      "overdue_days": null,
+      "days_left": 17
+    },
+    "message": "До обслуживания 17 дней"
+  },
+  "parameters": [
+    {
+      "id": "P-11",
+      "equipment_id": "PU-002",
+      "component_id": "N-11",
+      "name": "Давление на выходе",
+      "value": 6.2,
+      "unit": "бар",
+      "setpoint_min": null,
+      "setpoint_max": 10.0,
+      "measured_at": "2026-11-13T09:30:00+03:00",
+      "status": "normal",
+      "message": "В норме"
+    },
+    {
+      "id": "P-12",
+      "equipment_id": "PU-002",
+      "component_id": "N-11",
+      "name": "Температура продукта",
+      "value": 38.0,
+      "unit": "°C",
+      "setpoint_min": 5.0,
+      "setpoint_max": 45.0,
+      "measured_at": "2026-11-13T09:30:00+03:00",
+      "status": "normal",
+      "message": "В норме"
+    },
+    {
+      "id": "P-13",
+      "equipment_id": "PU-002",
+      "component_id": "N-13",
+      "name": "Ток двигателя",
+      "value": 18.6,
+      "unit": "А",
+      "setpoint_min": null,
+      "setpoint_max": 23.0,
+      "measured_at": "2026-11-13T09:30:00+03:00",
+      "status": "normal",
+      "message": "В норме"
+    },
+    {
+      "id": "P-14",
+      "equipment_id": "PU-002",
+      "component_id": "N-13",
+      "name": "Виброскорость двигателя",
+      "value": null,
+      "unit": "мм/с",
+      "setpoint_min": null,
+      "setpoint_max": 2.2,
+      "measured_at": null,
+      "status": "no_data",
+      "message": "Нет данных"
+    }
+  ],
+  "deviations_count": 0,
+  "components": [
+    {
+      "id": "N-13",
+      "parent_id": null,
+      "kind": "node",
+      "name": "Электродвигатель BRA160M4 ФБУ1, 11 кВт",
+      "type": "electric_motor",
+      "type_name": "Электродвигатель",
+      "order": 0,
+      "characteristics": [
+        {
+          "name": "Мощность",
+          "value": "11",
+          "unit": "кВт"
+        },
+        {
+          "name": "Номинальный ток",
+          "value": "23",
+          "unit": "А"
+        },
+        {
+          "name": "Частота вращения",
+          "value": "1460",
+          "unit": "об/мин"
+        },
+        {
+          "name": "Взрывозащита",
+          "value": "1Ex d IIB T4 Gb",
+          "unit": null
+        },
+        {
+          "name": "Заводской номер",
+          "value": "230201068",
+          "unit": null
+        }
+      ],
+      "installed_at": "2023-08-15",
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": 20.0,
+        "life_hours": 60000.0,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": 6800.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "ok",
+        "used_percent": 16,
+        "remaining": {
+          "years": 16.8,
+          "hours": 53200.0,
+          "cycles": null
+        },
+        "estimated_end_date": "2043-08-15",
+        "basis": "Оценка по календарному сроку и наработке от даты установки",
+        "missing_data": [],
+        "maintenance": null,
+        "message": "Ресурс в норме"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился",
+          "Нет текущих значений части параметров"
+        ],
+        "recommended_action": "Провести визуальный анализ узла"
+      },
+      "parameters": [
+        "P-13",
+        "P-14"
+      ],
+      "previous_results": []
+    },
+    {
+      "id": "N-11",
+      "parent_id": null,
+      "kind": "node",
+      "name": "Насос одновинтовой AMS PCP60S12/3",
+      "type": "pump",
+      "type_name": "Насос",
+      "order": 1,
+      "characteristics": [
+        {
+          "name": "Ротор",
+          "value": "сталь 40Х13, закалка 50 HRC",
+          "unit": null
+        },
+        {
+          "name": "Статор",
+          "value": "эластомер HNBR",
+          "unit": null
+        },
+        {
+          "name": "Уплотнение",
+          "value": "одинарное торцевое",
+          "unit": null
+        }
+      ],
+      "installed_at": "2023-08-15",
+      "last_replaced_at": null,
+      "last_maintenance_at": "2026-09-01",
+      "normative": {
+        "life_years": 20.0,
+        "life_hours": 11000.0,
+        "life_cycles": null,
+        "maintenance_interval_days": 90
+      },
+      "usage": {
+        "operating_hours": 6800.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "approaching",
+        "used_percent": 62,
+        "remaining": {
+          "years": 16.8,
+          "hours": 4200.0,
+          "cycles": null
+        },
+        "estimated_end_date": "2028-11-15",
+        "basis": "Оценка по календарному сроку и наработке от даты установки",
+        "missing_data": [],
+        "maintenance": {
+          "next_due_date": "2026-11-30",
+          "status": "approaching",
+          "overdue_days": null,
+          "days_left": 17
+        },
+        "message": "До обслуживания 17 дней"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "check",
+        "reasons": [
+          "До обслуживания 17 дней"
+        ],
+        "recommended_action": "Проверить затяжку монтажных элементов и крепление насоса до 30.11.2026"
+      },
+      "parameters": [
+        "P-11",
+        "P-12"
+      ],
+      "previous_results": []
+    },
+    {
+      "id": "N-12",
+      "parent_id": null,
+      "kind": "node",
+      "name": "Мотор-редуктор WXRF87-AM160",
+      "type": "gearbox",
+      "type_name": "Редуктор",
+      "order": 2,
+      "characteristics": [
+        {
+          "name": "Передаточное отношение",
+          "value": "5,30",
+          "unit": null
+        },
+        {
+          "name": "Крутящий момент на выходе",
+          "value": "910",
+          "unit": "Н·м"
+        },
+        {
+          "name": "Смазка",
+          "value": "синтетическое масло VG220",
+          "unit": null
+        }
+      ],
+      "installed_at": "2023-08-15",
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": null,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": 6800.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "insufficient_data",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+        "missing_data": [
+          "normative"
+        ],
+        "maintenance": null,
+        "message": "Недостаточно данных для оценки ресурса"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился",
+          "Недостаточно данных для оценки ресурса"
+        ],
+        "recommended_action": "Осмотреть узел"
+      },
+      "parameters": [],
+      "previous_results": []
+    },
+    {
+      "id": "C-16",
+      "parent_id": "N-11",
+      "kind": "part",
+      "name": "Ответные фланцы 100-16 на входе и выходе",
+      "type": "flange",
+      "type_name": "Фланцевое соединение",
+      "order": 1,
+      "characteristics": [
+        {
+          "name": "Условный проход",
+          "value": "100",
+          "unit": "мм"
+        },
+        {
+          "name": "Условное давление",
+          "value": "16",
+          "unit": "бар"
+        },
+        {
+          "name": "Стандарт",
+          "value": "ГОСТ 33259-2015",
+          "unit": null
+        }
+      ],
+      "installed_at": "2023-08-15",
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": null,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": null,
+        "cycles": null
+      },
+      "resource": {
+        "status": "insufficient_data",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+        "missing_data": [
+          "normative"
+        ],
+        "maintenance": null,
+        "message": "Недостаточно данных для оценки ресурса"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился",
+          "Недостаточно данных для оценки ресурса"
+        ],
+        "recommended_action": "Провести визуальный анализ узла"
+      },
+      "parameters": [],
+      "previous_results": []
+    },
+    {
+      "id": "C-11",
+      "parent_id": "N-11",
+      "kind": "part",
+      "name": "Статор винтовой пары (HNBR)",
+      "type": "stator",
+      "type_name": "Статор винтовой пары",
+      "order": null,
+      "characteristics": [
+        {
+          "name": "Материал",
+          "value": "эластомер HNBR",
+          "unit": null
+        },
+        {
+          "name": "Запасной статор в ЗИП",
+          "value": "60S1240DTS",
+          "unit": null
+        }
+      ],
+      "installed_at": "2023-08-15",
+      "last_replaced_at": "2025-10-14",
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": null,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": 1900.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "insufficient_data",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+        "missing_data": [
+          "normative"
+        ],
+        "maintenance": null,
+        "message": "Недостаточно данных для оценки ресурса"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился",
+          "Недостаточно данных для оценки ресурса"
+        ],
+        "recommended_action": "Осмотреть узел"
+      },
+      "parameters": [],
+      "previous_results": [
+        {
+          "id": 12,
+          "component_id": "C-11",
+          "type": "replacement",
+          "comment": "Замена статора из ЗИП: подача снизилась при номинальной частоте вращения",
+          "performed_by": "Инженер Сидоров",
+          "performed_at": "2025-10-14T11:00:00+03:00",
+          "visual": null,
+          "recommendation": "Контролировать подачу и давление после замены статора"
+        }
+      ]
+    },
+    {
+      "id": "C-12",
+      "parent_id": "N-11",
+      "kind": "part",
+      "name": "Ротор винтовой пары",
+      "type": "rotor",
+      "type_name": "Ротор винтовой пары",
+      "order": null,
+      "characteristics": [
+        {
+          "name": "Материал",
+          "value": "сталь 40Х13, закалка 50 HRC",
+          "unit": null
+        }
+      ],
+      "installed_at": "2023-08-15",
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": null,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": 6800.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "insufficient_data",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+        "missing_data": [
+          "normative"
+        ],
+        "maintenance": null,
+        "message": "Недостаточно данных для оценки ресурса"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился",
+          "Недостаточно данных для оценки ресурса"
+        ],
+        "recommended_action": "Осмотреть узел"
+      },
+      "parameters": [],
+      "previous_results": []
+    },
+    {
+      "id": "C-13",
+      "parent_id": "N-11",
+      "kind": "part",
+      "name": "Торцевое уплотнение 60S1290",
+      "type": "mechanical_seal",
+      "type_name": "Торцевое уплотнение",
+      "order": null,
+      "characteristics": [
+        {
+          "name": "Пара трения",
+          "value": "карбид вольфрама × карбид кремния",
+          "unit": null
+        }
+      ],
+      "installed_at": "2023-08-15",
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": null,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": 6800.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "insufficient_data",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+        "missing_data": [
+          "normative"
+        ],
+        "maintenance": null,
+        "message": "Недостаточно данных для оценки ресурса"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился",
+          "Недостаточно данных для оценки ресурса"
+        ],
+        "recommended_action": "Осмотреть узел"
+      },
+      "parameters": [],
+      "previous_results": []
+    },
+    {
+      "id": "C-14",
+      "parent_id": "N-11",
+      "kind": "part",
+      "name": "Термопреобразователь ПТ 0304-ВТ (защита от сухого хода)",
+      "type": "temperature_sensor",
+      "type_name": "Термопреобразователь",
+      "order": null,
+      "characteristics": [
+        {
+          "name": "Чувствительный элемент",
+          "value": "1 × Pt100",
+          "unit": null
+        },
+        {
+          "name": "Диапазон",
+          "value": "−50…+160",
+          "unit": "°C"
+        },
+        {
+          "name": "Заводской номер",
+          "value": "10096664",
+          "unit": null
+        }
+      ],
+      "installed_at": "2023-08-15",
+      "last_replaced_at": null,
+      "last_maintenance_at": "2024-11-05",
+      "normative": {
+        "life_years": 10.0,
+        "life_hours": 80000.0,
+        "life_cycles": null,
+        "maintenance_interval_days": 730
+      },
+      "usage": {
+        "operating_hours": 6800.0,
+        "cycles": null
+      },
+      "resource": {
+        "status": "due",
+        "used_percent": 32,
+        "remaining": {
+          "years": 6.8,
+          "hours": 73200.0,
+          "cycles": null
+        },
+        "estimated_end_date": "2033-08-14",
+        "basis": "Оценка по календарному сроку и наработке от даты установки",
+        "missing_data": [],
+        "maintenance": {
+          "next_due_date": "2026-11-05",
+          "status": "due",
+          "overdue_days": 8,
+          "days_left": null
+        },
+        "message": "Срок обслуживания наступил 8 дней назад"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "defect",
+        "reasons": [
+          "Наступил срок обслуживания"
+        ],
+        "recommended_action": "Провести поверку термопреобразователя"
+      },
+      "parameters": [],
+      "previous_results": [
+        {
+          "id": 11,
+          "component_id": "C-14",
+          "type": "maintenance",
+          "comment": "Поверка термопреобразователя ПТ 0304-ВТ",
+          "performed_by": "Инженер Иванов",
+          "performed_at": "2024-11-05T10:00:00+03:00",
+          "visual": null,
+          "recommendation": "Следующая поверка через 2 года"
+        }
+      ]
+    },
+    {
+      "id": "C-15",
+      "parent_id": "N-13",
+      "kind": "part",
+      "name": "Реле тепловой защиты РТЗ-1М",
+      "type": "relay",
+      "type_name": "Реле",
+      "order": null,
+      "characteristics": [
+        {
+          "name": "Напряжение питания",
+          "value": "230",
+          "unit": "В"
+        }
+      ],
+      "installed_at": "2023-08-15",
+      "last_replaced_at": null,
+      "last_maintenance_at": null,
+      "normative": {
+        "life_years": null,
+        "life_hours": null,
+        "life_cycles": null,
+        "maintenance_interval_days": null
+      },
+      "usage": {
+        "operating_hours": null,
+        "cycles": null
+      },
+      "resource": {
+        "status": "insufficient_data",
+        "used_percent": null,
+        "remaining": {
+          "years": null,
+          "hours": null,
+          "cycles": null
+        },
+        "estimated_end_date": null,
+        "basis": "Оценка ресурса невозможна; не предоставлено: нормативный срок службы",
+        "missing_data": [
+          "normative"
+        ],
+        "maintenance": null,
+        "message": "Недостаточно данных для оценки ресурса"
+      },
+      "visual": {
+        "category": "not_analyzed",
+        "signs": [],
+        "explanation": null,
+        "recommendation": null,
+        "detection_confidence": null,
+        "assessment_confidence": null,
+        "analyzed_at": null,
+        "disclaimer": null,
+        "note": null
+      },
+      "attention": {
+        "level": "unknown",
+        "reasons": [
+          "Визуальный анализ не проводился",
+          "Недостаточно данных для оценки ресурса"
+        ],
+        "recommended_action": "Осмотреть узел"
+      },
+      "parameters": [],
+      "previous_results": []
+    }
+  ],
+  "history": [
+    {
+      "id": 13,
+      "component_id": null,
+      "type": "maintenance",
+      "comment": "Проверка затяжки монтажных элементов и крепления насоса",
+      "performed_by": "Инженер Иванов",
+      "performed_at": "2026-09-01T10:00:00+03:00",
+      "visual": null,
+      "recommendation": "Следующая проверка через 3 месяца"
+    },
+    {
+      "id": 12,
+      "component_id": "C-11",
+      "type": "replacement",
+      "comment": "Замена статора из ЗИП: подача снизилась при номинальной частоте вращения",
+      "performed_by": "Инженер Сидоров",
+      "performed_at": "2025-10-14T11:00:00+03:00",
+      "visual": null,
+      "recommendation": "Контролировать подачу и давление после замены статора"
+    },
+    {
+      "id": 11,
+      "component_id": "C-14",
+      "type": "maintenance",
+      "comment": "Поверка термопреобразователя ПТ 0304-ВТ",
+      "performed_by": "Инженер Иванов",
+      "performed_at": "2024-11-05T10:00:00+03:00",
+      "visual": null,
+      "recommendation": "Следующая поверка через 2 года"
+    },
+    {
+      "id": 10,
+      "component_id": null,
+      "type": "checked",
+      "comment": "Ввод в эксплуатацию: обкатка, проверка герметичности и направления вращения",
+      "performed_by": "Инженер Иванов",
+      "performed_at": "2023-08-15T10:00:00+03:00",
+      "visual": null,
+      "recommendation": "Режим 8 ч в сутки, 5 суток в неделю; затяжка и крепления — раз в 3 месяца"
+    }
+  ]
+}
