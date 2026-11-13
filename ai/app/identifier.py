@@ -37,8 +37,10 @@ def rank_candidates(
     top = max(scores.values())
     weights = {k: math.exp((v - top) / temperature) for k, v in scores.items()}
     total = sum(weights.values())
-    # близость: 0 при оценке на 0.15 ниже порога, 1 при оценке на 0.10 выше порога
-    closeness = min(1.0, max(0.0, (top - (threshold - 0.15)) / 0.25))
+    # близость: 0 при оценке на 0.15 ниже порога, 0.5 ровно на пороге, 1 на 0.15 выше порога.
+    # Ниже порога уверенность всегда < 0.5 — бэкенд считает «распознано» по уверенности >= 0.5
+    # (backend/app/config.py, identify_threshold), и оба решения не расходятся в опасную сторону.
+    closeness = min(1.0, max(0.0, (top - (threshold - 0.15)) / 0.30))
     candidates = [
         {"equipment_id": k, "confidence": round(weights[k] / total * closeness, 3)}
         for k in sorted(scores, key=lambda k: scores[k], reverse=True)

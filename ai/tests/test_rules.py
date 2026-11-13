@@ -102,6 +102,25 @@ def test_duplicate_signs_removed():
         "Показания в норме.",
         "Требуется замена манометра.",
         "Двигатель вышел из строя.",
+        "Повреждений нет, состояние хорошее.",
+        "Проблем нет.",
+        "Никаких дефектов.",
+        "Не обнаружено дефектов.",
+        "Узел пригоден к эксплуатации.",
+        "Двигатель работает нормально.",
+        "Нормальное состояние.",
+        "В удовлетворительном состоянии.",
+        "Параметры в пределах нормы.",
+        "Допускается к эксплуатации.",
+        "Можно продолжать эксплуатацию.",
+        "Утечек нет, всё герметично.",
+        "Подшипник изношен.",
+        "Признаки кавитации.",
+        "Дисбаланс ротора.",
+        "Обмотка статора повреждена.",
+        "Следует заменить задвижку.",
+        "Рекомендуется замена.",
+        "Нужен ремонт.",
     ],
 )
 def test_forbidden_wording_replaced(text):
@@ -120,6 +139,9 @@ def test_forbidden_wording_replaced(text):
         "Под фланцем видны тёмные подтёки.",
         "Видимых проблем не обнаружено.",
         "Проверить герметичность соединений.",
+        "Видна ржавчина у основания корпуса.",
+        "Осмотреть место повреждения и проверить целостность корпуса.",
+        "Снимок смазан, детали не видны.",
     ],
 )
 def test_allowed_wording(text):
@@ -139,6 +161,8 @@ def test_templates_are_clean():
 def test_non_russian_text_replaced():
     result = check(explanation="Rust spots are visible on the housing.")
     assert "коррозия" in result.explanation
+    result = check(explanation="Rust spots на корпусе are visible, see photo.")
+    assert "коррозия" in result.explanation
 
 
 def test_long_text_cut_to_two_sentences():
@@ -146,11 +170,26 @@ def test_long_text_cut_to_two_sentences():
     assert result.explanation == "Видна ржавчина. Она на корпусе."
 
 
-def test_no_issues_recommendation_is_template():
-    result = check(category="no_visible_issues", signs=[], explanation="Корпус чистый, стекло целое.",
+def test_no_issues_texts_are_templates():
+    # свободный текст модели при «видимых проблем не обнаружено» не показываем:
+    # он может звучать как подтверждение исправности (ТЗ 4.2)
+    result = check(category="no_visible_issues", signs=[], explanation="Узел годится, всё хорошо.",
                    recommendation="Ничего делать не нужно.")
+    assert result.category == "no_visible_issues"
     assert result.recommendation == rules.template_recommendation("no_visible_issues", [])
-    assert result.explanation == "Корпус чистый, стекло целое."
+    assert result.explanation == rules.template_explanation("no_visible_issues", [], "Манометр")
+
+
+def test_dropped_sign_never_gives_no_issues():
+    raw = rules.parse_model_answer(answer(signs=["overheating"], category="no_visible_issues",
+                                          explanation="Видны бурые пятна у фланца."))
+    result = rules.enforce(raw, "Задвижка", "valve")
+    assert result.category == "check_recommended" and result.signs == []
+
+
+def test_non_string_sign_is_format_error():
+    with pytest.raises(rules.FormatError):
+        rules.parse_model_answer(answer(signs=[{"code": "corrosion"}]))
 
 
 def test_overheating_only_for_motor():

@@ -41,9 +41,25 @@ FORBIDDEN_PATTERNS = (
     r"\bвнутренн",          # любые утверждения о внутреннем состоянии
     r"\bвышел\s+из\s+строя\b",
     r"\bвыш(ла|ло|ли)\s+из\s+строя\b",
-    r"\bизнос\s+подшипник",
-    r"\bнеобходим\w*\s+замен",  # замену назначает инженер, а не предварительный осмотр
-    r"\bтребу\w+\s+замен",
+    r"\bизнос",            # износ, изношен — внутреннее состояние по фото не видно
+    r"\bизнош",
+    r"\bподшипник",
+    r"\bобмотк",
+    r"\bкавитац",
+    r"\bдисбаланс",
+    r"\bзамен",            # замену и ремонт назначает инженер, а не предварительный осмотр
+    r"\bремонт",
+    # утверждения исправности другими словами
+    r"\bпригод",
+    r"\bнормальн",
+    r"\bудовлетворительн",
+    r"\bв\s+пределах\s+норм",
+    r"\b(поврежден\w*|проблем\w*|утеч\w*|теч[иь]|неполад\w*|замечани\w*)\s+нет\b",
+    r"\bбез\s+(каких[- ]либо\s+)?(видимых\s+)?(поврежден|проблем|замечан|неполад)",
+    r"\b(не\s+(обнаружен\w*|выявлен\w*|найден\w*)|никаких)\s+(видимых\s+)?(дефект|поврежд|неисправ|проблем)",
+    r"\bдопуска\w*\s+к\s+эксплуатац",
+    r"\bпродолж\w*\s+эксплуатац",
+    r"\bможно\s+эксплуатир",
 )
 _FORBIDDEN = re.compile("|".join(FORBIDDEN_PATTERNS), re.IGNORECASE)
 _CYRILLIC = re.compile(r"[а-яё]", re.IGNORECASE)
@@ -143,7 +159,10 @@ def _clean_text(text: str) -> str:
 
 
 def _text_ok(text: str) -> bool:
-    return len(text) >= 5 and bool(_CYRILLIC.search(text)) and not has_forbidden(text)
+    """Текст годится: не короткий, по-русски (кириллицы больше половины букв), без запретных слов."""
+    letters = [c for c in text if c.isalpha()]
+    cyrillic = len(_CYRILLIC.findall(text))
+    return len(text) >= 5 and cyrillic * 2 > len(letters) and not has_forbidden(text)
 
 
 class FormatError(ValueError):
@@ -165,7 +184,7 @@ def parse_model_answer(raw: dict) -> Assessment:
         raise FormatError("signs не является списком")
     signs: list[str] = []
     for code in signs_raw:
-        if code not in SIGNS:
+        if not isinstance(code, str) or code not in SIGNS:
             raise FormatError(f"признак не из утверждённого списка: {code!r}")
         if SIGNS[code] not in signs:
             signs.append(SIGNS[code])
@@ -192,7 +211,10 @@ def allowed_signs(component_type: str) -> list[str]:
 def enforce(assessment: Assessment, component_name: str, component_type: str = "") -> Assessment:
     """Приводит разобранный ответ модели к правилам классификации и формулировок."""
     allowed = {SIGNS[code] for code in allowed_signs(component_type)}
-    assessment = Assessment(**{**assessment.__dict__, "signs": [s for s in assessment.signs if s in allowed]})
+    kept = [s for s in assessment.signs if s in allowed]
+    # модель назвала признак, неуместный для этого узла: она что-то увидела — зелёным не отвечаем
+    dropped = len(kept) != len(assessment.signs)
+    assessment = Assessment(**{**assessment.__dict__, "signs": kept})
     if assessment.image_quality == "poor":
         result = poor_quality(None)
         explanation = _clean_text(assessment.explanation)
@@ -204,7 +226,7 @@ def enforce(assessment: Assessment, component_name: str, component_type: str = "
     category = assessment.category
     signs = list(assessment.signs)
     # «Видимых проблем не обнаружено» — только при хорошем снимке без признаков.
-    if category == NO_VISIBLE_ISSUES and signs:
+    if category == NO_VISIBLE_ISSUES and (signs or dropped):
         category = CHECK_RECOMMENDED
     # Возможный дефект должен опираться на признак из утверждённого списка.
     if category == POSSIBLE_DEFECT and not signs:
@@ -213,7 +235,9 @@ def enforce(assessment: Assessment, component_name: str, component_type: str = "
     explanation = _clean_text(assessment.explanation)
     recommendation = _clean_text(assessment.recommendation)
     changed = category != assessment.category
-    if changed or not _text_ok(explanation):
+    # при «видимых проблем не обнаружено» — только шаблон: свободный текст модели может
+    # звучать как подтверждение исправности, чего ТЗ (4.2) не допускает
+    if changed or not _text_ok(explanation) or category == NO_VISIBLE_ISSUES:
         explanation = template_explanation(category, signs, component_name)
     if changed or not _text_ok(recommendation) or category == NO_VISIBLE_ISSUES:
         recommendation = template_recommendation(category, signs)
