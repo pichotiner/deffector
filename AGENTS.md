@@ -73,6 +73,7 @@ python backend/reset_db.py         # сброс базы к демо-данны�
 python backend/check_scenario.py   # проверка всех 10 шагов сценария через бэкенд
 cd backend && python -m pytest     # тесты бэкенда (нужен requirements-dev.txt)
 cd backend && python -m app.export_openapi   # обновить openapi.json после правки schemas.py
+python docs/presentation/make_pdf.py          # slides.html → slides.pdf (Edge или Chrome)
 ```
 
 Команды ИИ-сервиса и приложения — в `ai/README.md` и `mobile/README.md`, когда появятся.
@@ -92,5 +93,8 @@ cd backend && python -m app.export_openapi   # обновить openapi.json п�
 | `docs/stand.md` | инструкция для стенда и чек-листы: без интернета, утро защиты, пробный звонок |
 | `docs/qa.md` | ответы на вопросы жюри |
 | `docs/coverage.md` | матрица покрытия ТЗ с отметками, чем подтверждён каждый пункт |
+| `docs/presentation/` | презентация: `slides.html`, `slides.pdf` (`make_pdf.py`), текст выступления `speech.md` |
+| `docs/video.md` | что снять для видео и ролика-доказательства, как монтировать |
+| `README.md` | сопроводительная документация для жюри |
 | `backend/` | FastAPI + SQLite; подробности — `backend/README.md` |
 | `demo/print/` | QR-коды и таблички для печати |

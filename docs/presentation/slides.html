@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Deffector — презентация</title>
+<!--
+  Презентация к защите 15.11. Работает без интернета: шрифты системные, всё в этом файле.
+  Показ: открыть в браузере, F — во весь экран, ← → / пробел — листать, Home / End.
+  PDF: python docs/presentation/make_pdf.py (или в Chrome: Печать → Сохранить как PDF,
+  поля «Нет», «Фон» включить).
+  Места, которые заполняют Тимофей и Павел, выделены жёлтым: класс todo.
+-->
+<style>
+  :root {
+    --ink: #13202f;
+    --ink-2: #44546a;
+    --ink-3: #7a8798;
+    --line: #d9dfe7;
+    --paper: #ffffff;
+    --tint: #f2f5f9;
+    --blue: #1d5fae;
+    --blue-2: #e6eef9;
+    --red: #cf3e3a;
+    --red-bg: #fbe9e8;
+    --amber: #c98a00;
+    --amber-bg: #fdf3d6;
+    --green: #26925a;
+    --green-bg: #e3f4ea;
+    --grey: #7f8a96;
+    --grey-bg: #edf0f3;
+    --font: "Segoe UI", Inter, "Helvetica Neue", Arial, sans-serif;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; background: #1b2633; font-family: var(--font); color: var(--ink); }
+
+  /* ---------- слайд 1280×720, масштабируется под окно ---------- */
+  .deck { position: relative; }
+  .slide {
+    width: 1280px; height: 720px; background: var(--paper);
+    position: relative; overflow: hidden; padding: 56px 72px 48px;
+    display: flex; flex-direction: column;
+  }
+  .present .slide { position: absolute; left: 50%; top: 50%; transform-origin: center center; display: none; }
+  .present .slide.on { display: flex; }
+
+  .kicker { font-size: 15px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--blue); margin: 0 0 10px; }
+  h1 { font-size: 40px; line-height: 1.12; margin: 0 0 26px; font-weight: 700; letter-spacing: -.01em; }
+  h2 { font-size: 21px; margin: 0 0 12px; font-weight: 650; }
+  p, li { font-size: 19px; line-height: 1.42; margin: 0; color: var(--ink); }
+  ul { margin: 0; padding-left: 22px; }
+  li + li { margin-top: 9px; }
+  .muted { color: var(--ink-2); }
+  .small, .small li { font-size: 16px; }
+  .foot {
+    position: absolute; left: 72px; right: 72px; bottom: 22px;
+    display: flex; justify-content: space-between; font-size: 13px; color: var(--ink-3);
+  }
+  .grow { flex: 1; min-height: 0; }
+  .row { display: flex; gap: 28px; }
+  .col { flex: 1; min-width: 0; }
+  .card { background: var(--tint); border-radius: 14px; padding: 22px 24px; }
+  .card.blue { background: var(--blue-2); }
+  .card.line { background: none; border: 1.5px solid var(--line); }
+  .todo { background: #fff1b8; border: 1px dashed #c29400; border-radius: 4px; padding: 0 5px; color: #6b5200; }
+  .num { display: inline-flex; align-items: center; justify-content: center; width: 30px; height: 30px; border-radius: 50%;
+         background: var(--blue); color: #fff; font-weight: 700; font-size: 15px; flex: none; }
+  .chip { display: inline-flex; align-items: center; gap: 8px; border-radius: 999px; padding: 5px 14px; font-size: 16px; font-weight: 600; }
+  .chip.red { background: var(--red-bg); color: var(--red); }
+  .chip.amber { background: var(--amber-bg); color: #8a5f00; }
+  .chip.green { background: var(--green-bg); color: var(--green); }
+  .chip.grey { background: var(--grey-bg); color: #56616d; }
+  .dot { width: 11px; height: 11px; border-radius: 50%; display: inline-block; flex: none; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { text-align: left; padding: 9px 12px; font-size: 16.5px; line-height: 1.32; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { font-size: 13.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--ink-3); font-weight: 600; }
+  .ok { color: var(--green); font-weight: 700; white-space: nowrap; }
+
+  /* ---------- 1. титул ---------- */
+  .title { background: linear-gradient(135deg, #10233b 0%, #1d4f8f 100%); color: #fff; justify-content: center; }
+  .title .kicker { color: #9cc3ff; }
+  .title h1 { font-size: 76px; margin-bottom: 14px; }
+  .title .sub { font-size: 30px; color: #e3ecf8; font-weight: 500; margin-bottom: 40px; max-width: 900px; line-height: 1.25; }
+  .title .lead { font-size: 21px; color: #cad9ec; max-width: 960px; }
+  .title .team { position: absolute; left: 72px; right: 72px; bottom: 52px; display: flex; gap: 40px; }
+  .title .team div { font-size: 16px; color: #cad9ec; }
+  .title .team b { display: block; color: #fff; font-size: 19px; margin-bottom: 3px; }
+  .status-bar { position: absolute; right: 72px; top: 60px; display: flex; gap: 10px; }
+  .status-bar span { width: 56px; height: 8px; border-radius: 4px; }
+
+  /* ---------- 3. сценарий ---------- */
+  .steps { display: grid; grid-template-columns: 1fr 1fr; gap: 10px 22px; }
+  .step { display: flex; gap: 12px; align-items: flex-start; }
+  .step p { font-size: 16.5px; line-height: 1.3; }
+  .step p b { font-weight: 650; }
+  .live { margin-top: 18px; display: flex; gap: 14px; align-items: center; background: var(--blue); color: #fff;
+          border-radius: 12px; padding: 14px 20px; font-size: 18px; }
+  .live b { font-size: 19px; }
+
+  /* ---------- 4. архитектура ---------- */
+  .perimeter { border: 2px dashed #8fb2dc; border-radius: 18px; padding: 34px 26px 22px; position: relative; }
+  .perimeter > .tag { position: absolute; top: -13px; left: 22px; background: var(--paper); padding: 0 10px;
+                      color: var(--blue); font-weight: 650; font-size: 15px; }
+  .arch { display: flex; align-items: stretch; gap: 0; }
+  .box { flex: 1; background: var(--tint); border-radius: 12px; padding: 16px 18px; }
+  .box h2 { font-size: 19px; margin-bottom: 6px; }
+  .box p { font-size: 15.5px; color: var(--ink-2); line-height: 1.35; }
+  .arrow { width: 70px; display: flex; flex-direction: column; justify-content: center; align-items: center; color: var(--ink-3); font-size: 12.5px; text-align: center; }
+  .arrow svg { width: 60px; height: 22px; }
+  .proof { display: flex; gap: 22px; margin-top: 22px; }
+  .video { width: 380px; height: 214px; background: #0f1823; border-radius: 12px; overflow: hidden; position: relative; flex: none; }
+  .video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center;
+               color: #9fb0c4; font-size: 15px; padding: 20px; line-height: 1.4; }
+
+  /* ---------- 6. ИИ ---------- */
+  .pipe { display: flex; gap: 12px; align-items: stretch; }
+  .pipe .card { flex: 1; padding: 16px 18px; }
+  .pipe .card p { font-size: 15.5px; line-height: 1.35; color: var(--ink-2); }
+  .pipe .card h2 { font-size: 18px; margin-bottom: 6px; }
+  .pipe .to { display: flex; align-items: center; color: var(--ink-3); font-size: 22px; }
+  .who { font-size: 12.5px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--blue); margin-bottom: 4px; }
+
+  /* ---------- 7. ресурс ---------- */
+  .three { display: flex; gap: 18px; }
+  .three .card { flex: 1; padding: 18px 20px; }
+  .three .card p, .three .card li { font-size: 16px; line-height: 1.38; }
+  .formula { font-size: 17px; background: var(--paper); border-radius: 8px; padding: 8px 12px; margin: 10px 0; font-weight: 600; }
+
+  /* ---------- 10. развитие ---------- */
+  .grid4 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px 26px; }
+  .grid4 p { font-size: 17px; line-height: 1.35; }
+  .grid4 b { display: block; font-size: 17.5px; }
+  .team-row { display: flex; gap: 18px; margin-top: auto; margin-bottom: 14px; }
+  .team-row .card { flex: 1; padding: 14px 18px; }
+  .team-row b { font-size: 18px; display: block; }
+  .team-row span { font-size: 15px; color: var(--ink-2); }
+
+  /* ---------- навигация ---------- */
+  .all .slide { margin: 24px auto; box-shadow: 0 8px 30px rgba(0,0,0,.35); }
+
+  @media print {
+    @page { size: 1280px 720px; margin: 0; }
+    html, body { background: #fff; }
+    .slide { display: flex !important; position: relative !important; left: auto !important; top: auto !important; transform: none !important;
+             margin: 0 !important; box-shadow: none !important; break-after: page; page-break-after: always; }
+  }
+</style>
+</head>
+<body>
+<div class="deck" id="deck">
+
+<!-- 1 ============================================================ -->
+<section class="slide title">
+  <div class="status-bar">
+    <span style="background:#e0574f"></span><span style="background:#e7b21e"></span>
+    <span style="background:#3cb371"></span><span style="background:#9aa5b1"></span>
+  </div>
+  <p class="kicker">Кибер 102 · задача КСТ Энерго Инжиниринг</p>
+  <h1>Deffector</h1>
+  <p class="sub">AR-помощник инженера по осмотру промышленного оборудования</p>
+  <p class="lead">Навёл камеру — оборудование определено, узлы, требующие внимания, подсвечены
+    прямо на изображении: с причиной и рекомендуемым действием. Работает в локальной сети
+    предприятия, без интернета.</p>
+  <div class="team">
+    <div><b>Андрей</b>бэкенд, данные, расчёт ресурса</div>
+    <div><b>Павел</b>мобильное приложение и AR</div>
+    <div><b>Тимофей</b>ИИ и компьютерное зрение</div>
+  </div>
+</section>
+
+<!-- 2 ============================================================ -->
+<section class="slide">
+  <p class="kicker">1 · Задача</p>
+  <h1>Инженеру на объекте нужна вся информация об узле — сразу и у самого узла</h1>
+  <div class="row grow">
+    <div class="col card line">
+      <h2>Сейчас инженер сам</h2>
+      <ul>
+        <li>определяет, что за оборудование перед ним;</li>
+        <li>ищет состав, уставки, нормативные сроки и историю обслуживания в документации и базах;</li>
+        <li>осматривает узлы на глаз и решает, что важно;</li>
+        <li>записывает результат отдельно от осмотра.</li>
+      </ul>
+    </div>
+    <div class="col card blue">
+      <h2>С Deffector — один телефон</h2>
+      <ul>
+        <li>оборудование определяется по QR-коду, табличке, серийному номеру или фото;</li>
+        <li>цифровая карточка: состав, параметры с уставками, ресурс, история;</li>
+        <li>ИИ находит узлы в кадре и видимые признаки: коррозию, подтёки, повреждения;</li>
+        <li>метки поверх камеры: цвет, причина, что сделать;</li>
+        <li>результат осмотра — сразу в историю оборудования.</li>
+      </ul>
+    </div>
+  </div>
+  <p class="muted" style="margin-top:20px">Для кого: инженеры эксплуатации и сервиса на обходах, плановых осмотрах и ТО.</p>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>2</span></div>
+</section>
+
+<!-- 3 ============================================================ -->
+<section class="slide">
+  <p class="kicker">2 · Сценарий</p>
+  <h1 style="margin-bottom:18px">10 шагов из ТЗ — проходят подряд на телефоне</h1>
+  <div class="row grow" style="gap:34px">
+    <div class="col" style="flex:1.35">
+      <div class="steps">
+        <div class="step"><span class="num">1</span><p><b>Камера</b> — приложение сразу открывается на ней</p></div>
+        <div class="step"><span class="num">6</span><p><b>Визуальный анализ</b> узла: признаки, категория, уверенность</p></div>
+        <div class="step"><span class="num">2</span><p><b>Идентификация</b>: QR, маркировка, номер, фото, ручной выбор</p></div>
+        <div class="step"><span class="num">7</span><p><b>Сопоставление</b> со сроками, параметрами, историей</p></div>
+        <div class="step"><span class="num">3</span><p><b>Карточка</b>: спецификация, комплектующие, параметры</p></div>
+        <div class="step"><span class="num">8</span><p><b>AR-метки</b>: цветные рамки с причинами</p></div>
+        <div class="step"><span class="num">4</span><p><b>Требуют проверки</b> — список узлов с причинами</p></div>
+        <div class="step"><span class="num">9</span><p><b>Карточка узла</b>: срок службы, обслуживание, действие</p></div>
+        <div class="step"><span class="num">5</span><p><b>Подсказка</b> «Наведите камеру на …»</p></div>
+        <div class="step"><span class="num">10</span><p><b>Запись работ</b>: проверено, дефект, замечание, обслуживание, замена</p></div>
+      </div>
+      <div class="live">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><rect x="6" y="2" width="12" height="20" rx="2.5"/><circle cx="12" cy="18" r="1"/></svg>
+        <div><b>Живой показ — Павел.</b> Телефон, сервер на ПК, передача данных выключена. Запасной вариант — видео.</div>
+      </div>
+    </div>
+    <div style="width:330px; flex:none; display:flex; flex-direction:column; align-items:center">
+      <!-- Схема экрана на демо-данных PU-001. Павел: можно заменить скриншотом <img src="screen.png"> -->
+      <svg viewBox="0 0 330 520" width="300" height="473" role="img" aria-label="Экран AR-осмотра">
+        <rect x="6" y="4" width="318" height="512" rx="34" fill="#16202c"/>
+        <rect x="18" y="18" width="294" height="484" rx="24" fill="#5b6672"/>
+        <!-- «оборудование» -->
+        <rect x="40" y="120" width="150" height="96" rx="10" fill="#7b8692"/>
+        <rect x="190" y="146" width="34" height="44" fill="#6c7782"/>
+        <circle cx="262" cy="168" r="40" fill="#8a949f"/>
+        <rect x="30" y="296" width="270" height="22" fill="#76818c"/>
+        <rect x="62" y="270" width="44" height="74" rx="6" fill="#88929c"/>
+        <rect x="220" y="270" width="44" height="74" rx="6" fill="#88929c"/>
+        <circle cx="160" cy="250" r="22" fill="#d9dde1"/><circle cx="160" cy="250" r="16" fill="#f4f5f6"/>
+        <line x1="160" y1="250" x2="170" y2="240" stroke="#333" stroke-width="2"/>
+        <!-- рамки -->
+        <rect x="34" y="114" width="196" height="108" rx="6" fill="none" stroke="#e0574f" stroke-width="3.5"/>
+        <rect x="34" y="78" width="196" height="34" rx="6" fill="#e0574f"/>
+        <text x="44" y="93" fill="#fff" font-size="11.5" font-weight="700" font-family="Segoe UI, Inter, Arial">✕ Электродвигатель АИР 180M2</text>
+        <text x="44" y="106" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">коррозия · выработано 92 %</text>
+        <rect x="132" y="222" width="56" height="56" rx="6" fill="none" stroke="#e0574f" stroke-width="3.5"/>
+        <rect x="56" y="264" width="56" height="86" rx="6" fill="none" stroke="#e7b21e" stroke-width="3.5"/>
+        <rect x="214" y="264" width="56" height="86" rx="6" fill="none" stroke="#3cb371" stroke-width="3.5"/>
+        <rect x="30" y="360" width="128" height="34" rx="6" fill="#e7b21e"/>
+        <text x="38" y="375" fill="#2a2000" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">! Задвижка Ду100</text>
+        <text x="38" y="388" fill="#2a2000" font-size="10.5" font-family="Segoe UI, Inter, Arial">89 % ресурса по циклам</text>
+        <rect x="172" y="360" width="128" height="34" rx="6" fill="#3cb371"/>
+        <text x="180" y="375" fill="#fff" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">✓ Задвижка Ду65</text>
+        <text x="180" y="388" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">видимых проблем нет</text>
+        <rect x="180" y="226" width="128" height="34" rx="6" fill="#e0574f"/>
+        <text x="188" y="241" fill="#fff" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">✕ Манометр МП-100</text>
+        <text x="188" y="254" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">давление 7,9 &gt; 6,5 бар</text>
+        <!-- подсказка -->
+        <rect x="30" y="430" width="270" height="52" rx="12" fill="#ffffff" opacity=".95"/>
+        <text x="44" y="452" fill="#13202f" font-size="12" font-weight="700" font-family="Segoe UI, Inter, Arial">Требуют проверки: 8</text>
+        <text x="44" y="470" fill="#44546a" font-size="11.5" font-family="Segoe UI, Inter, Arial">Наведите камеру на электродвигатель</text>
+      </svg>
+      <p class="small muted" style="text-align:center; margin-top:8px">Экран осмотра на демо-данных насосного агрегата
+        <span class="todo">Павел: скриншот</span></p>
+    </div>
+  </div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>3</span></div>
+</section>
+
+<!-- 4 ============================================================ -->
+<section class="slide">
+  <p class="kicker">3 · Архитектура</p>
+  <h1 style="margin-bottom:28px">Всё работает в закрытой локальной сети — данные не покидают предприятие</h1>
+  <div class="perimeter">
+    <span class="tag">Локальная сеть предприятия · без выхода в интернет</span>
+    <div class="arch">
+      <div class="box">
+        <h2>Телефон инженера</h2>
+        <p>Android-приложение: камера, распознавание QR и текста на устройстве, AR-метки, формы осмотра</p>
+      </div>
+      <div class="arrow"><svg viewBox="0 0 60 22"><path d="M2 7h50M44 1l8 6-8 6M58 15H8M16 9l-8 6 8 6" fill="none" stroke="#7a8798" stroke-width="2"/></svg>Wi-Fi<br>HTTP</div>
+      <div class="box">
+        <h2>Бэкенд</h2>
+        <p>Цифровые карточки в базе, расчёт ресурса, сравнение с уставками, сопоставление рамок с карточкой, история</p>
+      </div>
+      <div class="arrow"><svg viewBox="0 0 60 22"><path d="M2 7h50M44 1l8 6-8 6M58 15H8M16 9l-8 6 8 6" fill="none" stroke="#7a8798" stroke-width="2"/></svg>тот же<br>сервер</div>
+      <div class="box">
+        <h2>ИИ-сервис</h2>
+        <p>Детектор узлов, мультимодальная модель, идентификация по фото. Модели локальные, веса — на диске</p>
+      </div>
+    </div>
+  </div>
+  <div class="proof">
+    <div class="video">
+      <video id="proof" src="proof.mp4" controls muted preload="metadata"></video>
+      <div class="ph" id="proof-ph"><span>Ролик: кабель провайдера вынут, сервер перезагружен,
+        передача данных выключена — сценарий проходит<br><br><span class="todo">Павел: proof.mp4</span></span></div>
+    </div>
+    <div class="col">
+      <h2>Как доказываем</h2>
+      <ul class="small">
+        <li>ролик слева: интернет отключён, весь сценарий проходит;</li>
+        <li>проверка сценария одной командой сама пишет «интернет на этом ПК: нет — ВСЁ РАБОТАЕТ»;</li>
+        <li>автотест: сценарий проходит при запрете любых соединений, кроме локальных;</li>
+        <li>модели распознавания QR и текста встроены в приложение, веса ИИ — на диске сервера.</li>
+      </ul>
+      <p class="small muted" style="margin-top:10px">На защите интернет нужен только видеозвонку.</p>
+    </div>
+  </div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>4</span></div>
+</section>
+
+<!-- 5 ============================================================ -->
+<section class="slide">
+  <p class="kicker">4 · Технологии</p>
+  <h1>Проверенные компоненты — в одном инструменте</h1>
+  <div class="row grow">
+    <div class="col card">
+      <p class="who">Приложение</p>
+      <h2>Kotlin · Jetpack Compose</h2>
+      <ul>
+        <li>CameraX — превью и кадры для анализа</li>
+        <li>ML Kit — QR-код и текст маркировки, модели внутри APK</li>
+        <li>метки — Compose Canvas поверх камеры</li>
+        <li>Retrofit + OkHttp — только к серверу предприятия</li>
+      </ul>
+    </div>
+    <div class="col card">
+      <p class="who">Бэкенд</p>
+      <h2>Python · FastAPI · SQLite</h2>
+      <ul>
+        <li>11 запросов; контракт проверяется на каждом ответе</li>
+        <li>база: оборудование → узлы → комплектующие, параметры, осмотры</li>
+        <li>тексты для экрана — готовыми</li>
+        <li>87 автотестов, проверка сценария одной командой</li>
+      </ul>
+    </div>
+    <div class="col card">
+      <p class="who">ИИ-сервис</p>
+      <h2>Python · локальные модели на GPU</h2>
+      <ul>
+        <li>детектор с открытым словарём — узлы по текстовым названиям, без разметки <span class="todo">Т: модель</span></li>
+        <li>мультимодальная модель через Ollama — признаки и объяснение <span class="todo">Т: модель</span></li>
+        <li>векторное сравнение с эталонными фото — идентификация <span class="todo">Т: модель</span></li>
+      </ul>
+    </div>
+  </div>
+  <p class="muted" style="margin-top:18px">Стенд: один ПК с Windows и видеокартой — сервер; запуск обеих служб одной командой.
+    Телефон в той же сети Wi-Fi.</p>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>5</span></div>
+</section>
+
+<!-- 6 ============================================================ -->
+<section class="slide">
+  <p class="kicker">5 · ИИ-анализ</p>
+  <h1 style="margin-bottom:22px">ИИ находит узлы и видимые признаки — и честно говорит, чего не знает</h1>
+  <div class="pipe">
+    <div class="card">
+      <p class="who">ИИ · несколько раз в секунду</p>
+      <h2>Узлы в кадре</h2>
+      <p>Детектор находит электродвигатель, манометр, задвижку, фланец: рамка, тип и уверенность</p>
+    </div>
+    <div class="to">→</div>
+    <div class="card">
+      <p class="who">Бэкенд</p>
+      <h2>Привязка к карточке</h2>
+      <p>Тип совпал — это узел из карточки; одинаковые — по порядку слева направо; иначе «неоднозначно» или «нет в карточке»</p>
+    </div>
+    <div class="to">→</div>
+    <div class="card">
+      <p class="who">ИИ · по нажатию</p>
+      <h2>Анализ узла</h2>
+      <p>Вырезанный узел → признаки (коррозия, подтёки, повреждение), объяснение, рекомендация, уверенность</p>
+    </div>
+  </div>
+  <div style="display:flex; gap:12px; margin:20px 0 18px">
+    <span class="chip green">✓ Видимых проблем не обнаружено</span>
+    <span class="chip amber">! Рекомендуется проверка</span>
+    <span class="chip red">✕ Обнаружены признаки возможного дефекта</span>
+  </div>
+  <div class="row">
+    <div class="col">
+      <h2>Ограничения ТЗ — соблюдаются кодом</h2>
+      <ul class="small">
+        <li>только видимое; внутренние неисправности не утверждаются;</li>
+        <li>«проблем нет» всегда с оговоркой: это не подтверждает исправность;</li>
+        <li>плохой снимок, сбой или ответ не по формату → «рекомендуется проверка», никогда «проблем нет».</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h2>Уверенность и скорость</h2>
+      <ul class="small">
+        <li>уверенность рамки — от детектора; уверенность анализа — оценка модели, не вероятность;</li>
+        <li>рамки — <span class="todo">Т: N</span> раз в секунду, анализ узла — <span class="todo">Т: N</span> с;</li>
+        <li>видеопамять — <span class="todo">Т: N</span> ГБ; модели предобученные, без дообучения.</li>
+      </ul>
+    </div>
+  </div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>6</span></div>
+</section>
+
+<!-- 7 ============================================================ -->
+<section class="slide">
+  <p class="kicker">6 · Расчёт ресурса</p>
+  <h1 style="margin-bottom:22px">Норматив, расчёт и факт — три раздельных блока</h1>
+  <div class="three">
+    <div class="card">
+      <p class="who">Норматив</p>
+      <h2>Нормативный срок</h2>
+      <p>Из паспорта: годы, моточасы или циклы, межповерочный или межсервисный интервал.
+        Например, торцевое уплотнение — 16 000 ч, поверка манометра — раз в год.</p>
+    </div>
+    <div class="card blue">
+      <p class="who">Расчёт</p>
+      <h2>Остаточный ресурс</h2>
+      <p>Отсчёт — от последней замены, иначе от установки.</p>
+      <div class="formula">выработка = max(календарь, наработка, циклы)</div>
+      <p>Остаток в годах, часах или циклах и ожидаемая дата. Порог: 80 % ресурса или 30 дней до ТО.</p>
+    </div>
+    <div class="card">
+      <p class="who">Факт</p>
+      <h2>Фактическое состояние</h2>
+      <p>Что ИИ увидел на снимке узла. Не смешивается с расчётом: узел может быть в норме
+        по сроку, но с коррозией — и наоборот.</p>
+    </div>
+  </div>
+  <table style="margin-top:18px">
+    <tr><th style="width:30%">Узел (демо-данные)</th><th>Расчёт</th><th style="width:36%">Статус</th></tr>
+    <tr><td>Торцевое уплотнение</td><td>118 % по наработке</td><td><span class="chip red">Наступил срок замены</span></td></tr>
+    <tr><td>Задвижка Ду100</td><td>89 % по циклам</td><td><span class="chip amber">Приближается срок замены</span></td></tr>
+    <tr><td>Фланцевое соединение</td><td>нет даты установки</td><td><span class="chip grey">Недостаточно данных — и чего именно</span></td></tr>
+  </table>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>7</span></div>
+</section>
+
+<!-- 8 ============================================================ -->
+<section class="slide">
+  <p class="kicker">7 · Соответствие ТЗ</p>
+  <h1 style="margin-bottom:16px">Каждый пункт ТЗ — в прототипе</h1>
+  <table>
+    <tr><th style="width:27%">Пункт ТЗ</th><th>Как сделано</th><th style="width:11%"></th></tr>
+    <tr><td>4.1 Идентификация</td><td>QR, маркировка, серийный номер (с поправкой на ошибки распознавания), фото; ручной выбор; параметры с уставками</td><td class="ok">✓ выполнено</td></tr>
+    <tr><td>4.2 ИИ-анализ</td><td>4 типа узлов, 3 вида признаков, 3 категории ТЗ, объяснение, рекомендация, уверенность, привязка к карточке</td><td class="ok">✓ выполнено</td></tr>
+    <tr><td>4.3 Ресурс</td><td>установка, наработка, циклы, замены; норматив, расчёт и факт раздельно; явная нехватка данных</td><td class="ok">✓ выполнено</td></tr>
+    <tr><td>4.4 AR-визуализация</td><td>рамки поверх камеры, цвет + значок, причина и действие в метке, нажатие → карточка узла</td><td class="ok">✓ выполнено</td></tr>
+    <tr><td>4.5 Цифровой двойник</td><td>2 образца, 17 узлов и комплектующих: характеристики, нормативы, даты, история, прошлые проверки</td><td class="ok">✓ выполнено</td></tr>
+    <tr><td>4.6 Регистрация осмотра</td><td>проверено, дефект, замечание, обслуживание, замена → история; ресурс пересчитывается</td><td class="ok">✓ выполнено</td></tr>
+    <tr><td>Сценарий, раздел 3</td><td>все 10 шагов подряд на телефоне</td><td class="ok">✓ выполнено</td></tr>
+    <tr><td>Без интернета</td><td>проверено с отключённым интернетом после перезагрузки сервера</td><td class="ok">✓ выполнено</td></tr>
+  </table>
+  <p class="small muted" style="margin-top:12px">Матрица по каждому подпункту и чем он подтверждён — docs/coverage.md в репозитории.</p>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>8</span></div>
+</section>
+
+<!-- 9 ============================================================ -->
+<section class="slide">
+  <p class="kicker">8 · Ограничения и риски</p>
+  <h1>Что прототип не умеет — говорим прямо</h1>
+  <div class="row grow">
+    <div class="col">
+      <h2>Ограничения</h2>
+      <ul>
+        <li>два образца оборудования, данные демонстрационные;</li>
+        <li>параметры — последние значения из карточки, а не с датчиков;</li>
+        <li>4 типа узлов и 3 вида видимых признаков;</li>
+        <li>уверенность анализа не калибрована;</li>
+        <li>метки привязаны к кадру, а не к пространству;</li>
+        <li>нет входа пользователей и шифрования — сеть доверенная.</li>
+      </ul>
+    </div>
+    <div class="col">
+      <h2>Риски и что с ними делаем</h2>
+      <table>
+        <tr><td style="width:46%">ИИ ошибается на незнакомых объектах, бликах, плохом свете</td><td>предварительный осмотр; сомнение и плохой снимок → «рекомендуется проверка»; решение за инженером</td></tr>
+        <tr><td>Ложное «проблем нет»</td><td>всегда оговорка; сбой ИИ никогда не даёт этот результат</td></tr>
+        <tr><td>Неполные данные в карточках</td><td>ресурс не придумываем: пишем «недостаточно данных» и чего не хватает</td></tr>
+        <tr><td>Сервер недоступен</td><td>понятная ошибка вместо зависания; дальше — работа без сервера</td></tr>
+      </table>
+    </div>
+  </div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>9</span></div>
+</section>
+
+<!-- 10 =========================================================== -->
+<section class="slide">
+  <p class="kicker">9 · Развитие</p>
+  <h1 style="margin-bottom:22px">Что дальше</h1>
+  <div class="grid4">
+    <div><b>Интеграция с ТОиР и датчиками</b><p class="muted">карточки, история и параметры — без ручного ввода, отклонения сразу</p></div>
+    <div><b>Модель на фото заказчика</b><p class="muted">дообучение и больше типов узлов — выше точность на его оборудовании</p></div>
+    <div><b>Метки в пространстве (ARCore)</b><p class="muted">остаются на узлах при обходе агрегата</p></div>
+    <div><b>Сравнение с прошлым снимком</b><p class="muted">видно, как развивается дефект</p></div>
+    <div><b>Работа без сервера</b><p class="muted">осмотр там, где нет сети; синхронизация потом</p></div>
+    <div><b>Прогноз по истории параметров</b><p class="muted">обслуживание по состоянию, а не по календарю</p></div>
+    <div><b>Пользователи и роли</b><p class="muted">кто что сделал; наряды и маршруты обходов</p></div>
+    <div><b>Тепловизор, звук, вибрация</b><p class="muted">признаки, которых не видно на обычном снимке</p></div>
+  </div>
+  <div class="team-row">
+    <div class="card"><b>Андрей</b><span>бэкенд, данные, расчёт ресурса; тимлид</span></div>
+    <div class="card"><b>Павел</b><span>Android-приложение и AR, стенд</span></div>
+    <div class="card"><b>Тимофей</b><span>ИИ и компьютерное зрение</span></div>
+    <div class="card blue"><b>Спасибо!</b><span>Ответим на вопросы</span></div>
+  </div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>10</span></div>
+</section>
+
+</div>
+
+<script>
+(function () {
+  var deck = document.getElementById("deck");
+  var slides = Array.prototype.slice.call(deck.querySelectorAll(".slide"));
+  var i = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1), 10) || 1) - 1));
+  var all = /[?&]all\b/.test(location.search);
+
+  // Ролик: если файла ещё нет — заглушка
+  var v = document.getElementById("proof"), ph = document.getElementById("proof-ph");
+  v.addEventListener("loadedmetadata", function () { ph.style.display = "none"; });
+  v.addEventListener("error", function () { v.style.display = "none"; });
+
+  function fit() {
+    if (all) return;
+    var s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
+    slides.forEach(function (el) { el.style.transform = "translate(-50%, -50%) scale(" + s + ")"; });
+  }
+  function show(n) {
+    i = Math.max(0, Math.min(slides.length - 1, n));
+    slides.forEach(function (el, k) { el.classList.toggle("on", k === i); });
+    history.replaceState(null, "", "#" + (i + 1));
+  }
+  function mode() {
+    document.body.className = all ? "all" : "present";
+    if (!all) { deck.style.height = "100vh"; fit(); show(i); }
+    else { deck.style.height = ""; slides.forEach(function (el) { el.style.transform = ""; }); }
+  }
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { show(i + 1); e.preventDefault(); }
+    else if (e.key === "ArrowLeft" || e.key === "PageUp") { show(i - 1); e.preventDefault(); }
+    else if (e.key === "Home") show(0);
+    else if (e.key === "End") show(slides.length - 1);
+    else if (e.key === "f" || e.key === "F" || e.key === "а" || e.key === "А") {
+      if (!document.fullscreenElement) document.documentElement.requestFullscreen();
+      else document.exitFullscreen();
+    } else if (e.key === "a" || e.key === "A" || e.key === "ф" || e.key === "Ф") { all = !all; mode(); }
+  });
+  deck.addEventListener("click", function (e) {
+    if (all || e.target.closest("video")) return;
+    show(e.clientX > window.innerWidth / 3 ? i + 1 : i - 1);
+  });
+  window.addEventListener("resize", fit);
+  mode();
+})();
+</script>
+</body>
+</html>
