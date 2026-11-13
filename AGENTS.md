@@ -67,6 +67,7 @@
 ## Команды
 
 ```
+python stand.py                    # стенд: ИИ-сервис + бэкенд одной командой (docs/stand.md)
 python backend/run.py              # бэкенд: установка при первом запуске и запуск
 python backend/reset_db.py         # сброс базы к демо-данным
 python backend/check_scenario.py   # проверка всех 10 шагов сценария через бэкенд
@@ -87,5 +88,9 @@ cd backend && python -m app.export_openapi   # обновить openapi.json п�
 | `docs/meeting-stage0.md` | решения этапа 0, уточнения контракта |
 | `docs/component-types.md` | словарь типов узлов (`type` = `cv_class`) |
 | `docs/ai-contract.md` | точный формат обмена бэкенд ↔ ИИ-сервис |
+| `stand.py` | запуск стенда: ИИ-сервис и бэкенд; журналы — `logs/` |
+| `docs/stand.md` | инструкция для стенда и чек-листы: без интернета, утро защиты, пробный звонок |
+| `docs/qa.md` | ответы на вопросы жюри |
+| `docs/coverage.md` | матрица покрытия ТЗ с отметками, чем подтверждён каждый пункт |
 | `backend/` | FastAPI + SQLite; подробности — `backend/README.md` |
 | `demo/print/` | QR-коды и таблички для печати |

@@ -214,3 +214,15 @@ def test_9_recorded_defect_turns_component_red_until_fixed():
     client.post("/api/equipment/PU-001/inspections",
                 json={"component_id": "C-04", "type": "maintenance", "comment": "Подтянут сальник"})
     assert level()["level"] == "none"
+
+
+@pytest.mark.parametrize("eq", ["PU-001", "CC-001"])
+def test_4_5_every_component_complete_or_gap_named(eq):
+    """Матрица 4.5: у каждого компонента есть характеристики, норматив и дата установки —
+    а если чего-то нет, это явно названо в missing_data (ТЗ 4.3)."""
+    for c in client.get(f"/api/equipment/{eq}").json()["components"]:
+        n, missing = c["normative"], c["resource"]["missing_data"]
+        assert c["characteristics"], c["id"]
+        assert any(n[k] for k in ("life_years", "life_hours", "life_cycles")) or "normative" in missing, c["id"]
+        assert c["installed_at"] or "installed_at" in missing, c["id"]
+        assert "last_replaced_at" in c and c["previous_results"] is not None, c["id"]

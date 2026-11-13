@@ -2,6 +2,7 @@
 
     python backend/run.py            # установить зависимости (при первом запуске) и запустить
     python backend/run.py --port 8080
+    python backend/run.py --quiet    # без строки на каждый запрос (так запускает stand.py)
 
 Работает одинаково в Windows и Linux. Создаёт виртуальное окружение backend/.venv,
 ставит туда зависимости из requirements.txt и запускает сервер на всех сетевых
@@ -67,6 +68,8 @@ def main():
     parser.add_argument("--host", default=os.environ.get("DEFFECTOR_HOST", "0.0.0.0"))
     parser.add_argument("--port", type=int, default=int(os.environ.get("DEFFECTOR_PORT", "8000")))
     parser.add_argument("--reload", action="store_true", help="перезапуск при изменении кода")
+    parser.add_argument("--quiet", action="store_true",
+                        help="не писать строку на каждый запрос; ошибки пишутся всегда")
     args = parser.parse_args()
 
     ensure_venv()
@@ -82,6 +85,8 @@ def main():
            "--host", args.host, "--port", str(args.port)]
     if args.reload:
         cmd.append("--reload")
+    if args.quiet:
+        cmd.append("--no-access-log")
     try:
         subprocess.call(cmd, cwd=str(BACKEND))
     except KeyboardInterrupt:
