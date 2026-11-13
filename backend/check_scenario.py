@@ -124,7 +124,7 @@ def run(c: Check, eq="PU-001"):
     c.expect(st == 200, f"бэкенд отвечает ({ms:.0f} мс)", f"бэкенд: код {st}")
     ai = h.get("ai", {})
     if ai.get("mode") == "stub":
-        c.warn("ИИ в режиме заглушки (settings.json: ai_mode = \"stub\") — на защите нужен \"real\"")
+        c.warn("ИИ в режиме заглушки — на защите нужен настоящий ИИ: python stand.py без --stub")
     else:
         c.expect(ai.get("status") == "ok", "ИИ-сервис отвечает", "ИИ-сервис не отвечает — запустите его")
     real_ai = ai.get("mode") == "real"

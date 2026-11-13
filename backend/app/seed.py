@@ -99,9 +99,11 @@ COMPONENTS = [
      "2019-06-10", "2024-09-01", "2026-08-10", None, 25000, None, 180, 9800, None,
      "Заменить смазку подшипника"),
     # ---- CC-001: узлы ----
-    ("N-11", "CC-001", None, "node", "Силовой отсек", "cabinet_section", 0, _ch(),
+    ("N-11", "CC-001", None, "node", "Силовой отсек", "cabinet_section", 0,
+     _ch(("Номинальный ток", "63", "А"), ("Напряжение", "380", "В")),
      "2020-02-20", None, None, 20, None, None, None, None, None, None),
-    ("N-12", "CC-001", None, "node", "Отсек управления", "cabinet_section", 1, _ch(),
+    ("N-12", "CC-001", None, "node", "Отсек управления", "cabinet_section", 1,
+     _ch(("Напряжение цепей управления", "24", "В")),
      "2020-02-20", None, None, 20, None, None, None, None, None, None),
     ("N-13", "CC-001", None, "node", "Вентилятор охлаждения шкафа", "electric_motor", 2,
      _ch(("Мощность", "0,12", "кВт")),
@@ -117,7 +119,8 @@ COMPONENTS = [
     ("C-14", "CC-001", "N-12", "part", "Программируемый контроллер", "controller", None,
      _ch(("Входы / выходы", "16 / 8", None)),
      "2020-02-20", None, None, 10, None, None, None, None, None, None),
-    ("C-15", "CC-001", "N-12", "part", "Реле контроля фаз", "relay", None, _ch(),
+    ("C-15", "CC-001", "N-12", "part", "Реле контроля фаз", "relay", None,
+     _ch(("Напряжение контроля", "380", "В")),
      None, None, None, None, None, None, None, None, None, None),
     ("C-16", "CC-001", "N-13", "part", "Фильтр вентиляционной решётки", "filter", None,
      _ch(("Класс фильтрации", "G3", None)),
@@ -209,6 +212,8 @@ def _insert(conn, table, columns, values):
 
 
 def seed(conn):
+    # Одна транзакция: запущенный бэкенд видит либо старую базу, либо новую — без пустых таблиц
+    conn.execute("BEGIN IMMEDIATE")
     for t in ("visual_result", "inspection", "parameter", "component", "equipment"):
         conn.execute(f"DROP TABLE IF EXISTS {t}")
     db.create_schema(conn)

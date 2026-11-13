@@ -112,6 +112,8 @@ def calculate(item, today: date, approaching_percent=80, warn_days=30):
 
     if not any(item.get(k) for k in ("life_years", "life_hours", "life_cycles")):
         missing.append("normative")
+    if ref is None and "installed_at" not in missing:
+        missing.insert(0, "installed_at")  # без даты отсчёта ресурс не посчитать ни по какому нормативу
 
     maintenance, m_missing = _maintenance(item, ref, today, warn_days)
     missing += m_missing

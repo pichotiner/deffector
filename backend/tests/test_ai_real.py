@@ -61,6 +61,7 @@ class FakeAI(BaseHTTPRequestHandler):
 @pytest.fixture
 def fake_ai(monkeypatch):
     server = ThreadingHTTPServer(("127.0.0.1", 0), FakeAI)
+    server.handle_error = lambda *a: None  # бэкенд по таймауту закрыл соединение — это ожидаемо
     threading.Thread(target=server.serve_forever, daemon=True).start()
     FakeAI.delay = 0.0
     FakeAI.analyze_reply = {
