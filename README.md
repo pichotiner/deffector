@@ -21,7 +21,7 @@
 |---|---|
 | Презентация | [`docs/presentation/slides.pdf`](docs/presentation/slides.pdf); для показа — `slides.html` (работает без интернета) |
 | Видео сценария и ролик «без интернета» | ⟨Андрей: ссылка после монтажа⟩ — `demo/video/scenario.mp4`, `docs/presentation/proof.mp4` |
-| APK | ⟨Павел: ссылка на сборку⟩ |
+| APK | [Android APK](mobile/dist/deffector-debug.apk), [сборка и установка](mobile/README.md) |
 | Ответы на частые вопросы | [`docs/qa.md`](docs/qa.md) |
 | Соответствие ТЗ по пунктам | [`docs/coverage.md`](docs/coverage.md) |
 | Материалы заказчика и как мы их использовали | [`docs/case/`](docs/case/README.md) |

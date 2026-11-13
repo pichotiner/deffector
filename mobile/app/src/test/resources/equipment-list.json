@@ -1,0 +1,20 @@
+{
+  "items": [
+    {
+      "id": "PU-001",
+      "name": "Насосный агрегат",
+      "model": "Wilo CronoLine-IL 65/160-5,5/2",
+      "serial_number": "SN2024-004587",
+      "marking": "PU-001",
+      "location": "Насосная станция, зал 1"
+    },
+    {
+      "id": "PU-002",
+      "name": "Насосный агрегат винтовой",
+      "model": "AMS PCP60S12/3 01 Ex B1 HNBR DTS",
+      "serial_number": "21031004-1",
+      "marking": "PU-002",
+      "location": "Насосная откачки нефтешлама"
+    }
+  ]
+}

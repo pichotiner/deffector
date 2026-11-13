@@ -1,0 +1,100 @@
+{
+  "id": "C-02",
+  "parent_id": "N-03",
+  "kind": "part",
+  "name": "Манометр на напорном патрубке МП-100",
+  "type": "pressure_gauge",
+  "type_name": "Манометр",
+  "order": 3,
+  "characteristics": [
+    {
+      "name": "Диапазон",
+      "value": "0–6",
+      "unit": "бар"
+    },
+    {
+      "name": "Класс точности",
+      "value": "1,5",
+      "unit": null
+    }
+  ],
+  "installed_at": "2024-03-01",
+  "last_replaced_at": "2024-11-05",
+  "last_maintenance_at": "2025-11-02",
+  "normative": {
+    "life_years": 8.0,
+    "life_hours": null,
+    "life_cycles": null,
+    "maintenance_interval_days": 365
+  },
+  "usage": {
+    "operating_hours": null,
+    "cycles": null
+  },
+  "resource": {
+    "status": "due",
+    "used_percent": 25,
+    "remaining": {
+      "years": 6.0,
+      "hours": null,
+      "cycles": null
+    },
+    "estimated_end_date": "2032-11-05",
+    "basis": "Оценка по календарному сроку от даты последней замены",
+    "missing_data": [],
+    "maintenance": {
+      "next_due_date": "2026-11-02",
+      "status": "due",
+      "overdue_days": 11,
+      "days_left": null
+    },
+    "message": "Срок обслуживания наступил 11 дней назад"
+  },
+  "visual": {
+    "category": "check_recommended",
+    "signs": [
+      "подтёки на штуцере"
+    ],
+    "explanation": "У резьбового соединения манометра видны тёмные следы, похожие на подтёки",
+    "recommendation": "Проверить герметичность резьбового соединения манометра",
+    "detection_confidence": 0.87,
+    "assessment_confidence": 0.6,
+    "analyzed_at": "2026-11-12T16:25:00+03:00",
+    "disclaimer": "Предварительный осмотр по изображению. Внутренние неисправности так не определяются",
+    "note": null
+  },
+  "attention": {
+    "level": "defect",
+    "reasons": [
+      "Наступил срок обслуживания",
+      "Давление на выходе: выше верхней уставки на 0,4 бар",
+      "Рекомендуется проверка: подтёки на штуцере"
+    ],
+    "recommended_action": "Провести поверку манометра"
+  },
+  "parameters": [
+    "P-01"
+  ],
+  "previous_results": [
+    {
+      "id": 4,
+      "component_id": "C-02",
+      "type": "maintenance",
+      "comment": "Поверка манометра",
+      "performed_by": "Инженер Иванов",
+      "performed_at": "2025-11-02T10:00:00+03:00",
+      "visual": null,
+      "recommendation": "Следующая поверка через 12 месяцев"
+    },
+    {
+      "id": 2,
+      "component_id": "C-02",
+      "type": "replacement",
+      "comment": "Замена манометра: разбито стекло",
+      "performed_by": "Инженер Иванов",
+      "performed_at": "2024-11-05T11:00:00+03:00",
+      "visual": null,
+      "recommendation": null
+    }
+  ]
+}
