@@ -110,7 +110,7 @@ class Analyzer:
             "format": ANSWER_SCHEMA,
             "keep_alive": -1,  # не выгружать модель из памяти между запросами
             "options": {
-                "temperature": 0,  # нулевая случайность: один снимок — один ответ
+                "temperature": 0,  # минимум случайности; на GPU ответ всё же не строго повторяем
                 "seed": 0,
                 "top_k": 1,
                 "num_predict": num_predict,
