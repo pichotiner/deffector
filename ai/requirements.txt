@@ -1,0 +1,4 @@
+# Полная установка. torch и torchvision ставит install.py отдельно — из каталога сборок с CUDA.
+-r requirements-stub.txt
+transformers==5.22.2
+huggingface_hub==2.4.0
