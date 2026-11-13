@@ -24,6 +24,39 @@ from .images import ImageError, decode_image  # noqa: E402
 
 log = logging.getLogger("ai")
 
+_GPU_CACHE: dict = {"at": 0.0, "value": None}
+
+
+def gpu_memory_mb() -> tuple[int, int] | None:
+    """Занятая и полная видеопамять карты по nvidia-smi: (used, total) в МБ.
+
+    torch.cuda.mem_get_info в Windows (драйвер WDDM) не учитывает память других
+    процессов — например, Ollama, — поэтому общий расход берём у драйвера.
+    Ответ кэшируется на 5 секунд: /health опрашивают часто.
+    """
+    import os
+    import shutil
+    import subprocess
+
+    now = time.monotonic()
+    if now - _GPU_CACHE["at"] < 5.0:
+        return _GPU_CACHE["value"]
+    value = None
+    exe = shutil.which("nvidia-smi")
+    if exe:
+        try:
+            kwargs = {"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt" else {}
+            out = subprocess.run(
+                [exe, "--query-gpu=memory.used,memory.total", "--format=csv,noheader,nounits"],
+                capture_output=True, text=True, timeout=3, **kwargs,
+            ).stdout
+            used, total = (int(v) for v in out.strip().splitlines()[0].split(","))
+            value = (used, total)
+        except (OSError, ValueError, IndexError, subprocess.SubprocessError):
+            value = None
+    _GPU_CACHE.update(at=now, value=value)
+    return value
+
 
 class ApiError(Exception):
     def __init__(self, status: int, code: str, message: str):
@@ -118,11 +151,16 @@ class Service:
             import torch
 
             if torch.cuda.is_available():
-                free, total = torch.cuda.mem_get_info()
+                smi = gpu_memory_mb()
+                if smi is not None:
+                    used_mb, total_mb = smi  # вся занятая память карты, включая Ollama
+                else:
+                    free, total = torch.cuda.mem_get_info()
+                    used_mb, total_mb = (total - free) // 2**20, total // 2**20
                 info["gpu"] = {
                     "name": torch.cuda.get_device_name(0),
-                    "memory_total_mb": total // 2**20,
-                    "memory_used_mb": (total - free) // 2**20,  # вся занятая память карты, включая Ollama
+                    "memory_total_mb": total_mb,
+                    "memory_used_mb": used_mb,
                 }
         except Exception:
             pass
