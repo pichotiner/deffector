@@ -1,0 +1,90 @@
+<!doctype html><html lang='ru'><head><meta charset='utf-8'><title>Листы для показа ИИ</title><style>
+@page { size: A4 landscape; margin: 8mm; }
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Segoe UI", Arial, sans-serif; color: #111; background: #fff; }
+.sheet { height: 194mm; display: flex; flex-direction: column; page-break-after: always; }
+.sheet:last-child { page-break-after: auto; }
+.photo { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; }
+.photo img { max-width: 100%; max-height: 100%; object-fit: contain; }
+.small img { max-width: 55%; max-height: 80%; }
+.cap { padding-top: 3mm; border-top: 1px solid #bbb; font-size: 11pt; line-height: 1.3; }
+.cap b { font-size: 13pt; }
+.src { color: #666; font-size: 8.5pt; }
+.cover h1 { font-size: 22pt; margin: 0 0 6mm; }
+.cover li { margin: 1.5mm 0; font-size: 11pt; }
+</style></head><body>
+<section class="sheet cover">
+  <h1>Листы для показа ИИ</h1>
+  <p>Наводить телефон в режиме AR-осмотра с открытой карточкой <b>PU-001</b>: рамки появляются
+  на узлах, «Анализировать» — оценка выбранного узла. Листы Э — для «Определить по фото».
+  Что ожидать — под каждым листом (по прогону на видеокарте 13.11). Кадр, который на стенде
+  ведёт себя нестабильно, на показ не брать.</p>
+  <ol style="list-style:none;padding:0"><li>1. Общий вид насосного агрегата</li><li>2. Насосная: два двигателя</li><li>3. Двигатель с коррозией</li><li>4. Манометр с коррозией</li><li>5. Фланец с коррозией</li><li>6. Шаровой кран с течью</li><li>7. Задвижка с коррозией</li><li>8. Клеммная коробка двигателя: перегрев</li><li>9. Агрегат без видимых дефектов</li></ol>
+  <ol style="list-style:none;padding:0"><li>Э1. Эталон PU-001 — насосный агрегат Wilo</li><li>Э2. Эталон PU-001 — насосы Wilo CronoLine</li><li>Э3. Эталон PU-002 — винтовой агрегат AMS</li><li>Э4. Эталон PU-002 — винтовой агрегат AMS</li></ol>
+  <p class="src">Собрано скриптом demo/photos/show/make_show.py.</p>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../pump_unit_drawing_01.jpg"></div>
+  <div class="cap"><b>1. Общий вид насосного агрегата</b><br>Рамки: двигатель и два фланца. Порядок рамок слева направо сопоставляется с карточкой PU-001.
+  <div class="src">demo/photos/pump_unit_drawing_01.jpg · Wikimedia Commons, автор и лицензия — demo/photos/README.md</div></div>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../pump_room_01.jpg"></div>
+  <div class="cap"><b>2. Насосная: два двигателя</b><br>Рамки на обоих двигателях.
+  <div class="src">demo/photos/pump_room_01.jpg · Wikimedia Commons, автор и лицензия — demo/photos/README.md</div></div>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../motor_corrosion_01.jpg"></div>
+  <div class="cap"><b>3. Двигатель с коррозией</b><br>Рамка на двигателе → «Анализировать»: «обнаружены признаки возможного дефекта», коррозия.
+  <div class="src">demo/photos/motor_corrosion_01.jpg · Wikimedia Commons, автор и лицензия — demo/photos/README.md</div></div>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../gauge_corrosion_01.jpg"></div>
+  <div class="cap"><b>4. Манометр с коррозией</b><br>Рамка на манометре → коррозия, категория «обнаружены признаки возможного дефекта» или «рекомендуется проверка».
+  <div class="src">demo/photos/gauge_corrosion_01.jpg · Wikimedia Commons, автор и лицензия — demo/photos/README.md</div></div>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../flange_corrosion_02.jpg"></div>
+  <div class="cap"><b>5. Фланец с коррозией</b><br>Рамка на фланце → коррозия.
+  <div class="src">demo/photos/flange_corrosion_02.jpg · Wikimedia Commons, автор и лицензия — demo/photos/README.md</div></div>
+</section>
+<section class="sheet">
+  <div class="photo small"><img src="../../../docs/case/%D0%97%D0%B0%D0%BF%D0%BE%D1%80%D0%BD%D0%B0%D1%8F%20%D0%B0%D1%80%D0%BC%D0%B0%D1%82%D1%83%D1%80%D0%B0/cca9d029-459e-5007-8f88-181843ed8665.jpg"></div>
+  <div class="cap"><b>6. Шаровой кран с течью</b><br>Рамка на арматуре → течь/подтёки. Фото маленькое — печатать не крупнее половины листа или показывать на мониторе.
+  <div class="src">docs/case/Запорная арматура/cca9d029-459e-5007-8f88-181843ed8665.jpg · фото заказчика из материалов кейса</div></div>
+</section>
+<section class="sheet">
+  <div class="photo small"><img src="../../../docs/case/%D0%97%D0%B0%D0%BF%D0%BE%D1%80%D0%BD%D0%B0%D1%8F%20%D0%B0%D1%80%D0%BC%D0%B0%D1%82%D1%83%D1%80%D0%B0/0831c2a9-3a2b-5bf7-b70f-05f1d51f5cdb%20%281%29.jpg"></div>
+  <div class="cap"><b>7. Задвижка с коррозией</b><br>Рамка на арматуре → коррозия. Фото маленькое.
+  <div class="src">docs/case/Запорная арматура/0831c2a9-3a2b-5bf7-b70f-05f1d51f5cdb (1).jpg · фото заказчика из материалов кейса</div></div>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../../../docs/case/%D0%9D%D0%B0%D1%81%D0%BE%D1%81%D0%BD%D1%8B%D0%B5%20%D0%B0%D0%B3%D1%80%D0%B5%D0%B3%D0%B0%D1%82%D1%8B/photo_2026-11-13_12-48-02.jpg"></div>
+  <div class="cap"><b>8. Клеммная коробка двигателя: перегрев</b><br>Запасной кадр: анализ находит «следы перегрева», но рамки двигателя на этом крупном плане может не быть — тогда кадр не показывать.
+  <div class="src">docs/case/Насосные агрегаты/photo_2026-11-13_12-48-02.jpg · фото заказчика из материалов кейса</div></div>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../pump_unit_01.jpg"></div>
+  <div class="cap"><b>9. Агрегат без видимых дефектов</b><br>Рамка на двигателе → «видимых проблем не обнаружено» с оговоркой. gauge_clean_01.jpg для «чистого» не брать: модель видит на нём коррозию.
+  <div class="src">demo/photos/pump_unit_01.jpg · Wikimedia Commons, автор и лицензия — demo/photos/README.md</div></div>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../../reference/PU-001/case_pump_01.jpg"></div>
+  <div class="cap"><b>Э1. Эталон PU-001 — насосный агрегат Wilo</b><br>«Определить по фото» → PU-001. Снять этот лист телефоном 2–3 раза и положить снимки в demo/reference/PU-001/.
+  <div class="src">demo/reference/PU-001/case_pump_01.jpg · фото заказчика из материалов кейса</div></div>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../../reference/PU-001/wilo_manual_01.jpg"></div>
+  <div class="cap"><b>Э2. Эталон PU-001 — насосы Wilo CronoLine</b><br>«Определить по фото» → PU-001.
+  <div class="src">demo/reference/PU-001/wilo_manual_01.jpg · руководство Wilo из материалов кейса</div></div>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../../reference/PU-002/ams_manual_01.jpg"></div>
+  <div class="cap"><b>Э3. Эталон PU-002 — винтовой агрегат AMS</b><br>«Определить по фото» → PU-002. Снять этот лист телефоном 2–3 раза и положить снимки в demo/reference/PU-002/.
+  <div class="src">demo/reference/PU-002/ams_manual_01.jpg · инструкция AMS из материалов кейса</div></div>
+</section>
+<section class="sheet">
+  <div class="photo"><img src="../../reference/PU-002/ams_manual_02.jpg"></div>
+  <div class="cap"><b>Э4. Эталон PU-002 — винтовой агрегат AMS</b><br>«Определить по фото» → PU-002.
+  <div class="src">demo/reference/PU-002/ams_manual_02.jpg · инструкция AMS из материалов кейса</div></div>
+</section></body></html>
