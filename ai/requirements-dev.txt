@@ -1,0 +1,2 @@
+-r requirements-stub.txt
+pytest

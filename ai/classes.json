@@ -1,0 +1,25 @@
+{
+  "_comment": "Словарь типов узлов. Ключ — cv_class (совпадает с type узла в базе). prompts — английские названия для детектора с открытым словарём, threshold — порог уверенности для этого типа.",
+  "classes": {
+    "electric_motor": {
+      "name": "Электродвигатель",
+      "prompts": ["electric motor", "industrial electric motor"],
+      "threshold": 0.2
+    },
+    "pressure_gauge": {
+      "name": "Манометр",
+      "prompts": ["pressure gauge", "manometer"],
+      "threshold": 0.2
+    },
+    "valve": {
+      "name": "Запорная арматура",
+      "prompts": ["valve", "gate valve", "ball valve"],
+      "threshold": 0.2
+    },
+    "flange": {
+      "name": "Фланцевое соединение",
+      "prompts": ["pipe flange", "flange joint"],
+      "threshold": 0.2
+    }
+  }
+}
