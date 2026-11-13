@@ -232,9 +232,9 @@ torch видит только свою память и не учитывает O
 [
   {"bbox": [0.08, 0.30, 0.34, 0.42], "cv_class": "electric_motor", "confidence": 0.91},
   {"bbox": [0.41, 0.22, 0.12, 0.18], "cv_class": "pressure_gauge", "confidence": 0.87},
-  {"bbox": [0.62, 0.40, 0.14, 0.22], "cv_class": "valve", "confidence": 0.78},
-  {"bbox": [0.48, 0.52, 0.09, 0.16], "cv_class": "flange", "confidence": 0.66},
-  {"bbox": [0.80, 0.50, 0.09, 0.17], "cv_class": "flange", "confidence": 0.58}
+  {"bbox": [0.50, 0.40, 0.11, 0.20], "cv_class": "valve", "confidence": 0.78},
+  {"bbox": [0.80, 0.42, 0.12, 0.21], "cv_class": "valve", "confidence": 0.72},
+  {"bbox": [0.66, 0.52, 0.09, 0.16], "cv_class": "flange", "confidence": 0.66}
 ]
 ```
 
