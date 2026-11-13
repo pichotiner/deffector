@@ -1,0 +1,38 @@
+name: Tests
+
+on:
+  push:
+    paths: ["backend/**", "ai/**", ".github/workflows/tests.yml"]
+  pull_request:
+    paths: ["backend/**", "ai/**", ".github/workflows/tests.yml"]
+
+jobs:
+  backend:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]   # стенд у Павла — Windows
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r backend/requirements-dev.txt
+      - run: python -m pytest -q
+        working-directory: backend
+
+  ai:   # тесты идут на заглушке: видеокарта и веса моделей не нужны
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -r ai/requirements-dev.txt
+      - run: python -m pytest -q
+        working-directory: ai
