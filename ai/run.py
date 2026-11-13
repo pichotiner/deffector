@@ -48,6 +48,11 @@ def main() -> None:
         if missing or not torch_ok:
             what = "нет torch/transformers" if not torch_ok else "нет весов: " + ", ".join(missing)
             fail(f"полная установка не завершена ({what}). Выполните: python ai/install.py")
+        if installed_info().get("mode") != "full":
+            # всё скачано, но установка оборвалась — например, torch не увидел видеокарту:
+            # без этой проверки сервис молча работал бы на процессоре
+            fail("установка не дошла до конца (см. вывод python ai/install.py — например, "
+                 "не найдена видеокарта). Выполните: python ai/install.py")
         installed_vlm = installed_info().get("vlm")
         if installed_vlm and "AI_VLM_MODEL" not in env:
             env["AI_VLM_MODEL"] = installed_vlm  # модель, выбранная при установке (--vlm)
