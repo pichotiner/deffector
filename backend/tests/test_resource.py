@@ -28,8 +28,9 @@ def test_overdue_maintenance():
 
 
 def test_expired_life_by_hours():
-    r = calc(comp("C-06"))
-    assert r["status"] == "due" and r["used_percent"] == 118
+    # Подшипники двигателя Wilo: ресурс 20 000 ч, наработка 20 600 ч
+    r = calc(comp("C-07"))
+    assert r["status"] == "due" and r["used_percent"] == 103
     assert r["message"].startswith("Наступил срок замены")
     assert r["estimated_end_date"] < TODAY.isoformat()  # ресурс исчерпан в прошлом
 
@@ -42,14 +43,17 @@ def test_approaching_by_cycles():
 
 
 def test_approaching_by_hours():
-    r = calc(comp("N-02"))
-    assert r["status"] == "approaching" and r["used_percent"] == 92
-    assert r["remaining"]["hours"] == 3200
+    # Торцевое уплотнение Wilo: замена при ревизии 15 000 ч, после замены 13 300 ч
+    r = calc(comp("C-06"))
+    assert r["status"] == "approaching" and r["used_percent"] == 89
+    assert r["remaining"]["hours"] == 1700
+    assert "от даты последней замены" in r["basis"]
 
 
 def test_approaching_by_maintenance():
+    # ТО-1 каждые 4000 ч ≈ 167 суток от 04.06.2026
     r = calc(comp("N-01"))
-    assert r["status"] == "approaching" and r["maintenance"]["days_left"] == 19
+    assert r["status"] == "approaching" and r["maintenance"]["days_left"] == 5
 
 
 def test_large_reserve_is_ok():
@@ -67,8 +71,23 @@ def test_insufficient_data_is_explicit():
 def test_replacement_history_moves_reference_point():
     r = calc(comp("C-02"))
     assert "от даты последней замены" in r["basis"]
-    # 2021-03-15 → 2026-11-13 при сроке 8 лет ≈ 71 %
-    assert r["used_percent"] == 71
+    # 2024-11-05 → 2026-11-13 при сроке 8 лет ≈ 25 %
+    assert r["used_percent"] == 25
+
+
+def test_no_normative_by_condition_is_explicit():
+    # Рабочее колесо Wilo и статор AMS меняются «по состоянию» — норматива нет
+    for cid in ("C-08", "C-11"):
+        r = calc(comp(cid))
+        assert r["status"] == "insufficient_data" and r["missing_data"] == ["normative"]
+
+
+def test_passport_normatives_of_screw_pump():
+    eq = next(e for e in seed.EQUIPMENT if e["id"] == "PU-002")
+    r = calc(eq)
+    # Паспорт: ресурс до списания 11 000 ч, наработка 6 800 ч; ТО — раз в 3 месяца
+    assert r["used_percent"] == 62 and r["remaining"]["hours"] == 4200
+    assert r["status"] == "approaching" and r["maintenance"]["days_left"] == 17
 
 
 def test_partial_data_is_reported():

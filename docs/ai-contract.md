@@ -75,7 +75,7 @@
 {"recognized": true, "candidates": [{"equipment_id": "PU-001", "confidence": 0.82}]}
 ```
 
-`equipment_id` — `PU-001` или `CC-001`. Названия добавит бэкенд. Порог `recognized`
+`equipment_id` — `PU-001` или `PU-002` (с 13.11 второй образец — винтовой агрегат AMS вместо шкафа `CC-001`). Названия добавит бэкенд. Порог `recognized`
 бэкенд применяет и сам (`identify_threshold`).
 
 ## Проверка без телефона

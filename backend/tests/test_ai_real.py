@@ -51,7 +51,7 @@ class FakeAI(BaseHTTPRequestHandler):
             self._send(200, FakeAI.analyze_reply)
         elif self.path == "/identify":
             self._send(200, {"recognized": True, "candidates": [
-                {"equipment_id": "CC-001", "confidence": 0.3},
+                {"equipment_id": "PU-002", "confidence": 0.3},
                 {"equipment_id": "PU-001", "confidence": 0.77},
                 {"equipment_id": "XX-999", "confidence": 0.9}]})
         else:
@@ -122,7 +122,7 @@ def test_no_visible_issues_gets_note(fake_ai):
 
 def test_identify_filters_unknown_and_sorts(fake_ai):
     r = client.post("/api/identify/image", files=JPEG).json()
-    assert [c["equipment_id"] for c in r["candidates"]] == ["PU-001", "CC-001"]
+    assert [c["equipment_id"] for c in r["candidates"]] == ["PU-001", "PU-002"]
     assert r["recognized"] is True
 
 

@@ -194,7 +194,8 @@
       </ul>
     </div>
   </div>
-  <p class="muted" style="margin-top:20px">Для кого: инженеры эксплуатации и сервиса на обходах, плановых осмотрах и ТО.</p>
+  <p class="muted" style="margin-top:20px">Для кого: инженеры эксплуатации и сервиса на обходах, плановых осмотрах и ТО.
+    Демо-данные — из материалов заказчика: паспорта, регламенты ТО, базы вибрации и температуры.</p>
   <div class="foot"><span>Deffector · Кибер 102</span><span>2</span></div>
 </section>
 
@@ -238,23 +239,23 @@
         <!-- рамки -->
         <rect x="34" y="114" width="196" height="108" rx="6" fill="none" stroke="#e0574f" stroke-width="3.5"/>
         <rect x="34" y="78" width="196" height="34" rx="6" fill="#e0574f"/>
-        <text x="44" y="93" fill="#fff" font-size="11.5" font-weight="700" font-family="Segoe UI, Inter, Arial">✕ Электродвигатель АИР 180M2</text>
-        <text x="44" y="106" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">коррозия · выработано 92 %</text>
+        <text x="44" y="93" fill="#fff" font-size="11.5" font-weight="700" font-family="Segoe UI, Inter, Arial">✕ Электродвигатель 5,5 кВт</text>
+        <text x="44" y="106" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">признаки коррозии на корпусе</text>
         <rect x="132" y="222" width="56" height="56" rx="6" fill="none" stroke="#e0574f" stroke-width="3.5"/>
         <rect x="56" y="264" width="56" height="86" rx="6" fill="none" stroke="#e7b21e" stroke-width="3.5"/>
         <rect x="214" y="264" width="56" height="86" rx="6" fill="none" stroke="#3cb371" stroke-width="3.5"/>
         <rect x="30" y="360" width="128" height="34" rx="6" fill="#e7b21e"/>
-        <text x="38" y="375" fill="#2a2000" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">! Задвижка Ду100</text>
+        <text x="38" y="375" fill="#2a2000" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">! Задвижка на входе</text>
         <text x="38" y="388" fill="#2a2000" font-size="10.5" font-family="Segoe UI, Inter, Arial">89 % ресурса по циклам</text>
         <rect x="172" y="360" width="128" height="34" rx="6" fill="#3cb371"/>
-        <text x="180" y="375" fill="#fff" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">✓ Задвижка Ду65</text>
+        <text x="180" y="375" fill="#fff" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">✓ Задвижка на выходе</text>
         <text x="180" y="388" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">видимых проблем нет</text>
         <rect x="180" y="226" width="128" height="34" rx="6" fill="#e0574f"/>
         <text x="188" y="241" fill="#fff" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">✕ Манометр МП-100</text>
-        <text x="188" y="254" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">давление 7,9 &gt; 6,5 бар</text>
+        <text x="188" y="254" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">давление 4,4 &gt; 4,0 бар</text>
         <!-- подсказка -->
         <rect x="30" y="430" width="270" height="52" rx="12" fill="#ffffff" opacity=".95"/>
-        <text x="44" y="452" fill="#13202f" font-size="12" font-weight="700" font-family="Segoe UI, Inter, Arial">Требуют проверки: 8</text>
+        <text x="44" y="452" fill="#13202f" font-size="12" font-weight="700" font-family="Segoe UI, Inter, Arial">Требуют проверки: 10</text>
         <text x="44" y="470" fill="#44546a" font-size="11.5" font-family="Segoe UI, Inter, Arial">Наведите камеру на электродвигатель</text>
       </svg>
       <p class="small muted" style="text-align:center; margin-top:8px">Экран осмотра на демо-данных насосного агрегата
@@ -404,8 +405,8 @@
     <div class="card">
       <p class="who">Норматив</p>
       <h2>Нормативный срок</h2>
-      <p>Из паспорта: годы, моточасы или циклы, межповерочный или межсервисный интервал.
-        Например, торцевое уплотнение — 16 000 ч, поверка манометра — раз в год.</p>
+      <p>Из документации заказчика: годы, моточасы или циклы, интервалы ТО и поверки.
+        Подшипники двигателя Wilo — 20 000 ч, ТО-1 — каждые 4000 ч, агрегат AMS — 11 000 ч до списания.</p>
     </div>
     <div class="card blue">
       <p class="who">Расчёт</p>
@@ -423,9 +424,9 @@
   </div>
   <table style="margin-top:18px">
     <tr><th style="width:30%">Узел (демо-данные)</th><th>Расчёт</th><th style="width:36%">Статус</th></tr>
-    <tr><td>Торцевое уплотнение</td><td>118 % по наработке</td><td><span class="chip red">Наступил срок замены</span></td></tr>
-    <tr><td>Задвижка Ду100</td><td>89 % по циклам</td><td><span class="chip amber">Приближается срок замены</span></td></tr>
-    <tr><td>Фланцевое соединение</td><td>нет даты установки</td><td><span class="chip grey">Недостаточно данных — и чего именно</span></td></tr>
+    <tr><td>Подшипники двигателя</td><td>20 600 из 20 000 ч</td><td><span class="chip red">Наступил срок замены</span></td></tr>
+    <tr><td>Торцевое уплотнение</td><td>89 %: замена на ревизии 15 000 ч</td><td><span class="chip amber">Приближается срок замены</span></td></tr>
+    <tr><td>Рабочее колесо</td><td>в документации — «по состоянию»</td><td><span class="chip grey">Недостаточно данных: нет норматива</span></td></tr>
   </table>
   <div class="foot"><span>Deffector · Кибер 102</span><span>7</span></div>
 </section>
@@ -436,11 +437,11 @@
   <h1 style="margin-bottom:16px">Каждый пункт ТЗ — в прототипе</h1>
   <table>
     <tr><th style="width:27%">Пункт ТЗ</th><th>Как сделано</th><th style="width:11%"></th></tr>
-    <tr><td>4.1 Идентификация</td><td>QR, маркировка, серийный номер (с поправкой на ошибки распознавания), фото; ручной выбор; параметры с уставками</td><td class="ok">✓ выполнено</td></tr>
+    <tr><td>4.1 Идентификация</td><td>QR, маркировка, номер, фото, ручной выбор; вибрация и температура — из баз заказчика, с его уставками</td><td class="ok">✓ выполнено</td></tr>
     <tr><td>4.2 ИИ-анализ</td><td>4 типа узлов, 3 вида признаков, 3 категории ТЗ, объяснение, рекомендация, уверенность, привязка к карточке</td><td class="ok">✓ выполнено</td></tr>
     <tr><td>4.3 Ресурс</td><td>установка, наработка, циклы, замены; норматив, расчёт и факт раздельно; явная нехватка данных</td><td class="ok">✓ выполнено</td></tr>
     <tr><td>4.4 AR-визуализация</td><td>рамки поверх камеры, цвет + значок, причина и действие в метке, нажатие → карточка узла</td><td class="ok">✓ выполнено</td></tr>
-    <tr><td>4.5 Цифровой двойник</td><td>2 образца, 17 узлов и комплектующих: характеристики, нормативы, даты, история, прошлые проверки</td><td class="ok">✓ выполнено</td></tr>
+    <tr><td>4.5 Цифровой двойник</td><td>2 образца из материалов заказчика (Wilo CronoLine-IL, AMS PCP60S12/3), 20 узлов и комплектующих: характеристики, нормативы, даты, история</td><td class="ok">✓ выполнено</td></tr>
     <tr><td>4.6 Регистрация осмотра</td><td>проверено, дефект, замечание, обслуживание, замена → история; ресурс пересчитывается</td><td class="ok">✓ выполнено</td></tr>
     <tr><td>Сценарий, раздел 3</td><td>все 10 шагов подряд на телефоне</td><td class="ok">✓ выполнено</td></tr>
     <tr><td>Без интернета</td><td>проверено с отключённым интернетом после перезагрузки сервера</td><td class="ok">✓ выполнено</td></tr>

@@ -87,7 +87,8 @@ python docs/presentation/make_pdf.py          # slides.html → slides.pdf (Edge
 | `plan/` | общий план, планы ролей, `future.md` |
 | `docs/tz/` | ТЗ и уточнения организаторов |
 | `docs/meeting-stage0.md` | решения этапа 0, уточнения контракта |
-| `docs/component-types.md` | словарь типов узлов (`type` = `cv_class`) |
+| `docs/component-types.md` | словарь типов узлов (`type` = `cv_class`), дефекты из перечня заказчика |
+| `docs/case/` | материалы кейса от заказчика: паспорта, регламенты, базы вибрации и температуры, фото; опись — `README.md` |
 | `docs/ai-contract.md` | точный формат обмена бэкенд ↔ ИИ-сервис |
 | `stand.py` | запуск стенда: ИИ-сервис и бэкенд; журналы — `logs/` |
 | `docs/stand.md` | инструкция для стенда и чек-листы: без интернета, утро защиты, пробный звонок |

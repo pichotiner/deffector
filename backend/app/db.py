@@ -58,7 +58,10 @@ CREATE TABLE IF NOT EXISTS parameter (
     unit TEXT,
     setpoint_min REAL,
     setpoint_max REAL,
-    measured_at TEXT
+    measured_at TEXT,
+    warn_text TEXT,   -- диагноз при выходе за уставку предупреждения (материалы заказчика)
+    alarm_max REAL,   -- уровень тревоги
+    alarm_text TEXT   -- диагноз при тревоге
 );
 
 CREATE TABLE IF NOT EXISTS inspection (

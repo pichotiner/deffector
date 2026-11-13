@@ -8,5 +8,6 @@
   "maintenance_warning_days": 30,
   "identify_threshold": 0.5,
   "not_inspected_days": 180,
-  "today": null
+  "today": null,
+  "telemetry_at": "2026-11-13 09:00"
 }
