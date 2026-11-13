@@ -11,9 +11,17 @@ COMPONENT_TYPES = {
     "pressure_gauge": {"name": "Манометр", "prompt": "pressure gauge", "detectable": True},
     "valve": {"name": "Запорная арматура", "prompt": "valve", "detectable": True},
     "flange": {"name": "Фланцевое соединение", "prompt": "pipe flange", "detectable": True},
-    # Не распознаются ИИ — нужны только для полноты состава оборудования.
+    # Не распознаются ИИ — нужны для полноты состава оборудования.
     "pump": {"name": "Насос", "prompt": None, "detectable": False},
+    "pipeline": {"name": "Трубопроводная обвязка", "prompt": None, "detectable": False},
+    "mechanical_seal": {"name": "Торцевое уплотнение", "prompt": None, "detectable": False},
+    "bearing": {"name": "Подшипник", "prompt": None, "detectable": False},
+    "cabinet_section": {"name": "Отсек шкафа", "prompt": None, "detectable": False},
+    "contactor": {"name": "Контактор", "prompt": None, "detectable": False},
     "circuit_breaker": {"name": "Автоматический выключатель", "prompt": None, "detectable": False},
+    "controller": {"name": "Контроллер", "prompt": None, "detectable": False},
+    "relay": {"name": "Реле", "prompt": None, "detectable": False},
+    "filter": {"name": "Фильтр", "prompt": None, "detectable": False},
 }
 
 DETECTABLE_TYPES = [t for t, v in COMPONENT_TYPES.items() if v["detectable"]]
@@ -48,6 +56,8 @@ INSPECTION_TYPES = {
     "replacement": "Замена",
 }
 INSPECTION_TYPES_NEED_COMMENT = ("defect", "remark")
+
+VISUAL_CATEGORIES_FROM_AI = ("no_visible_issues", "check_recommended", "possible_defect")
 
 # Обязательные тексты (ТЗ, раздел 4.2).
 DISCLAIMER = "Предварительный осмотр по изображению. Внутренние неисправности так не определяются"
