@@ -70,6 +70,10 @@ def test_3_identify():
 def test_4_card_contents():
     card = client.get("/api/equipment/PU-001").json()
     assert card["model"] == "Wilo CronoLine-IL 65/160-5,5/2" and card["characteristics"]
+    # модельные данные учёта явно подписаны в карточке каждого образца
+    for eq in ("PU-001", "PU-002"):
+        rows = {c["name"]: c["value"] for c in client.get(f"/api/equipment/{eq}").json()["characteristics"]}
+        assert rows["Данные эксплуатации"].startswith("демонстрационные данные"), eq
     # Срок службы агрегата в документации Wilo не указан — так и показываем
     assert card["normative"]["life_years"] is None
     assert "normative" in card["resource"]["missing_data"]
