@@ -28,7 +28,10 @@ def main() -> None:
     parser = argparse.ArgumentParser(description="Запуск ИИ-сервиса")
     parser.add_argument("--stub", action="store_true", help="режим заглушки, без моделей")
     parser.add_argument("--host", default=os.environ.get("AI_HOST", "127.0.0.1"))
-    parser.add_argument("--port", type=int, default=int(os.environ.get("AI_PORT", "8001")))
+    port = os.environ.get("AI_PORT", "8001")
+    if not port.isdigit():
+        fail(f"переменная AI_PORT={port!r} — нужен номер порта, например 8001")
+    parser.add_argument("--port", type=int, default=int(port))
     args = parser.parse_args()
 
     python = venv_python()
