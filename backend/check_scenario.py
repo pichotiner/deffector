@@ -138,9 +138,13 @@ def run(c: Check, eq="PU-001"):
              f"список оборудования: {st} {r}")
     st, r, _ = c.call("GET", f"/api/equipment/lookup?qr={quote('KST:PU-001')}")
     c.expect(r.get("found") and r.get("equipment_id") == eq, "по QR-коду", f"по QR-коду: {r}")
-    st, r, _ = c.call("GET", f"/api/equipment/lookup?serial={quote('sn 2021-OO4587')}")
+    st, r, _ = c.call("GET", f"/api/equipment/lookup?serial={quote('sn 2024-OO4587')}")
     c.expect(r.get("found") and r.get("equipment_id") == eq,
              "по серийному номеру (с ошибками распознавания O/0)", f"по серийному номеру: {r}")
+    st, r, _ = c.call("GET", "/api/equipment/lookup?serial=21031004-1")
+    c.expect(r.get("found") and r.get("equipment_id") == "PU-002",
+             "второй образец — по заводскому номеру из паспорта (21031004-1)",
+             f"по заводскому номеру PU-002: {r}")
     st, r, _ = c.call("GET", "/api/equipment/lookup?marking=PU-001")
     c.expect(r.get("found") and r.get("equipment_id") == eq, "по маркировке", f"по маркировке: {r}")
     st, r, ms = c.call("POST", "/api/identify/image", image=True)
@@ -164,6 +168,9 @@ def run(c: Check, eq="PU-001"):
              "нет параметров с отклонением в демо-данных")
     c.expect(len(card.get("history", [])) >= 6, f"история: {len(card.get('history', []))} записей",
              "история пустая или короткая")
+    case = [p for p in card.get("parameters", []) if p.get("measured_at", "") and p["unit"] in ("мм/с", "°C", "g")]
+    c.expect(len(case) >= 6, f"вибрация и температура из баз заказчика: {len(case)} параметров",
+             "нет параметров из баз заказчика")
 
     # ---- 4–5. что проверить ----
     c.title("Шаги 4–5. Узлы, требующие проверки, и подсказка")

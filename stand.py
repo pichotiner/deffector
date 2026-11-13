@@ -31,6 +31,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent
 BACKEND_RUN = ROOT / "backend" / "run.py"
 AI_RUN = ROOT / "ai" / "run.py"
+AI_INSTALL = ROOT / "ai" / "install.py"
+AI_VENV = ROOT / "ai" / ".venv"
 LOGS = ROOT / "logs"
 
 _OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # только этот ПК
@@ -60,6 +62,7 @@ class Service:
         self.env = env or {}
         self.tail = collections.deque(maxlen=15)
         self.proc = None
+        self.warned = False
 
     def start(self):
         LOGS.mkdir(exist_ok=True)
@@ -87,7 +90,21 @@ class Service:
         return self.proc is not None and self.proc.poll() is None
 
     def ready(self):
-        return http_get(self.health_url)[0] == 200
+        code, body = http_get(self.health_url)
+        if code != 200:
+            return False
+        if self.name != "ИИ":
+            return True
+        # ИИ-сервис отвечает 200 и во время загрузки моделей: смотрим поле status
+        try:
+            health = json.loads(body or b"{}")
+        except ValueError:
+            return True
+        if health.get("status") == "degraded" and not self.warned:
+            self.warned = True
+            say("[!!] ИИ-сервис загрузился не полностью: " + json.dumps(health.get("models", {}),
+                                                                        ensure_ascii=False))
+        return health.get("status") in (None, "ok", "degraded") and health.get("status") != "loading"
 
     def stop(self):
         if not self.alive():
@@ -183,6 +200,12 @@ def main():
         if (what == "бэкенда" or use_ai) and port_busy(port):
             say(f"[XX] Порт {port} {what} уже занят — стенд, похоже, уже запущен в другом окне. "
                 "Закройте то окно (или Ctrl+C в нём) и запустите снова.")
+            return 1
+
+    if use_ai and not AI_VENV.exists():
+        say("Первый запуск ИИ-сервиса: ставлю библиотеки и модели (нужен интернет, только один раз) ...")
+        if subprocess.call([sys.executable, str(AI_INSTALL)], cwd=str(ROOT)) != 0:
+            say("[XX] Установка ИИ-сервиса не удалась — см. вывод выше и ai/README.md")
             return 1
 
     if args.reset:

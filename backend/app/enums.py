@@ -16,12 +16,13 @@ COMPONENT_TYPES = {
     "pipeline": {"name": "Трубопроводная обвязка", "prompt": None, "detectable": False},
     "mechanical_seal": {"name": "Торцевое уплотнение", "prompt": None, "detectable": False},
     "bearing": {"name": "Подшипник", "prompt": None, "detectable": False},
-    "cabinet_section": {"name": "Отсек шкафа", "prompt": None, "detectable": False},
-    "contactor": {"name": "Контактор", "prompt": None, "detectable": False},
-    "circuit_breaker": {"name": "Автоматический выключатель", "prompt": None, "detectable": False},
-    "controller": {"name": "Контроллер", "prompt": None, "detectable": False},
+    "impeller": {"name": "Рабочее колесо", "prompt": None, "detectable": False},
+    "coupling": {"name": "Соединительная муфта", "prompt": None, "detectable": False},
+    "gearbox": {"name": "Редуктор", "prompt": None, "detectable": False},
+    "stator": {"name": "Статор винтовой пары", "prompt": None, "detectable": False},
+    "rotor": {"name": "Ротор винтовой пары", "prompt": None, "detectable": False},
+    "temperature_sensor": {"name": "Термопреобразователь", "prompt": None, "detectable": False},
     "relay": {"name": "Реле", "prompt": None, "detectable": False},
-    "filter": {"name": "Фильтр", "prompt": None, "detectable": False},
 }
 
 DETECTABLE_TYPES = [t for t, v in COMPONENT_TYPES.items() if v["detectable"]]

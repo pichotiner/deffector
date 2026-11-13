@@ -26,17 +26,18 @@ def test_11_health():
 
 
 def test_1_list_and_search():
-    assert {i["id"] for i in client.get("/api/equipment").json()["items"]} == {"PU-001", "CC-001"}
-    assert [i["id"] for i in client.get("/api/equipment?q=агрегат").json()["items"]] == ["PU-001"]
-    assert [i["id"] for i in client.get("/api/equipment?q=sn2020").json()["items"]] == ["CC-001"]
+    assert {i["id"] for i in client.get("/api/equipment").json()["items"]} == {"PU-001", "PU-002"}
+    assert [i["id"] for i in client.get("/api/equipment?q=wilo").json()["items"]] == ["PU-001"]
+    assert [i["id"] for i in client.get("/api/equipment?q=винтовой").json()["items"]] == ["PU-002"]
+    assert [i["id"] for i in client.get("/api/equipment?q=21031004").json()["items"]] == ["PU-002"]
 
 
 @pytest.mark.parametrize("query, by, conf", [
     ("qr=KST:PU-001", "qr", 1.0),
     ("qr=PU-001", "qr", 1.0),                       # в QR записана просто маркировка
-    ("serial=SN2021-004587", "serial", 1.0),
-    ("serial=sn 2021 OO4587", "serial", 0.93),      # регистр, пробелы, O вместо 0
-    ("serial=5N2O21-OO4S87", "serial", 0.93),       # S/5, O/0
+    ("serial=SN2024-004587", "serial", 1.0),
+    ("serial=sn 2024 OO4587", "serial", 0.93),      # регистр, пробелы, O вместо 0
+    ("serial=5N2O24-OO4S87", "serial", 0.93),       # S/5, O/0
     ("marking=PU001", "marking", 0.93),
 ])
 def test_2_lookup_found(query, by, conf):
@@ -44,8 +45,15 @@ def test_2_lookup_found(query, by, conf):
     assert r == {"found": True, "equipment_id": "PU-001", "matched_by": by, "match_confidence": conf}
 
 
+def test_2_lookup_by_passport_serial_number():
+    # Заводской номер агрегата AMS из паспорта, с ошибками распознавания I/1 и O/0
+    for serial in ("21031004-1", "2IO31OO4-1"):
+        r = client.get(f"/api/equipment/lookup?serial={serial}").json()
+        assert r["found"] and r["equipment_id"] == "PU-002"
+
+
 def test_2_lookup_not_found_gives_suggestions():
-    r = client.get("/api/equipment/lookup?serial=SN2021-004500").json()
+    r = client.get("/api/equipment/lookup?serial=SN2024-004500").json()
     assert r["found"] is False and r["suggestions"][0]["equipment_id"] == "PU-001"
 
 
@@ -61,8 +69,10 @@ def test_3_identify():
 
 def test_4_card_contents():
     card = client.get("/api/equipment/PU-001").json()
-    assert card["model"] == "К 100-65-200" and card["characteristics"]
-    assert card["normative"]["life_years"] == 15
+    assert card["model"] == "Wilo CronoLine-IL 65/160-5,5/2" and card["characteristics"]
+    # Срок службы агрегата в документации Wilo не указан — так и показываем
+    assert card["normative"]["life_years"] is None
+    assert "normative" in card["resource"]["missing_data"]
     assert card["deviations_count"] == 1
     kinds = {c["kind"] for c in card["components"]}
     assert kinds == {"node", "part"}
@@ -74,13 +84,17 @@ def test_4_card_contents():
 def test_4_parameters_against_setpoints():
     params = {p["id"]: p for p in client.get("/api/equipment/PU-001").json()["parameters"]}
     assert params["P-01"]["status"] == "deviation"
-    assert params["P-01"]["message"] == "Выше верхней уставки на 1,4 бар"
-    assert params["P-02"]["status"] == "normal"
-    assert params["P-03"]["status"] == "no_data"
+    assert params["P-01"]["message"] == "Выше верхней уставки на 0,4 бар"
+    assert params["P-09"]["status"] == "no_data"
+    # Вибрация и температура — из баз значений заказчика, замер 13.11 09:00
+    assert params["P-02"]["status"] == "normal" and params["P-02"]["value"] == 0.8
+    assert params["P-02"]["setpoint_max"] == 2.8
+    assert params["P-07"]["value"] == 65.0
+    assert params["P-07"]["measured_at"] == "2026-11-13T09:00:00+03:00"
 
 
 def test_4_both_samples_have_cards():
-    for eq in ("PU-001", "CC-001"):
+    for eq in ("PU-001", "PU-002"):
         card = client.get(f"/api/equipment/{eq}").json()
         nodes = [c for c in card["components"] if c["kind"] == "node"]
         parts = [c for c in card["components"] if c["kind"] == "part"]
@@ -117,7 +131,7 @@ def test_6_detect_match_kinds():
     assert by_class["valve"]["match"] == "ambiguous"
     assert by_class["valve"]["candidates"] == ["C-03", "C-04"]
     assert "C-05" in r["not_in_frame"]
-    r = client.post("/api/equipment/CC-001/detect", files=JPEG).json()
+    r = client.post("/api/equipment/PU-002/detect", files=JPEG).json()
     assert {d["match"] for d in r["detections"]} == {"matched", "not_in_card"}
 
 
@@ -184,7 +198,7 @@ def test_9_maintenance_recalculates():
 
 def test_9_replacement_resets_component():
     r = client.post("/api/equipment/PU-001/inspections",
-                    json={"component_id": "N-02", "type": "replacement", "comment": "Новый двигатель"})
+                    json={"component_id": "C-07", "type": "replacement", "comment": "Новые подшипники"})
     c = r.json()["component"]
     assert c["last_replaced_at"] == "2026-11-13"
     assert c["usage"]["operating_hours"] == 0
@@ -216,7 +230,7 @@ def test_9_recorded_defect_turns_component_red_until_fixed():
     assert level()["level"] == "none"
 
 
-@pytest.mark.parametrize("eq", ["PU-001", "CC-001"])
+@pytest.mark.parametrize("eq", ["PU-001", "PU-002"])
 def test_4_5_every_component_complete_or_gap_named(eq):
     """Матрица 4.5: у каждого компонента есть характеристики, норматив и дата установки —
     а если чего-то нет, это явно названо в missing_data (ТЗ 4.3)."""
