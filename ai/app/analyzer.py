@@ -17,15 +17,16 @@ log = logging.getLogger("ai.analyzer")
 
 ANSWER_SCHEMA = {
     "type": "object",
+    # порядок полей задаёт порядок ответа: сначала описание увиденного, затем выводы
     "properties": {
+        "explanation": {"type": "string"},
         "image_quality": {"type": "string", "enum": ["ok", "poor"]},
         "signs": {"type": "array", "items": {"type": "string", "enum": list(rules.SIGNS)}},
         "category": {"type": "string", "enum": list(rules.CATEGORIES)},
-        "explanation": {"type": "string"},
         "recommendation": {"type": "string"},
         "assessment_confidence": {"type": "number", "minimum": 0, "maximum": 1},
     },
-    "required": ["image_quality", "signs", "category", "explanation", "recommendation", "assessment_confidence"],
+    "required": ["explanation", "image_quality", "signs", "category", "recommendation", "assessment_confidence"],
 }
 
 SYSTEM_PROMPT = """Ты помогаешь инженеру при предварительном визуальном осмотре промышленного оборудования. \
@@ -36,14 +37,15 @@ SYSTEM_PROMPT = """Ты помогаешь инженеру при предва�
 - leak — течь или подтёки: капли, мокрые пятна, потёки масла или воды, лужа под узлом;
 - mechanical_damage — механическое повреждение: трещина, вмятина, скол, разбитое стекло, погнутая или оторванная деталь.
 
-Ответь одним объектом JSON с полями:
-- image_quality: "poor", если снимок смазан, слишком тёмный, узел закрыт или слишком мелкий; иначе "ok";
-- signs: список найденных признаков из трёх перечисленных (пустой, если их нет);
+Ответь одним объектом JSON с полями в таком порядке:
+- explanation: одно-два предложения на русском — что именно и где видно на изображении;
+- image_quality: "ok", если узел можно рассмотреть; "poor" — только если снимок смазан, слишком тёмный, \
+узел закрыт или слишком мелкий и рассмотреть его нельзя;
+- signs: список найденных признаков из трёх перечисленных; пустой список, если их не видно;
 - category:
   "possible_defect" — признак виден явно;
   "check_recommended" — признак есть, но он сомнительный, либо снимок плохой;
   "no_visible_issues" — снимок хороший и ни одного признака не видно;
-- explanation: одно-два предложения на русском — что именно и где видно на изображении;
 - recommendation: одно предложение на русском — что проверить дальше при осмотре на месте;
 - assessment_confidence: число от 0 до 1 — насколько ты уверен в своей оценке.
 
@@ -53,7 +55,8 @@ SYSTEM_PROMPT = """Ты помогаешь инженеру при предва�
 «видимых проблем не обнаружено»;
 - не назначай ремонт или замену — только что проверить;
 - при плохом снимке никогда не выбирай "no_visible_issues";
-- грязь, пыль и обычные потёртости краски признаками не считай."""
+- грязь, пыль и обычные потёртости краски признаками не считай;
+- не выдумывай признаки: называй только то, что действительно различимо на снимке."""
 
 
 def build_user_prompt(component_type_name: str, component_name: str) -> str:

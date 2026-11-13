@@ -11,7 +11,6 @@ from __future__ import annotations
 import argparse
 import subprocess
 import sys
-import urllib.request
 
 from _setup import (
     AI_DIR,
@@ -26,12 +25,20 @@ from _setup import (
     venv_python,
 )
 
-ASSETS_URL = "https://github.com/ultralytics/assets/releases/download/v8.4.0"
 DEFAULT_TORCH_INDEX = "https://download.pytorch.org/whl/cu128"  # CUDA 12.8: нужна для RTX 50xx
-DEFAULT_DETECTOR = "yoloe-26l-seg.pt"
 DEFAULT_VLM = "qwen2.5vl:7b"
-CLIP_REPO = "laion/CLIP-ViT-B-32-laion2B-s34B-b79K"
-CLIP_FILES = ["config.json", "preprocessor_config.json", "model.safetensors"]
+# Модели с Hugging Face: папка в ai/weights -> (репозиторий, нужные файлы)
+HF_MODELS = {
+    "owlv2": (
+        "google/owlv2-base-patch16-ensemble",
+        ["config.json", "preprocessor_config.json", "model.safetensors", "tokenizer_config.json",
+         "vocab.json", "merges.txt", "special_tokens_map.json"],
+    ),
+    "clip": (
+        "laion/CLIP-ViT-B-32-laion2B-s34B-b79K",
+        ["config.json", "preprocessor_config.json", "model.safetensors"],
+    ),
+}
 
 
 def run(command: list[str], **kwargs) -> None:
@@ -45,33 +52,11 @@ def step(title: str) -> None:
     print(f"\n=== {title} ===", flush=True)
 
 
-def download(name: str) -> None:
-    target = WEIGHTS_DIR / name
-    if target.is_file() and target.stat().st_size > 1_000_000:
-        print(f"  уже есть: {target}")
-        return
-    url = f"{ASSETS_URL}/{name}"
-    print(f"  скачиваю {url}", flush=True)
-    partial = target.with_name(target.name + ".part")
-    try:
-        with urllib.request.urlopen(url, timeout=60) as response, open(partial, "wb") as file:
-            while chunk := response.read(1 << 20):
-                file.write(chunk)
-    except OSError as exc:
-        fail(f"не удалось скачать {url}: {exc}")
-    partial.replace(target)
-
-
-def text_encoder_for(detector: str) -> str:
-    return "mobileclip2_b.ts" if "yoloe-26" in detector else "mobileclip_blt.ts"
-
-
 def main() -> None:
     parser = argparse.ArgumentParser(description="Установка ИИ-сервиса")
     parser.add_argument("--stub", action="store_true", help="только режим заглушки, без моделей")
     parser.add_argument("--cpu", action="store_true", help="ставить torch без поддержки видеокарты")
     parser.add_argument("--torch-index", default=None, help=f"каталог сборок torch (по умолчанию в Windows: {DEFAULT_TORCH_INDEX})")
-    parser.add_argument("--detector", default=DEFAULT_DETECTOR, help="файл весов детектора")
     parser.add_argument("--vlm", default=DEFAULT_VLM, help="мультимодальная модель в Ollama")
     parser.add_argument("--skip-ollama", action="store_true", help="не скачивать модель для Ollama")
     args = parser.parse_args()
@@ -103,15 +88,14 @@ def main() -> None:
 
     step("Веса детектора и модели идентификации")
     WEIGHTS_DIR.mkdir(parents=True, exist_ok=True)
-    download(args.detector)
-    download(text_encoder_for(args.detector))
-    clip_dir = WEIGHTS_DIR / "clip"
-    if all((clip_dir / name).is_file() for name in CLIP_FILES):
-        print(f"  уже есть: {clip_dir}")
-    else:
+    for folder, (repo, files) in HF_MODELS.items():
+        target = WEIGHTS_DIR / folder
+        if all((target / name).is_file() for name in files):
+            print(f"  уже есть: {target}")
+            continue
         code = (
             "from huggingface_hub import snapshot_download;"
-            f"snapshot_download({CLIP_REPO!r}, local_dir={str(clip_dir)!r}, allow_patterns={CLIP_FILES!r})"
+            f"snapshot_download({repo!r}, local_dir={str(target)!r}, allow_patterns={files!r})"
         )
         run([python, "-c", code])
 
@@ -143,8 +127,8 @@ def main() -> None:
             run([ollama, "pull", args.vlm])
 
     print("\nГотово. Запуск сервиса:  python ai/run.py")
-    if args.detector != DEFAULT_DETECTOR or args.vlm != DEFAULT_VLM:
-        print(f"Нестандартные модели — задайте AI_DETECTOR_WEIGHTS={args.detector} и AI_VLM_MODEL={args.vlm}")
+    if args.vlm != DEFAULT_VLM:
+        print(f"Нестандартная модель — перед запуском задайте переменную AI_VLM_MODEL={args.vlm}")
 
 
 if __name__ == "__main__":

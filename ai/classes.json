@@ -3,23 +3,33 @@
   "classes": {
     "electric_motor": {
       "name": "Электродвигатель",
-      "prompts": ["electric motor", "industrial electric motor"],
-      "threshold": 0.2
+      "prompts": [
+        "a photo of an electric motor"
+      ],
+      "threshold": 0.22
     },
     "pressure_gauge": {
       "name": "Манометр",
-      "prompts": ["pressure gauge", "manometer"],
-      "threshold": 0.2
+      "prompts": [
+        "a photo of a pressure gauge"
+      ],
+      "threshold": 0.27
     },
     "valve": {
       "name": "Запорная арматура",
-      "prompts": ["valve", "gate valve", "ball valve"],
-      "threshold": 0.2
+      "prompts": [
+        "a photo of a valve",
+        "a photo of a gate valve",
+        "a photo of a ball valve"
+      ],
+      "threshold": 0.33
     },
     "flange": {
       "name": "Фланцевое соединение",
-      "prompts": ["pipe flange", "flange joint"],
-      "threshold": 0.2
+      "prompts": [
+        "a photo of a pipe flange"
+      ],
+      "threshold": 0.31
     }
   }
 }

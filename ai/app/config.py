@@ -11,16 +11,13 @@ REPO_DIR = AI_DIR.parent
 
 
 def apply_offline_env() -> None:
-    """Запрещает библиотекам ходить в интернет. Вызывается до импорта torch/ultralytics/transformers."""
+    """Запрещает библиотекам ходить в интернет. Вызывается до импорта torch и transformers."""
     offline = {
         "HF_HUB_OFFLINE": "1",
         "TRANSFORMERS_OFFLINE": "1",
         "HF_HUB_DISABLE_TELEMETRY": "1",
         "HF_HUB_DISABLE_IMPLICIT_TOKEN": "1",
         "DO_NOT_TRACK": "1",
-        "YOLO_OFFLINE": "true",
-        "YOLO_AUTOINSTALL": "false",
-        "YOLO_VERBOSE": "false",
     }
     for key, value in offline.items():
         os.environ[key] = value
@@ -59,8 +56,8 @@ class Settings:
     reference_dir: Path = REPO_DIR / "demo" / "reference"
 
     # Детектор узлов
-    detector_weights: str = "yoloe-26l-seg.pt"
-    detector_imgsz: int = 640
+    detector_dir: str = "owlv2"
+    detector_max_area: float = 0.85
     detector_iou: float = 0.5
     detector_max_det: int = 30
 
@@ -74,7 +71,7 @@ class Settings:
 
     # Идентификация по изображению
     clip_dir: str = "clip"
-    identify_threshold: float = 0.78
+    identify_threshold: float = 0.70
     identify_top_k: int = 3
     identify_temperature: float = 0.03
 
@@ -87,7 +84,7 @@ class Settings:
 
     @property
     def detector_path(self) -> Path:
-        return self.weights_dir / self.detector_weights
+        return self.weights_dir / self.detector_dir
 
     @property
     def clip_path(self) -> Path:
@@ -120,8 +117,8 @@ def load_settings() -> Settings:
         weights_dir=_env_path("WEIGHTS_DIR", AI_DIR / "weights"),
         classes_file=classes_file,
         reference_dir=_env_path("REFERENCE_DIR", REPO_DIR / "demo" / "reference"),
-        detector_weights=_env("DETECTOR_WEIGHTS", "yoloe-26l-seg.pt"),
-        detector_imgsz=int(_env("DETECTOR_IMGSZ", "640")),
+        detector_dir=_env("DETECTOR_DIR", "owlv2"),
+        detector_max_area=float(_env("DETECTOR_MAX_AREA", "0.85")),
         detector_iou=float(_env("DETECTOR_IOU", "0.5")),
         detector_max_det=int(_env("DETECTOR_MAX_DET", "30")),
         ollama_url=_env("OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/"),
@@ -131,7 +128,7 @@ def load_settings() -> Settings:
         vlm_num_ctx=int(_env("VLM_NUM_CTX", "4096")),
         warmup=_env_bool("WARMUP", True),
         clip_dir=_env("CLIP_DIR", "clip"),
-        identify_threshold=float(_env("IDENTIFY_THRESHOLD", "0.78")),
+        identify_threshold=float(_env("IDENTIFY_THRESHOLD", "0.70")),
         identify_top_k=int(_env("IDENTIFY_TOP_K", "3")),
         identify_temperature=float(_env("IDENTIFY_TEMPERATURE", "0.03")),
         min_side_px=int(_env("MIN_SIDE_PX", "64")),

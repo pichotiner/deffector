@@ -1,0 +1,46 @@
+{
+  "_comment": "Разметка тестового набора для ai/tools/evaluate.py. nodes — сколько узлов каждого типа видно на фото. analyze — проверка оценки дефектов на этом фото: signs — ожидаемые признаки (corrosion, leak, mechanical_damage); пустой список — ожидается «видимых проблем не обнаружено». Фото без записи в наборе не участвуют.",
+  "photos": {
+    "pump_unit_01.jpg": {
+      "nodes": {"electric_motor": 1, "flange": 2},
+      "analyze": {"component_type": "electric_motor", "component_name": "Электродвигатель насоса", "signs": []}
+    },
+    "pump_room_01.jpg": {"nodes": {"electric_motor": 2}},
+    "pump_unit_drawing_01.jpg": {"nodes": {"electric_motor": 1, "flange": 2}},
+    "motor_corrosion_01.jpg": {
+      "nodes": {"electric_motor": 1},
+      "analyze": {"component_type": "electric_motor", "component_name": "Электродвигатель вентилятора", "signs": ["corrosion"]}
+    },
+    "gauge_clean_01.jpg": {
+      "nodes": {"pressure_gauge": 1},
+      "analyze": {"component_type": "pressure_gauge", "component_name": "Манометр воздушной магистрали", "signs": []}
+    },
+    "gauge_clean_02.jpg": {
+      "nodes": {"pressure_gauge": 1},
+      "analyze": {"component_type": "pressure_gauge", "component_name": "Манометр тормозной магистрали", "signs": []}
+    },
+    "gauge_corrosion_01.jpg": {
+      "nodes": {"pressure_gauge": 1},
+      "analyze": {"component_type": "pressure_gauge", "component_name": "Манометр", "signs": ["corrosion"]}
+    },
+    "valve_ball_01.jpg": {
+      "nodes": {"valve": 1, "pressure_gauge": 1},
+      "analyze": {"component_type": "valve", "component_name": "Шаровой кран", "signs": []}
+    },
+    "valve_gate_01.jpg": {"nodes": {"valve": 2}},
+    "valve_leak_01.jpg": {
+      "nodes": {"valve": 1},
+      "analyze": {"component_type": "valve", "component_name": "Вентиль под мойкой", "signs": ["corrosion", "leak"], "any_sign": true}
+    },
+    "flange_corrosion_01.jpg": {
+      "nodes": {"flange": 1},
+      "analyze": {"component_type": "flange", "component_name": "Фланцевое соединение", "signs": ["corrosion"]}
+    },
+    "flange_corrosion_02.jpg": {
+      "nodes": {"flange": 1},
+      "analyze": {"component_type": "flange", "component_name": "Фланцевое соединение", "signs": ["corrosion"]}
+    },
+    "other/room_01.jpg": {"nodes": {}},
+    "other/car_01.jpg": {"nodes": {}}
+  }
+}

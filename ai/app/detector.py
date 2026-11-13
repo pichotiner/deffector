@@ -1,10 +1,9 @@
-"""Распознавание узлов: детектор с открытым словарём (YOLOE) и обработка рамок."""
+"""Распознавание узлов: детектор с открытым словарём (OWLv2) и обработка рамок."""
 from __future__ import annotations
 
 import logging
 import threading
 from dataclasses import dataclass
-from pathlib import Path
 
 from PIL import Image
 
@@ -86,7 +85,7 @@ def clip_box(x1: float, y1: float, x2: float, y2: float) -> tuple[float, float, 
 
 
 class Detector:
-    """Обёртка над YOLOE. Словарь классов задаётся один раз при загрузке."""
+    """Обёртка над OWLv2. Классы задаются текстом из classes.json, обучение не нужно."""
 
     def __init__(self, settings: Settings, device: str):
         self.settings = settings
@@ -94,6 +93,8 @@ class Detector:
         self.classes: dict[str, ClassSpec] = settings.classes
         self._lock = threading.Lock()
         self._model = None
+        self._processor = None
+        self._text_inputs = None
         # номер названия в словаре детектора -> cv_class
         self._prompt_to_class: list[str] = []
         self._prompts: list[str] = []
@@ -104,47 +105,49 @@ class Detector:
 
     @property
     def name(self) -> str:
-        return Path(self.settings.detector_weights).stem
+        return self.settings.detector_dir
 
     def load(self) -> None:
         path = self.settings.detector_path
-        if not path.is_file():
+        if not (path / "config.json").is_file():
             raise FileNotFoundError(f"Нет весов детектора: {path}. Запустите python ai/install.py")
 
-        from ultralytics import YOLOE
-        from ultralytics.utils import SETTINGS
+        import torch
+        from transformers import Owlv2ForObjectDetection, Owlv2Processor
 
-        # Текстовый кодировщик детектор ищет в своей папке весов — направляем её на нашу,
-        # иначе библиотека попробует скачать файл из интернета.
-        SETTINGS["weights_dir"] = str(self.settings.weights_dir)
-        SETTINGS["sync"] = False
-
-        model = YOLOE(str(path))
-        text_model = getattr(model.model, "text_model", "mobileclip:blt")
-        encoder_file = {"mobileclip": "mobileclip_blt.ts", "mobileclip2": "mobileclip2_b.ts"}.get(
-            text_model.split(":")[0]
-        )
-        if encoder_file and not (self.settings.weights_dir / encoder_file).is_file():
-            raise FileNotFoundError(
-                f"Нет текстового кодировщика детектора: {self.settings.weights_dir / encoder_file}. "
-                "Запустите python ai/install.py"
-            )
-        model.set_classes(self._prompts, model.get_text_pe(self._prompts))
-        self._model = model
+        self._processor = Owlv2Processor.from_pretrained(str(path), local_files_only=True)
+        model = Owlv2ForObjectDetection.from_pretrained(str(path), local_files_only=True)
+        if self.device.startswith("cuda"):
+            model = model.half()
+        self._model = model.to(self.device).eval()
+        # названия классов не меняются — переводим их в числа один раз
+        text = self._processor(text=[self._prompts], return_tensors="pt")
+        self._text_inputs = {k: v.to(self.device) for k, v in text.items()}
+        self._torch = torch
         self._predict_raw(Image.new("RGB", (640, 480), (90, 90, 90)), 0.5)  # прогрев
         log.info("Детектор %s загружен на %s, названий в словаре: %d", self.name, self.device, len(self._prompts))
 
-    def _predict_raw(self, image: Image.Image, conf: float):
-        return self._model.predict(
-            image,
-            imgsz=self.settings.detector_imgsz,
-            conf=conf,
-            iou=self.settings.detector_iou,
-            max_det=self.settings.detector_max_det * 3,
-            device=self.device,
-            half=self.device.startswith("cuda"),
-            verbose=False,
-        )[0]
+    def _predict_raw(self, image: Image.Image, conf: float) -> list[tuple[float, float, float, float, float, int]]:
+        """Возвращает рамки (x1, y1, x2, y2 в долях кадра), уверенность и номер названия."""
+        torch = self._torch
+        width, height = image.size
+        side = max(width, height)  # модель дополняет кадр до квадрата снизу и справа
+        pixels = self._processor(images=image, return_tensors="pt")["pixel_values"]
+        pixels = pixels.to(self.device, dtype=next(self._model.parameters()).dtype)
+        with torch.inference_mode():
+            outputs = self._model(pixel_values=pixels, **self._text_inputs)
+            scores, labels = torch.max(torch.sigmoid(outputs.logits[0].float()), dim=-1)
+            keep = scores >= conf
+            scores, labels = scores[keep], labels[keep]
+            cx, cy, w, h = outputs.pred_boxes[0].float()[keep].unbind(-1)
+        result = []
+        for s, l, bx, by, bw, bh in zip(
+            scores.tolist(), labels.tolist(), cx.tolist(), cy.tolist(), w.tolist(), h.tolist()
+        ):
+            x1, x2 = (bx - bw / 2) * side / width, (bx + bw / 2) * side / width
+            y1, y2 = (by - bh / 2) * side / height, (by + bh / 2) * side / height
+            result.append((x1, y1, x2, y2, s, l))
+        return result
 
     def detect(self, image: Image.Image, cv_classes: list[str] | None = None) -> list[Box]:
         """Находит узлы запрошенных типов. cv_classes=None — все типы словаря."""
@@ -155,19 +158,16 @@ class Detector:
             return []
         min_conf = min(self.classes[c].threshold for c in wanted)
         with self._lock:
-            result = self._predict_raw(image, min_conf)
+            raw = self._predict_raw(image, min_conf)
 
         boxes: list[Box] = []
-        coords = result.boxes.xyxyn.tolist()
-        scores = result.boxes.conf.tolist()
-        indices = result.boxes.cls.tolist()
-        for (x1, y1, x2, y2), score, index in zip(coords, scores, indices):
+        for x1, y1, x2, y2, score, index in raw:
             cv_class = self._prompt_to_class[int(index)]
             if cv_class not in wanted or score < self.classes[cv_class].threshold:
                 continue
             clipped = clip_box(x1, y1, x2, y2)
-            if clipped is None:
-                continue
+            if clipped is None or clipped[2] * clipped[3] > self.settings.detector_max_area:
+                continue  # рамка на весь кадр — не узел
             boxes.append(Box(*clipped, cv_class=cv_class, confidence=float(score)))
         boxes = suppress_duplicates(boxes, iou_same=self.settings.detector_iou)
         return boxes[: self.settings.detector_max_det]

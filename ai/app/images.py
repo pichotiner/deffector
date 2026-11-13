@@ -23,7 +23,7 @@ def decode_image(data: bytes) -> Image.Image:
         image = Image.open(io.BytesIO(data))
         image = ImageOps.exif_transpose(image)  # фото с телефона хранят поворот в EXIF
         return image.convert("RGB")
-    except Exception as exc:  # библиотеки подменяют Image.open, тип ошибки заранее не известен
+    except Exception as exc:  # тип ошибки зависит от формата файла
         raise ImageError("Не удалось прочитать изображение") from exc
 
 

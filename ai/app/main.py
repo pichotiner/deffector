@@ -51,7 +51,7 @@ class Service:
         self.analyzer = None
         self.identifier = None
         self.states = {
-            "detector": ModelState(self.settings.detector_weights),
+            "detector": ModelState(self.settings.detector_dir),
             "vlm": ModelState(self.settings.vlm_model),
             "identifier": ModelState(self.settings.clip_dir),
         }
