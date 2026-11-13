@@ -139,11 +139,11 @@ FastAPI проверяет по ним каждый ответ. Что доба�
 | компонент `visual` | `note` есть всегда: текст при `no_visible_issues`, иначе `null` |
 | `resource.maintenance` | есть и `overdue_days`, и `days_left`; ненужное — `null` |
 | `resource.missing_data` | коды: `installed_at`, `operating_hours`, `cycles`, `last_maintenance_at`, `normative`; по-русски то же перечислено в `basis` |
-| detect | `candidates` есть всегда (`null`, кроме `ambiguous`); `label` у `matched` — название узла из карточки |
+| detect | `candidates` есть всегда (`null`, кроме `ambiguous`); `label` у `matched` — название узла из карточки. Если узел такого типа в карточке один, все рамки этого типа — `matched` на него (у `PU-002` два фланца в кадре — оба «Ответные фланцы», `C-16`); `ambiguous` — только когда узлов в карточке несколько, а рамок другое число |
 | attention | у каждого пункта `recommended_action` и `detectable` (найдёт ли узел ИИ); сюда же попадают узлы без осмотра дольше `not_inspected_days` |
 | analyze | необязательное поле формы `detection_confidence` — уверенность рамки, по которой вырезан снимок |
 | запись осмотра | `maintenance` без `component_id` — обслуживание оборудования в целом; для `maintenance` в `recommendation` — дата следующего обслуживания |
-| ошибки | `503 ai_unavailable` — ИИ-сервис не ответил |
+| ошибки | `503 ai_unavailable` — ИИ-сервис не ответил; `422 validation_error` «Снимок не читается. Сделайте кадр ещё раз» — ИИ-сервис не смог открыть снимок (его `bad_image`) |
 
 Все тексты для экрана (причины, рекомендации, подсказки, сообщения) бэкенд отдаёт готовыми —
 приложение показывает их как есть.

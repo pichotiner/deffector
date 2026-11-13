@@ -8,6 +8,7 @@ from datetime import timedelta
 from fastapi import FastAPI, File, Form, Request, UploadFile
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
+from starlette.concurrency import run_in_threadpool
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
 from . import ai_client, cards, config, db, lookup, matching, repo, seed
@@ -58,6 +59,11 @@ async def _ai_error(_: Request, exc: ai_client.AiUnavailable):
                   "ИИ-сервис не отвечает или вернул ошибку. Проверьте, что он запущен, и повторите")
 
 
+@app.exception_handler(ai_client.AiBadImage)
+async def _ai_bad_image(_: Request, exc: ai_client.AiBadImage):
+    return _error(422, "validation_error", "Снимок не читается. Сделайте кадр ещё раз")
+
+
 # ---------- вспомогательное ----------
 
 def _card(conn, eq_id) -> cards.Card:
@@ -79,6 +85,12 @@ async def _image_bytes(image: UploadFile):
     if not data:
         raise ApiError(422, "validation_error", "Пустое изображение")
     return data
+
+
+async def _ai(call, *args):
+    """Вызов ИИ-сервиса — в отдельном потоке: анализ узла идёт секунды, а рамки
+    и остальные запросы в это время должны отвечать."""
+    return await run_in_threadpool(call, *args)
 
 
 # ---------- 11. health ----------
@@ -111,7 +123,7 @@ def equipment_lookup(qr: str | None = None, serial: str | None = None, marking: 
 @app.post("/api/identify/image", response_model=s.IdentifyResult)
 async def identify_image(image: UploadFile = File(...)):
     data = await _image_bytes(image)
-    result = ai_client.identify(data)
+    result = await _ai(ai_client.identify, data)
     with db.session() as conn:
         names = {e["id"]: e["name"] for e in repo.equipment_all(conn)}
     candidates = sorted(
@@ -147,8 +159,8 @@ async def equipment_detect(eq_id: str, image: UploadFile = File(...)):
     data = await _image_bytes(image)
     with db.session() as conn:
         card = _card(conn, eq_id)
-        raw = ai_client.detect(data, eq_id, matching.classes_for(card))
-        return matching.match(card, raw)
+    raw = await _ai(ai_client.detect, data, eq_id, matching.classes_for(card))
+    return matching.match(card, raw)
 
 
 # ---------- 7. analyze ----------
@@ -160,7 +172,7 @@ async def component_analyze(eq_id: str, cid: str, image: UploadFile = File(...),
     with db.session() as conn:
         card = _card(conn, eq_id)
         c = _raw_component(card, cid)
-    result = ai_client.analyze(data, c["type"], c["name"])  # вне транзакции: может идти секунды
+    result = await _ai(ai_client.analyze, data, c["type"], c["name"])  # вне транзакции: идёт секунды
     with db.session() as conn:
         repo.add_visual(conn, eq_id, cid, {
             **result, "detection_confidence": detection_confidence, "analyzed_at": config.now_iso(),

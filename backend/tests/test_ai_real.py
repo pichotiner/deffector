@@ -20,7 +20,10 @@ JPEG = {"image": ("frame.jpg", b"\xff\xd8\xff\xe0fake", "image/jpeg")}
 
 class FakeAI(BaseHTTPRequestHandler):
     analyze_reply = None
+    detect_reply = None
+    error = None        # (код, тело) — ответить ошибкой на любой POST
     delay = 0.0
+    delay_path = None   # задержка только для этого пути; None — для всех
     last_body = b""
 
     def log_message(self, *args):
@@ -39,9 +42,12 @@ class FakeAI(BaseHTTPRequestHandler):
 
     def do_POST(self):
         FakeAI.last_body = self.rfile.read(int(self.headers["Content-Length"]))
-        time.sleep(FakeAI.delay)
-        if self.path == "/detect":
-            self._send(200, [
+        if FakeAI.delay_path in (None, self.path):
+            time.sleep(FakeAI.delay)
+        if FakeAI.error:
+            self._send(*FakeAI.error)
+        elif self.path == "/detect":
+            self._send(200, FakeAI.detect_reply or [
                 {"bbox": [0.40, 0.20, 0.10, 0.10], "cv_class": "pressure_gauge", "confidence": 0.9},
                 {"bbox": [0.20, 0.50, 0.10, 0.20], "cv_class": "valve", "confidence": 0.8},
                 {"bbox": [0.70, 0.50, 0.10, 0.20], "cv_class": "valve", "confidence": 0.8},
@@ -63,7 +69,7 @@ def fake_ai(monkeypatch):
     server = ThreadingHTTPServer(("127.0.0.1", 0), FakeAI)
     server.handle_error = lambda *a: None  # бэкенд по таймауту закрыл соединение — это ожидаемо
     threading.Thread(target=server.serve_forever, daemon=True).start()
-    FakeAI.delay = 0.0
+    FakeAI.delay, FakeAI.delay_path, FakeAI.error, FakeAI.detect_reply = 0.0, None, None, None
     FakeAI.analyze_reply = {
         "category": "possible_defect", "signs": ["течь/подтёки"],
         "explanation": "Под фланцем видны мокрые следы", "recommendation": "Проверить затяжку фланца",
@@ -90,6 +96,60 @@ def test_detect_sends_card_classes_and_matches_left_to_right(fake_ai):
     x, y, w, h = motor["bbox"]
     assert x + w <= 1 and y + h <= 1  # рамка обрезана по краю кадра
     assert r["not_in_frame"] == ["C-05"]
+
+
+def test_detect_single_card_node_takes_every_box_of_its_type(fake_ai):
+    """В карточке один узел типа, в кадре таких рамок две: обе — этот узел, а не «выберите из одного»."""
+    fake_ai.detect_reply = [
+        {"bbox": [0.10, 0.40, 0.10, 0.20], "cv_class": "flange", "confidence": 0.8},
+        {"bbox": [0.80, 0.40, 0.10, 0.20], "cv_class": "flange", "confidence": 0.7},
+        {"bbox": [0.30, 0.50, 0.10, 0.20], "cv_class": "valve", "confidence": 0.8},
+    ]
+    r = client.post("/api/equipment/PU-002/detect", files=JPEG).json()
+    flanges = [d for d in r["detections"] if d["cv_class"] == "flange"]
+    assert [(d["match"], d["component_id"]) for d in flanges] == [("matched", "C-16")] * 2
+    assert all(d["label"].startswith("Ответные фланцы") for d in flanges)
+    assert "C-16" not in r["not_in_frame"]
+    # две задвижки в карточке, рамка одна — по-прежнему выбор пользователя
+    r = client.post("/api/equipment/PU-001/detect", files=JPEG).json()
+    valve = next(d for d in r["detections"] if d["cv_class"] == "valve")
+    assert valve["match"] == "ambiguous" and valve["candidates"] == ["C-03", "C-04"]
+    assert [d["component_id"] for d in r["detections"] if d["cv_class"] == "flange"] == ["C-05", "C-05"]
+
+
+def test_unreadable_image_is_422_not_ai_down(fake_ai):
+    fake_ai.error = (422, {"error": {"code": "bad_image", "message": "cannot decode"}})
+    for path in ("/api/equipment/PU-001/detect", "/api/identify/image",
+                 "/api/equipment/PU-001/components/C-05/analyze"):
+        r = client.post(path, files=JPEG)
+        assert r.status_code == 422, path
+        assert r.json()["error"] == {"code": "validation_error",
+                                     "message": "Снимок не читается. Сделайте кадр ещё раз"}
+    # другие ошибки ИИ-сервиса — по-прежнему «не отвечает»
+    for error in ((422, {"error": {"code": "bad_request", "message": "classes"}}), (500, {}), (404, {})):
+        fake_ai.error = error
+        r = client.post("/api/equipment/PU-001/detect", files=JPEG)
+        assert r.status_code == 503 and r.json()["error"]["code"] == "ai_unavailable", error
+
+
+def test_slow_analyze_does_not_hold_other_requests(fake_ai):
+    """Пока ИИ анализирует узел (секунды), рамки и карточка должны отвечать сразу."""
+    fake_ai.delay, fake_ai.delay_path = 1.5, "/analyze"
+    done = {}
+    with TestClient(app) as shared:  # один цикл событий на все запросы, как у сервера
+        def analyze():
+            done["analyze"] = shared.post("/api/equipment/PU-001/components/C-05/analyze", files=JPEG)
+        t = threading.Thread(target=analyze)
+        t.start()
+        time.sleep(0.3)  # анализ уже ушёл в ИИ-сервис
+        started = time.monotonic()
+        assert shared.post("/api/equipment/PU-001/detect", files=JPEG).status_code == 200
+        assert shared.post("/api/identify/image", files=JPEG).status_code == 200
+        assert shared.get("/api/equipment/PU-001").status_code == 200
+        waited = time.monotonic() - started
+        t.join()
+    assert waited < 1.0, f"запросы ждали анализ {waited:.1f} с"
+    assert done["analyze"].status_code == 200
 
 
 def test_analyze_saves_ai_result(fake_ai):
