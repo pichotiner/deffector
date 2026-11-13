@@ -1,0 +1,15 @@
+{
+  "found": false,
+  "suggestions": [
+    {
+      "equipment_id": "PU-001",
+      "name": "Насосный агрегат",
+      "score": 0.83
+    },
+    {
+      "equipment_id": "PU-002",
+      "name": "Насосный агрегат винтовой",
+      "score": 0.48
+    }
+  ]
+}

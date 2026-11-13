@@ -1,0 +1,67 @@
+{
+  "detections": [
+    {
+      "bbox": [
+        0.051,
+        0.393,
+        0.3,
+        0.35
+      ],
+      "cv_class": "electric_motor",
+      "detection_confidence": 0.93,
+      "match": "matched",
+      "component_id": "N-02",
+      "candidates": null,
+      "label": "Электродвигатель 5,5 кВт",
+      "attention_level": "defect",
+      "resource_status": "insufficient_data",
+      "visual_category": "possible_defect",
+      "reason": "Обнаружены признаки возможного дефекта: следы коррозии на корпусе",
+      "recommended_action": "Осмотреть корпус и лапы крепления, оценить глубину коррозии"
+    },
+    {
+      "bbox": [
+        0.411,
+        0.213,
+        0.12,
+        0.18
+      ],
+      "cv_class": "pressure_gauge",
+      "detection_confidence": 0.87,
+      "match": "matched",
+      "component_id": "C-02",
+      "candidates": null,
+      "label": "Манометр на напорном патрубке МП-100",
+      "attention_level": "defect",
+      "resource_status": "due",
+      "visual_category": "check_recommended",
+      "reason": "Наступил срок обслуживания",
+      "recommended_action": "Провести поверку манометра"
+    },
+    {
+      "bbox": [
+        0.621,
+        0.543,
+        0.14,
+        0.2
+      ],
+      "cv_class": "valve",
+      "detection_confidence": 0.78,
+      "match": "ambiguous",
+      "component_id": null,
+      "candidates": [
+        "C-03",
+        "C-04"
+      ],
+      "label": "Запорная арматура",
+      "attention_level": "unknown",
+      "resource_status": null,
+      "visual_category": null,
+      "reason": "Подходит несколько узлов карточки — выберите нужный",
+      "recommended_action": null
+    }
+  ],
+  "not_in_frame": [
+    "C-05"
+  ]
+}
