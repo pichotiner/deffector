@@ -89,7 +89,10 @@ class Analyzer:
             response.raise_for_status()
         except httpx.HTTPError as exc:
             raise RuntimeError(f"Ollama не отвечает по адресу {self.settings.ollama_url}") from exc
-        names = {m.get("name", "") for m in response.json().get("models", [])}
+        try:
+            names = {m.get("name", "") for m in response.json().get("models", [])}
+        except (ValueError, AttributeError, TypeError) as exc:
+            raise RuntimeError(f"По адресу {self.settings.ollama_url} отвечает не Ollama") from exc
         wanted = self.settings.vlm_model
         if wanted not in names and f"{wanted}:latest" not in names:
             raise RuntimeError(f"Модель {wanted} не скачана в Ollama. Запустите python ai/install.py")
@@ -99,7 +102,8 @@ class Analyzer:
         image = Image.new("RGB", (224, 224), (120, 120, 120))
         self._ask(image, "узел", "узел", timeout=300.0)
 
-    def _ask(self, image: Image.Image, type_name: str, component_name: str, timeout: float) -> dict:
+    def _ask(self, image: Image.Image, type_name: str, component_name: str, timeout: float,
+             num_predict: int = 300) -> dict:
         payload = {
             "model": self.settings.vlm_model,
             "stream": False,
@@ -109,7 +113,7 @@ class Analyzer:
                 "temperature": 0,  # нулевая случайность: один снимок — один ответ
                 "seed": 0,
                 "top_k": 1,
-                "num_predict": 300,
+                "num_predict": num_predict,
                 "num_ctx": self.settings.vlm_num_ctx,
             },
             "messages": [
@@ -123,10 +127,10 @@ class Analyzer:
         }
         response = self._client.post("/api/chat", json=payload, timeout=timeout)
         response.raise_for_status()
-        content = response.json().get("message", {}).get("content", "")
         try:
+            content = response.json()["message"]["content"]
             return json.loads(content)
-        except (TypeError, json.JSONDecodeError) as exc:
+        except (KeyError, TypeError, ValueError) as exc:
             raise rules.FormatError("ответ модели не является JSON") from exc
 
     def analyze(self, image: Image.Image, component_type: str, component_name: str) -> rules.Assessment:
@@ -146,7 +150,10 @@ class Analyzer:
             if remaining <= 0.5:
                 break
             try:
-                raw = self._ask(prepared, type_name, name, timeout=remaining)
+                # повтор с тем же запросом при нулевой случайности дал бы тот же ответ; частая причина
+                # сбоя формата — обрезанный по длине ответ, поэтому во второй раз места больше
+                raw = self._ask(prepared, type_name, name, timeout=remaining,
+                                num_predict=300 if attempt == 1 else 600)
                 return rules.enforce(rules.parse_model_answer(raw), name, component_type)
             except rules.FormatError as exc:
                 log.warning("Ответ модели не по формату (попытка %d): %s", attempt, exc)
@@ -155,5 +162,8 @@ class Analyzer:
                 break
             except httpx.HTTPError as exc:
                 log.error("Ошибка обращения к Ollama: %s", exc)
+                break
+            except Exception:  # /analyze не отвечает 500: при любом сбое — осторожный ответ
+                log.exception("Сбой анализа")
                 break
         return rules.analysis_failed()

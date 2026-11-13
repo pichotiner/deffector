@@ -40,5 +40,6 @@ def test_below_threshold_confidence_under_half():
     for top in (0.6, 0.7, 0.77, 0.779):
         recognized, candidates = rank_candidates({"PU-001": [top], "PU-002": [0.3]}, **PARAMS)
         assert not recognized and candidates[0]["confidence"] < 0.5
-    recognized, candidates = rank_candidates({"PU-001": [0.78], "PU-002": [0.3]}, **PARAMS)
+    # ровно на пороге уверенность чуть ниже 0.5 (бэкенд осторожнее), чуть выше порога — уже >= 0.5
+    recognized, candidates = rank_candidates({"PU-001": [0.79], "PU-002": [0.3]}, **PARAMS)
     assert recognized and candidates[0]["confidence"] >= 0.5

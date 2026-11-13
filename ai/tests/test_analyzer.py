@@ -124,3 +124,33 @@ def test_model_says_no_issues_on_good_image():
     result = make_analyzer(lambda r: reply(answer)).analyze(sharp_image(), "valve", "Задвижка")
     assert result.category == "no_visible_issues"
     assert result.explanation == "На снимке узла «Задвижка» видимых проблем не обнаружено."
+
+
+@pytest.mark.parametrize(
+    "response",
+    [
+        httpx.Response(200, text="<html>не Ollama</html>"),
+        httpx.Response(200, json={"message": "строка вместо объекта"}),
+        httpx.Response(200, json=[1, 2, 3]),
+    ],
+)
+def test_garbage_from_ollama_is_cautious_answer(response):
+    result = make_analyzer(lambda request: response).analyze(sharp_image(), "flange", "Фланец")
+    assert result.category == "check_recommended"
+
+
+def test_retry_gets_more_tokens():
+    seen = []
+
+    def handler(request):
+        seen.append(json.loads(request.content)["options"]["num_predict"])
+        return reply("{обрезанный ответ" if len(seen) == 1 else GOOD)
+
+    result = make_analyzer(handler).analyze(sharp_image(), "flange", "Фланец")
+    assert result.category == "possible_defect" and seen == [300, 600]
+
+
+def test_check_ready_garbage_is_clear_error():
+    analyzer = make_analyzer(lambda request: httpx.Response(200, text="не json"))
+    with pytest.raises(RuntimeError, match="не Ollama"):
+        analyzer.check_ready()

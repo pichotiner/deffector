@@ -60,6 +60,19 @@ FORBIDDEN_PATTERNS = (
     r"\bдопуска\w*\s+к\s+эксплуатац",
     r"\bпродолж\w*\s+эксплуатац",
     r"\bможно\s+эксплуатир",
+    r"\bотсутству",
+    r"\b(поврежден\w*|коррози\w*|ржавчин\w*|теч[иь]|подт[её]к\w*|дефект\w*|проблем\w*)\s+не\s+видн",
+    r"\bхорош\w*\s+(техническ\w*\s+)?состояни",
+    r"\bсостояни\w*\s+хорош",
+    r"\bштатн",
+    r"\bцел(ый|ая|ое|ые)\b",
+    r"\bгерметич(ен|на|но|ны)\b",
+    r"\bротор",
+    r"\bстатор",
+    r"\bзамыкан",
+    r"\bпоменя",
+    r"\bменять",
+    r"\bобнаружен\w*\s+дефект",  # утверждение дефекта: только «признаки возможного дефекта»
 )
 _FORBIDDEN = re.compile("|".join(FORBIDDEN_PATTERNS), re.IGNORECASE)
 _CYRILLIC = re.compile(r"[а-яё]", re.IGNORECASE)
@@ -237,9 +250,10 @@ def enforce(assessment: Assessment, component_name: str, component_type: str = "
     changed = category != assessment.category
     # при «видимых проблем не обнаружено» — только шаблон: свободный текст модели может
     # звучать как подтверждение исправности, чего ТЗ (4.2) не допускает
-    if changed or not _text_ok(explanation) or category == NO_VISIBLE_ISSUES:
+    # признак отброшен — текст модели мог говорить о нём, берём шаблон по оставшимся признакам
+    if changed or dropped or not _text_ok(explanation) or category == NO_VISIBLE_ISSUES:
         explanation = template_explanation(category, signs, component_name)
-    if changed or not _text_ok(recommendation) or category == NO_VISIBLE_ISSUES:
+    if changed or dropped or not _text_ok(recommendation) or category == NO_VISIBLE_ISSUES:
         recommendation = template_recommendation(category, signs)
     return Assessment(
         category=category,

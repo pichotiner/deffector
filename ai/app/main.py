@@ -23,8 +23,38 @@ from . import stub  # noqa: E402
 from .images import ImageError, decode_image  # noqa: E402
 
 log = logging.getLogger("ai")
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(levelname)s %(name)s: %(message)s")
 
-_GPU_CACHE: dict = {"at": 0.0, "value": None}
+_GPU_CACHE: dict = {"at": -1e9, "value": None, "busy": False}
+_GPU_LOCK = threading.Lock()
+
+
+def _read_nvidia_smi() -> tuple[int, int] | None:
+    import os
+    import shutil
+    import subprocess
+
+    exe = shutil.which("nvidia-smi")
+    if not exe:
+        return None
+    try:
+        kwargs = {"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt" else {}
+        out = subprocess.run(
+            [exe, "--query-gpu=memory.used,memory.total", "--format=csv,noheader,nounits"],
+            capture_output=True, text=True, timeout=3, **kwargs,
+        ).stdout
+        used, total = (int(v) for v in out.strip().splitlines()[0].split(","))
+        return used, total
+    except (OSError, ValueError, IndexError, subprocess.SubprocessError):
+        return None
+
+
+def _refresh_gpu() -> None:
+    try:
+        value = _read_nvidia_smi()
+    finally:
+        with _GPU_LOCK:
+            _GPU_CACHE.update(at=time.monotonic(), value=value if "value" in locals() else None, busy=False)
 
 
 def gpu_memory_mb() -> tuple[int, int] | None:
@@ -32,30 +62,15 @@ def gpu_memory_mb() -> tuple[int, int] | None:
 
     torch.cuda.mem_get_info в Windows (драйвер WDDM) не учитывает память других
     процессов — например, Ollama, — поэтому общий расход берём у драйвера.
-    Ответ кэшируется на 5 секунд: /health опрашивают часто.
+    nvidia-smi вызывается в фоновом потоке не чаще раза в 5 секунд, а /health сразу
+    отдаёт последнее известное значение: бэкенд и стенд ждут /health не дольше 2 секунд.
     """
-    import os
-    import shutil
-    import subprocess
-
-    now = time.monotonic()
-    if now - _GPU_CACHE["at"] < 5.0:
+    with _GPU_LOCK:
+        stale = time.monotonic() - _GPU_CACHE["at"] >= 5.0
+        if stale and not _GPU_CACHE["busy"]:
+            _GPU_CACHE["busy"] = True
+            threading.Thread(target=_refresh_gpu, name="nvidia-smi", daemon=True).start()
         return _GPU_CACHE["value"]
-    value = None
-    exe = shutil.which("nvidia-smi")
-    if exe:
-        try:
-            kwargs = {"creationflags": subprocess.CREATE_NO_WINDOW} if os.name == "nt" else {}
-            out = subprocess.run(
-                [exe, "--query-gpu=memory.used,memory.total", "--format=csv,noheader,nounits"],
-                capture_output=True, text=True, timeout=3, **kwargs,
-            ).stdout
-            used, total = (int(v) for v in out.strip().splitlines()[0].split(","))
-            value = (used, total)
-        except (OSError, ValueError, IndexError, subprocess.SubprocessError):
-            value = None
-    _GPU_CACHE.update(at=now, value=value)
-    return value
 
 
 class ApiError(Exception):
@@ -104,39 +119,54 @@ class Service:
     def load_models(self) -> None:
         self.loading = True
         try:
-            import torch
-
-            from .analyzer import Analyzer
-            from .detector import Detector
-            from .identifier import Identifier
-
-            device = self.settings.device
-            if device == "auto":
-                device = "cuda:0" if torch.cuda.is_available() else "cpu"
-            elif device == "cuda":
-                device = "cuda:0"
-            self.device = device
-
-            self.detector = Detector(self.settings, device)
-            self._load_one("detector", self.detector.load)
-            self.identifier = Identifier(self.settings, device)
-            self._load_one("identifier", self.identifier.load)
-            self.analyzer = Analyzer(self.settings)
-
-            def load_vlm():
-                self.analyzer.check_ready()
-                if self.settings.warmup:
-                    self.analyzer.warmup()
-
-            self._load_one("vlm", load_vlm)
+            self._load_models()
+        except Exception as exc:  # нет torch, сломанная сборка CUDA и т. п.: причина — в /health
+            log.exception("Модели не загружены")
+            for state in self.states.values():
+                if not state.ready and not state.error:
+                    state.error = f"{type(exc).__name__}: {exc} — выполните python ai/install.py"
         finally:
             self.loading = False
+
+    def _load_models(self) -> None:
+        import torch
+
+        from .analyzer import Analyzer
+        from .detector import Detector
+        from .identifier import Identifier
+
+        device = self.settings.device
+        if device == "auto":
+            device = "cuda:0" if torch.cuda.is_available() else "cpu"
+        elif device == "cuda":
+            device = "cuda:0"
+        self.device = device
+
+        self.detector = Detector(self.settings, device)
+        self._load_one("detector", self.detector.load)
+        self.identifier = Identifier(self.settings, device)
+        self._load_one("identifier", self.identifier.load)
+        self.analyzer = Analyzer(self.settings)
+
+        def load_vlm():
+            self.analyzer.check_ready()
+            if self.settings.warmup:
+                self.analyzer.warmup()
+
+        self._load_one("vlm", load_vlm)
 
     def health(self) -> dict:
         if self.settings.stub:
             return {"status": "ok", "ready": True, "stub": True, "models": {}}
         ready = all(s.ready for s in self.states.values())
-        status = "loading" if self.loading else ("ok" if ready else "degraded")
+        if self.loading:
+            status = "loading"
+        elif ready:
+            status = "ok"
+        elif any(s.ready for s in self.states.values()):
+            status = "degraded"  # часть моделей работает: сервис отвечает, неготовые запросы — 503
+        else:
+            status = "failed"  # ни одной модели: «готов» сказать нельзя, причина — в models.*.error
         info = {
             "status": status,
             "ready": ready,
@@ -148,9 +178,12 @@ class Service:
         if self.identifier is not None:
             info["reference_photos"] = self.identifier.reference_counts
         try:
-            import torch
+            import sys
 
-            if torch.cuda.is_available():
+            # torch берём, только если поток загрузки его уже импортировал: импорт идёт секунды,
+            # а /health должен отвечать сразу
+            torch = sys.modules.get("torch")
+            if torch is not None and not self.loading and torch.cuda.is_available():
                 smi = gpu_memory_mb()
                 if smi is not None:
                     used_mb, total_mb = smi  # вся занятая память карты, включая Ollama
@@ -207,8 +240,12 @@ def parse_classes(values: list[str] | None) -> list[str] | None:
 
 
 async def read_image(upload: UploadFile):
+    from starlette.concurrency import run_in_threadpool
+
+    data = await upload.read()
     try:
-        return decode_image(await upload.read())
+        # декодирование большого снимка — до сотен мс: не в цикле событий, чтобы не держать /health
+        return await run_in_threadpool(decode_image, data)
     except ImageError as exc:
         raise ApiError(422, "bad_image", str(exc)) from exc
 
@@ -257,8 +294,10 @@ def create_app() -> FastAPI:
     @app.get("/health")
     def health():
         info = service.health()
-        # пока модели загружаются — 503: бэкенд и стенд считают сервис готовым по коду 200
-        return JSONResponse(status_code=503 if info["status"] == "loading" else 200, content=info)
+        # пока модели загружаются или не загрузилась ни одна — 503: бэкенд и стенд считают
+        # сервис готовым по коду 200
+        code = 503 if info["status"] in ("loading", "failed") else 200
+        return JSONResponse(status_code=code, content=info)
 
     @app.post("/detect")
     async def detect(image: UploadFile = File(...), classes: list[str] | None = Form(None)):
@@ -279,9 +318,10 @@ def create_app() -> FastAPI:
         picture = await read_image(image)
         if service.settings.stub:
             return stub.analyze(component_type, component_name)
-        service.require("vlm")
         from starlette.concurrency import run_in_threadpool
 
+        # require("vlm") может спросить Ollama по сети (до 5 с) — не в цикле событий
+        await run_in_threadpool(service.require, "vlm")
         result = await run_in_threadpool(service.analyzer.analyze, picture, component_type, component_name)
         return result.as_dict()
 

@@ -17,6 +17,11 @@ log = logging.getLogger("ai.identifier")
 IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".webp", ".bmp"}
 
 
+def _floor3(value: float) -> float:
+    """Округление вниз до тысячных: 0.4999 не должно стать 0.5 (порог «распознано» у бэкенда)."""
+    return math.floor(round(value * 1000, 6)) / 1000
+
+
 def rank_candidates(
     similarities: dict[str, list[float]], threshold: float, top_k: int, temperature: float
 ) -> tuple[bool, list[dict]]:
@@ -42,7 +47,7 @@ def rank_candidates(
     # (backend/app/config.py, identify_threshold), и оба решения не расходятся в опасную сторону.
     closeness = min(1.0, max(0.0, (top - (threshold - 0.15)) / 0.30))
     candidates = [
-        {"equipment_id": k, "confidence": round(weights[k] / total * closeness, 3)}
+        {"equipment_id": k, "confidence": _floor3(weights[k] / total * closeness)}
         for k in sorted(scores, key=lambda k: scores[k], reverse=True)
     ]
     return top >= threshold, candidates

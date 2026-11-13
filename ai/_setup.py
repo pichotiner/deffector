@@ -16,12 +16,47 @@ VENV_DIR = AI_DIR / ".venv"
 WEIGHTS_DIR = Path(os.environ.get("AI_WEIGHTS_DIR") or AI_DIR / "weights")
 OLLAMA_URL = os.environ.get("AI_OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/")
 IS_WINDOWS = os.name == "nt"
+INSTALLED_FILE = VENV_DIR / "installed.json"  # отметка о завершённой установке: режим и модель
+# numpy 2.5 требует Python 3.12+, сборки torch с CUDA проверены на 3.12
+PY_MIN, PY_MAX = (3, 12), (3, 13)
+WEIGHT_FILES = ("owlv2/model.safetensors", "clip/model.safetensors")
 
 
 def venv_python() -> Path:
     if IS_WINDOWS:
         return VENV_DIR / "Scripts" / "python.exe"
     return VENV_DIR / "bin" / "python"
+
+
+def python_ok(version: tuple[int, int]) -> bool:
+    return PY_MIN <= tuple(version[:2]) <= PY_MAX
+
+
+def base_python() -> list[str] | None:
+    """Python для создания .venv: текущий, если подходит, иначе в Windows — через py -3.12/-3.13."""
+    if python_ok(sys.version_info):
+        return [sys.executable]
+    if IS_WINDOWS and shutil.which("py"):
+        for version in ("3.12", "3.13"):
+            probe = subprocess.run(["py", f"-{version}", "-c", ""], capture_output=True)
+            if probe.returncode == 0:
+                return ["py", f"-{version}"]
+    return None
+
+
+def venv_ok(python: Path) -> bool:
+    """Окружение годится: Python нужной версии и рабочий pip (не оборванное создание)."""
+    if not python.is_file():
+        return False
+    code = (f"import sys, pip; raise SystemExit(0 if {PY_MIN} <= sys.version_info[:2] <= {PY_MAX} else 1)")
+    return subprocess.run([str(python), "-c", code], capture_output=True).returncode == 0
+
+
+def installed_info() -> dict:
+    try:
+        return json.loads(INSTALLED_FILE.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
 
 
 def find_ollama() -> str | None:

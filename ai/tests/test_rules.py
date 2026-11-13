@@ -121,6 +121,15 @@ def test_duplicate_signs_removed():
         "Следует заменить задвижку.",
         "Рекомендуется замена.",
         "Нужен ремонт.",
+        "Повреждения отсутствуют.",
+        "Повреждений не видно.",
+        "Состояние хорошее.",
+        "Работает штатно.",
+        "Корпус целый, герметичен.",
+        "Ротор задевает статор.",
+        "Короткое замыкание.",
+        "Обнаружен дефект: трещина.",
+        "Нужно поменять прокладку.",
     ],
 )
 def test_forbidden_wording_replaced(text):
@@ -185,6 +194,15 @@ def test_dropped_sign_never_gives_no_issues():
                                           explanation="Видны бурые пятна у фланца."))
     result = rules.enforce(raw, "Задвижка", "valve")
     assert result.category == "check_recommended" and result.signs == []
+
+
+def test_dropped_sign_texts_follow_kept_signs():
+    raw = rules.parse_model_answer(answer(signs=["corrosion", "overheating"], category="possible_defect",
+                                          explanation="Ржавчина и потемнение краски.",
+                                          recommendation="Проверить нагрев корпуса."))
+    result = rules.enforce(raw, "Задвижка", "valve")
+    assert result.signs == ["коррозия"] and result.category == "possible_defect"
+    assert result.recommendation == rules.template_recommendation("possible_defect", ["коррозия"])
 
 
 def test_non_string_sign_is_format_error():

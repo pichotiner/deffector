@@ -107,32 +107,42 @@ def load_classes(path: Path) -> dict[str, ClassSpec]:
     return result
 
 
+def _num(kind, name: str, default: str, low=None):
+    """Число из переменной AI_<name>; мусор — понятная ошибка, а не трасса."""
+    raw = _env(name, default)
+    try:
+        value = kind(str(raw).replace(",", "."))
+    except ValueError:
+        raise SystemExit(f"ОШИБКА: переменная AI_{name}={raw!r} — нужно число (например {default})") from None
+    return max(low, value) if low is not None else value
+
+
 def load_settings() -> Settings:
     classes_file = _env_path("CLASSES_FILE", AI_DIR / "classes.json")
     return Settings(
         stub=_env_bool("STUB", False),
         host=_env("HOST", "127.0.0.1"),
-        port=int(_env("PORT", "8001")),
+        port=_num(int, "PORT", "8001"),
         device=_env("DEVICE", "auto"),
         weights_dir=_env_path("WEIGHTS_DIR", AI_DIR / "weights"),
         classes_file=classes_file,
         reference_dir=_env_path("REFERENCE_DIR", REPO_DIR / "demo" / "reference"),
         detector_dir=_env("DETECTOR_DIR", "owlv2"),
-        detector_max_area=float(_env("DETECTOR_MAX_AREA", "0.85")),
-        detector_iou=float(_env("DETECTOR_IOU", "0.5")),
-        detector_max_det=int(_env("DETECTOR_MAX_DET", "30")),
+        detector_max_area=_num(float, "DETECTOR_MAX_AREA", "0.85"),
+        detector_iou=_num(float, "DETECTOR_IOU", "0.5"),
+        detector_max_det=_num(int, "DETECTOR_MAX_DET", "30", low=1),
         ollama_url=_env("OLLAMA_URL", "http://127.0.0.1:11434").rstrip("/"),
         vlm_model=_env("VLM_MODEL", "qwen2.5vl:7b"),
-        analyze_timeout_s=float(_env("ANALYZE_TIMEOUT_S", "15")),
-        vlm_image_side=int(_env("VLM_IMAGE_SIDE", "896")),
-        vlm_num_ctx=int(_env("VLM_NUM_CTX", "4096")),
+        analyze_timeout_s=_num(float, "ANALYZE_TIMEOUT_S", "15", low=1),
+        vlm_image_side=_num(int, "VLM_IMAGE_SIDE", "896", low=64),
+        vlm_num_ctx=_num(int, "VLM_NUM_CTX", "4096", low=1024),
         warmup=_env_bool("WARMUP", True),
         clip_dir=_env("CLIP_DIR", "clip"),
-        identify_threshold=float(_env("IDENTIFY_THRESHOLD", "0.66")),
-        identify_top_k=int(_env("IDENTIFY_TOP_K", "1")),
-        identify_temperature=float(_env("IDENTIFY_TEMPERATURE", "0.03")),
-        min_side_px=int(_env("MIN_SIDE_PX", "64")),
-        min_brightness=float(_env("MIN_BRIGHTNESS", "30")),
-        min_sharpness=float(_env("MIN_SHARPNESS", "15")),
+        identify_threshold=_num(float, "IDENTIFY_THRESHOLD", "0.66"),
+        identify_top_k=_num(int, "IDENTIFY_TOP_K", "1", low=1),
+        identify_temperature=_num(float, "IDENTIFY_TEMPERATURE", "0.03", low=1e-3),
+        min_side_px=_num(int, "MIN_SIDE_PX", "64"),
+        min_brightness=_num(float, "MIN_BRIGHTNESS", "30"),
+        min_sharpness=_num(float, "MIN_SHARPNESS", "15"),
         classes=load_classes(classes_file),
     )

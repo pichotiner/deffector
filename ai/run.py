@@ -10,7 +10,18 @@ import os
 import subprocess
 import sys
 
-from _setup import AI_DIR, VENV_DIR, ensure_ollama_running, fail, has_model, ollama_models, venv_python
+from _setup import (
+    AI_DIR,
+    VENV_DIR,
+    WEIGHT_FILES,
+    WEIGHTS_DIR,
+    ensure_ollama_running,
+    fail,
+    has_model,
+    installed_info,
+    ollama_models,
+    venv_python,
+)
 
 
 def main() -> None:
@@ -30,6 +41,16 @@ def main() -> None:
     env["AI_STUB"] = "1" if stub else "0"
 
     if not stub:
+        # после install.py --stub или оборванной установки сервис поднялся бы без моделей
+        missing = [name for name in WEIGHT_FILES if not (WEIGHTS_DIR / name).is_file()]
+        torch_ok = subprocess.run([str(python), "-c", "import torch, transformers"],
+                                  capture_output=True).returncode == 0
+        if missing or not torch_ok:
+            what = "нет torch/transformers" if not torch_ok else "нет весов: " + ", ".join(missing)
+            fail(f"полная установка не завершена ({what}). Выполните: python ai/install.py")
+        installed_vlm = installed_info().get("vlm")
+        if installed_vlm and "AI_VLM_MODEL" not in env:
+            env["AI_VLM_MODEL"] = installed_vlm  # модель, выбранная при установке (--vlm)
         vlm = env.get("AI_VLM_MODEL", "qwen2.5vl:7b")
         if not ensure_ollama_running():
             print("ВНИМАНИЕ: Ollama не запущена — /analyze работать не будет, остальные запросы будут.", flush=True)
