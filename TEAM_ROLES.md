@@ -110,3 +110,5 @@ Owns the data, the calculations, and the integration of the three parts.
 ## Detailed plans
 
 Detailed work plans for each role (in Russian) are in [plan/](plan/README.md).
+
+The defence is online: Pavel runs the live demo from his own PC and phone, Timofey presents the slides, Andrey answers questions about the AI.
