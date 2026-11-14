@@ -296,6 +296,28 @@ def test_report_pdf():
     assert b"DejaVuSans" in r.content                                         # шрифт с кириллицей вложен
 
 
+def test_report_pdf_splits_a_long_inspection_across_pages():
+    headers = bearer(MASTER)
+    r = anon.post("/api/equipment/PU-001/inspections", headers=headers, json={
+        "component_id": "C-02", "type": "remark", "comment": "Строка осмотра\n" * 180})
+    assert r.status_code == 201
+    r = anon.get("/api/equipment/PU-001/report?format=pdf", headers=headers)
+    assert r.status_code == 200
+    assert r.content.startswith(b"%PDF-") and r.content.rstrip().endswith(b"%%EOF")
+
+
+def test_report_xlsx_removes_invalid_xml_controls_without_changing_history():
+    headers = bearer(MASTER)
+    comment = "Течь\x00и\x0bвибрация\x1f\tосмотр\nзавершён"
+    r = anon.post("/api/equipment/PU-001/inspections", headers=headers, json={
+        "component_id": "C-02", "type": "remark", "comment": comment})
+    assert r.status_code == 201 and r.json()["inspection"]["comment"] == comment
+    r = anon.get("/api/equipment/PU-001/report?format=xlsx", headers=headers)
+    assert r.status_code == 200
+    sheets = xlsx_sheets(r.content)  # ElementTree отклоняет запрещённые XML 1.0 символы.
+    assert sheets["История"][1][3] == "Течьивибрация\tосмотр\nзавершён"
+
+
 @pytest.mark.parametrize("query, status", [
     ("format=docx", 422), ("date_from=13.11.2026", 422),
     ("date_from=2026-11-13&date_to=2026-11-01", 422)])

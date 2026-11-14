@@ -9,6 +9,7 @@ DejaVu Sans из app/fonts (кириллица), всё с диска, инте�
 """
 
 import io
+import re
 import zipfile
 from datetime import date
 from xml.sax.saxutils import escape
@@ -30,6 +31,7 @@ ATTENTION_LABELS = {
 }
 
 TITLE = "Отчёт об осмотре оборудования"
+_INVALID_XML = re.compile(r"[^\x09\x0A\x0D\x20-\uD7FF\uE000-\uFFFD\U00010000-\U0010FFFF]")
 PRELIMINARY = ("ИИ-анализ — инструмент предварительного осмотра по изображению: внутренние "
                "неисправности так не определяются. " + NO_ISSUES_NOTE + ".")
 
@@ -238,7 +240,9 @@ def _col(i):
 
 def _cell(row, col, value, style):
     # Только строки: значения уже приведены к тексту с единицами измерения.
-    text = escape(str(value)).replace("\r", "")
+    # Управляющие символы допустимы в JSON/SQLite, но ломают документ XML 1.0.
+    # Очищаем только представление для выгрузки, не исходную запись осмотра.
+    text = escape(_INVALID_XML.sub("", str(value))).replace("\r", "")
     return (f'<c r="{_col(col)}{row}" s="{style}" t="inlineStr">'
             f'<is><t xml:space="preserve">{text}</t></is></c>')
 
@@ -342,7 +346,7 @@ def to_pdf(report: dict) -> bytes:
     small = ParagraphStyle("small", parent=base, fontSize=7, leading=9, textColor=colors.HexColor("#4A5661"))
 
     def p(text, style=base):
-        return Paragraph(escape(str(text)), style)
+        return Paragraph(escape(_INVALID_XML.sub("", str(text))), style)
 
     grid = [("GRID", (0, 0), (-1, -1), 0.4, line), ("VALIGN", (0, 0), (-1, -1), "TOP"),
             ("LEFTPADDING", (0, 0), (-1, -1), 3), ("RIGHTPADDING", (0, 0), (-1, -1), 3),
@@ -356,7 +360,10 @@ def to_pdf(report: dict) -> bytes:
         rows += [[p(v) for v in row] for row in section["rows"]]
         if not section["rows"]:
             rows.append([p("Записей нет")] + [""] * (len(section["head"]) - 1))
-        t = Table(rows, colWidths=[width * s / sum(shares) for s in shares], repeatRows=1)
+        # Один длинный комментарий может занять больше страницы. Делим саму строку,
+        # а не отбрасываем текст и не завершаем выгрузку ошибкой LayoutError.
+        t = Table(rows, colWidths=[width * s / sum(shares) for s in shares], repeatRows=1,
+                  splitInRow=1)
         t.setStyle(TableStyle(grid + [("BACKGROUND", (0, 0), (-1, 0), fill)]))
         # Заголовок раздела не остаётся один внизу страницы.
         return [CondPageBreak(35 * mm), p(section["title"], heading), t]
@@ -364,7 +371,7 @@ def to_pdf(report: dict) -> bytes:
     story = [p(report["title"], title),
              p(f"{report['equipment_id']} — {report['equipment_name']}", heading)]
     summary = Table([[p(k, bold), p(v)] for k, v in report["summary"]],
-                    colWidths=[width * 0.3, width * 0.7])
+                    colWidths=[width * 0.3, width * 0.7], splitInRow=1)
     summary.setStyle(TableStyle(grid + [("BACKGROUND", (0, 0), (0, -1), fill)]))
     story += [summary]
     story += table(report["components"], [6, 15, 14, 12, 21, 12, 21, 17, 19, 11, 12])
