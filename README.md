@@ -20,7 +20,7 @@
 | Что | Где |
 |---|---|
 | Презентация | [`docs/presentation/slides.pdf`](docs/presentation/slides.pdf); для показа — `slides.html` (работает без интернета) |
-| Видео сценария | [Запись экрана телефона, 2:36](demo/video/scenario.mp4) — QR, карточка, AR, анализ арматуры и двигателя, история; [содержание и происхождение](demo/video/README.md) |
+| Видео сценария | [Запись экрана телефона, 2:48](demo/video/scenario.mp4) — QR, карточка, AR, анализ двигателя и арматуры, запись дефектов, история; [содержание и происхождение](demo/video/README.md) |
 | APK | [Android APK](mobile/dist/deffector-debug.apk), [сборка и установка](mobile/README.md) |
 | Ответы на частые вопросы | [`docs/qa.md`](docs/qa.md) |
 | Соответствие ТЗ по пунктам | [`docs/coverage.md`](docs/coverage.md) |
