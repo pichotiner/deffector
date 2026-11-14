@@ -74,6 +74,7 @@ python backend/check_scenario.py   # проверка всех 10 шагов с�
 cd backend && python -m pytest     # тесты бэкенда (нужен requirements-dev.txt)
 cd backend && python -m app.export_openapi   # обновить openapi.json после правки schemas.py
 python docs/presentation/make_pdf.py          # slides.html → slides.pdf (Edge или Chrome)
+python docs/video/make_video.py docs/video/scenario.json   # монтаж видео по списку вырезок (нужен ffmpeg)
 ```
 
 Команды ИИ-сервиса и приложения — в `ai/README.md` и `mobile/README.md`, когда появятся.
@@ -95,7 +96,7 @@ python docs/presentation/make_pdf.py          # slides.html → slides.pdf (Edge
 | `docs/qa.md` | ответы на вопросы жюри |
 | `docs/coverage.md` | матрица покрытия ТЗ с отметками, чем подтверждён каждый пункт |
 | `docs/presentation/` | презентация: `slides.html`, `slides.pdf` (`make_pdf.py`), текст выступления `speech.md` |
-| `docs/video.md` | что снять для видео и ролика-доказательства, как монтировать |
+| `docs/video.md`, `docs/video/` | что снять для видео и ролика-доказательства; монтаж — `make_video.py` по спискам вырезок `scenario.json`, `proof.json` |
 | `README.md` | сопроводительная документация для жюри |
 | `backend/` | FastAPI + SQLite; подробности — `backend/README.md` |
 | `demo/print/` | QR-коды и таблички для печати |
