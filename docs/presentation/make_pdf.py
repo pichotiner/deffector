@@ -14,6 +14,8 @@ import os
 import shutil
 import subprocess
 import sys
+import tempfile
+import time
 from pathlib import Path
 
 HERE = Path(__file__).resolve().parent
@@ -51,21 +53,51 @@ def main():
         return 1
     url = (HERE / "slides.html").as_uri() + "?all&pdf"
     out = Path(args.out).resolve()
-    # Headless сам берёт временный профиль и не мешает открытому браузеру
-    cmd = [browser, "--headless=new", "--disable-gpu", "--no-first-run",
-           "--no-default-browser-check", "--disable-background-networking",
-           "--disable-component-update", "--no-pdf-header-footer", f"--print-to-pdf={out}", url]
-    if os.name != "nt":
-        cmd[1:1] = ["--no-sandbox", "--disable-dev-shm-usage"]
-    if out.exists():
-        out.unlink()
-    try:
-        subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=90)
-    except subprocess.TimeoutExpired:
-        pass
-    if not out.exists() or out.stat().st_size == 0:
-        print("PDF не получился — откройте slides.html в браузере и сохраните через «Печать».")
-        return 1
+    # Отдельный профиль не передаёт команду уже открытому браузеру.
+    # Старый PDF сохраняем до успешного завершения нового рендера.
+    out.parent.mkdir(parents=True, exist_ok=True)
+    with tempfile.TemporaryDirectory(prefix="deffector-pdf-", ignore_cleanup_errors=True) as work:
+        temp = Path(work).resolve()
+        assert temp.parent == Path(tempfile.gettempdir()).resolve()
+        rendered = temp / "slides.pdf"
+        cmd = [browser, "--headless=new", "--disable-gpu", "--no-first-run",
+               "--no-default-browser-check", "--disable-background-networking",
+               "--disable-component-update", "--no-pdf-header-footer",
+               f"--user-data-dir={temp / 'profile'}", f"--print-to-pdf={rendered}", url]
+        if os.name != "nt":
+            cmd[1:1] = ["--no-sandbox", "--disable-dev-shm-usage"]
+        deadline = time.monotonic() + 90
+        try:
+            subprocess.run(cmd, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL, timeout=90)
+        except subprocess.TimeoutExpired:
+            pass
+        # Windows-лаунчер Edge иногда завершается раньше процесса печати.
+        while True:
+            try:
+                pdf = rendered.read_bytes()
+            except OSError:
+                pdf = b""
+            if pdf.startswith(b"%PDF-") and pdf.rstrip().endswith(b"%%EOF"):
+                pending = None
+                try:
+                    # Тот же том: успешный replace заменяет файл целиком.
+                    with tempfile.NamedTemporaryFile(dir=out.parent, prefix=out.name + ".",
+                                                     suffix=".tmp", delete=False) as target:
+                        pending = Path(target.name)
+                        target.write(pdf)
+                    os.replace(pending, out)
+                except OSError as exc:
+                    print(f"Не удалось сохранить новый PDF; предыдущий файл сохранён: {exc}")
+                    return 1
+                finally:
+                    if pending is not None:
+                        pending.unlink(missing_ok=True)
+                break
+            if time.monotonic() >= deadline:
+                print("PDF не получился; предыдущий файл сохранён. Откройте slides.html "
+                      "в браузере и сохраните через «Печать».")
+                return 1
+            time.sleep(0.25)
     print(f"Готово: {out}")
     return 0
 

@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
+from app import ai_client, config
 from app.main import app
 
 client = TestClient(app)
@@ -219,6 +220,35 @@ def test_openapi_json_is_up_to_date():
     path = Path(__file__).resolve().parent.parent / "openapi.json"
     assert json.loads(path.read_text(encoding="utf-8")) == app.openapi(), \
         "Обновите схему: python -m app.export_openapi"
+
+
+def test_analysis_after_replacement_in_same_second_is_saved(monkeypatch):
+    times = iter(("2026-11-13T12:00:00.100000+03:00", "2026-11-13T12:00:00.200000+03:00"))
+
+    def now_iso(timespec="seconds"):
+        timestamp = next(times)
+        return timestamp if timespec == "microseconds" else "2026-11-13T12:00:00+03:00"
+
+    monkeypatch.setattr(config, "now_iso", now_iso)
+    base = "/api/equipment/PU-001"
+    replace = client.post(f"{base}/inspections", json={"component_id": "C-02", "type": "replacement"})
+    assert replace.json()["component"]["visual"]["category"] == "not_analyzed"
+    analysis = client.post(f"{base}/components/C-02/analyze", files=JPEG)
+    assert analysis.json()["visual"]["category"] == "check_recommended"
+
+
+def test_analysis_started_before_replacement_stays_reset(monkeypatch):
+    analyze = ai_client.analyze
+    base = "/api/equipment/PU-001"
+
+    def replace_during_analysis(*args):
+        response = client.post(f"{base}/inspections", json={"component_id": "C-02", "type": "replacement"})
+        assert response.status_code == 201
+        return analyze(*args)
+
+    monkeypatch.setattr(ai_client, "analyze", replace_during_analysis)
+    analysis = client.post(f"{base}/components/C-02/analyze", files=JPEG)
+    assert analysis.json()["visual"]["category"] == "not_analyzed"
 
 
 def test_9_recorded_defect_turns_component_red_until_fixed():

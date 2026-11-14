@@ -12,7 +12,7 @@ import argparse
 import json
 import statistics
 import time
-from collections import Counter, defaultdict
+from collections import Counter
 from pathlib import Path
 
 import httpx
@@ -53,6 +53,10 @@ def main() -> None:
         time.sleep(2)
         health = client.get("/health").json()
     print("Сервис:", json.dumps(health, ensure_ascii=False))
+    if health.get("stub") or not health.get("models", {}).get("detector", {}).get("ready"):
+        parser.exit(1, "Для оценки качества нужен запущенный детектор в настоящем режиме.\n")
+    if not args.skip_analyze and not health["models"].get("vlm", {}).get("ready"):
+        parser.exit(1, "Для оценки дефектов нужна загруженная мультимодальная модель.\n")
     classes = health.get("classes") or list(COLORS)
 
     labeled, found, false_boxes = Counter(), Counter(), 0
@@ -66,7 +70,7 @@ def main() -> None:
         data = (args.photos / name).read_bytes()
         files = {"image": (Path(name).name, data, "image/jpeg")}
         started = time.perf_counter()
-        detections = client.post("/detect", files=files).json()
+        detections = client.post("/detect", files=files).raise_for_status().json()
         detect_ms.append((time.perf_counter() - started) * 1000)
         counts = Counter(d["cv_class"] for d in detections)
         for cv_class in classes:
@@ -89,7 +93,9 @@ def main() -> None:
                 "/analyze",
                 files=files,
                 data={"component_type": task["component_type"], "component_name": task["component_name"]},
-            ).json()
+            ).raise_for_status().json()
+            if result.get("explanation") == "Автоматический анализ не выполнен.":
+                parser.exit(1, f"Модель не выполнила анализ {name}. Итоговые метрики не рассчитаны.\n")
             analyze_ms.append((time.perf_counter() - started) * 1000)
             entry["analysis"] = result
             category, signs = result.get("category"), result.get("signs", [])
@@ -119,9 +125,10 @@ def main() -> None:
     print("\n| Что считаем | Результат |\n|---|---|")
     per_class = ", ".join(f"{c}: {found[c]} из {labeled[c]}" for c in classes)
     print(f"| Узлов найдено из размеченных, по каждому типу | {per_class} |")
-    print(f"| Ложных рамок на кадр | {false_boxes / photos:.2f} ({false_boxes} на {photos} фото) |")
+    print(f"| Рамок сверх размеченного количества узлов того же типа на кадр | {false_boxes / photos:.2f} ({false_boxes} на {photos} фото) |")
     per_sign = ", ".join(f"{s}: {sign_ok[s]} из {sign_total[s]}" for s in SIGN_TEXT.values() if sign_total[s]) or "—"
-    print(f"| Категория совпала с ожидаемой, по каждому признаку | {per_sign}; без признаков: {clean_ok} из {clean_total} |")
+    print(f"| Найден ожидаемый признак и назначена проверка или возможный дефект | {per_sign} |")
+    print(f"| Чистые кадры, получившие «видимых проблем не обнаружено» | {clean_ok} из {clean_total} |")
     print(f"| Чистые кадры, ошибочно получившие «возможный дефект» | {clean_as_defect} из {clean_total} |")
     print(f"| Кадры с дефектом, получившие «видимых проблем не обнаружено» | {defect_missed} из {defect_total} |")
     print(f"| Время ответа `/detect` и `/analyze` | detect: {ms(detect_ms)}; analyze: {ms(analyze_ms)} |")

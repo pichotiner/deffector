@@ -152,8 +152,8 @@ class AppState(app: Application) : AndroidViewModel(app) {
         if (busy || selected != null || candidates.isNotEmpty() || api == null) return
         if (screen == Screen.AR && now - lastDetect >= ArTiming.DETECT_INTERVAL_MS && error == null) {
             lastDetect = now
+            val equipmentId = requireNotNull(card).id
             try {
-                val equipmentId = requireNotNull(card).id
                 val image = withContext(Dispatchers.Default) { jpeg(resize(bitmap, 640)) }
                 val result = service().detect(equipmentId, Network.image(image))
                 if (screen == Screen.AR && selected == null && !busy && card?.id == equipmentId) {
@@ -162,9 +162,11 @@ class AppState(app: Application) : AndroidViewModel(app) {
                 }
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) {
-                frame = null
-                error = Network.message(e)
-                retry = { error = null }
+                if (screen == Screen.AR && selected == null && !busy && card?.id == equipmentId) {
+                    frame = null
+                    error = Network.message(e)
+                    retry = { error = null }
+                }
             }
         } else if (screen == Screen.CAMERA && now - lastScan > 1100 && error == null) {
             lastScan = now

@@ -121,7 +121,10 @@ def session(path=None):
 
 
 def create_schema(conn):
-    conn.executescript(SCHEMA)
+    # executescript() завершает уже открытую транзакцию до выполнения SQL.
+    for statement in SCHEMA.split(";"):
+        if statement.strip():
+            conn.execute(statement)
 
 
 def row(r):

@@ -130,7 +130,7 @@ class Service:
         if self.status == "degraded" and not self.warned:
             self.warned = True
             say(f"[!!] ИИ-сервис загрузился не полностью — {self.problem or 'см. logs/stand-ai.log'}")
-        return self.status != "loading"
+        return self.status in ("ok", "degraded")
 
     def failed(self):
         """ИИ-сервис сообщил, что не загрузил ни одной модели."""
@@ -228,8 +228,9 @@ def main():
 
     use_ai = not args.stub
     if use_ai and not AI_RUN.exists():
-        say("[!!] ИИ-сервиса в репозитории ещё нет (ai/run.py) — запускаю бэкенд с заглушкой ИИ.")
-        use_ai = False
+        say("[XX] Нет ai/run.py — настоящий стенд запустить нельзя. "
+            "Восстановите файлы проекта. Для проверки приложения: python stand.py --stub")
+        return 1
 
     for port, what in ((args.port, "бэкенда"), (args.ai_port, "ИИ-сервиса")):
         if (what == "бэкенда" or use_ai) and port_busy(port):
@@ -256,7 +257,7 @@ def main():
     services = []
     if use_ai:
         services.append(Service("ИИ", [sys.executable, str(AI_RUN), "--port", str(args.ai_port)],
-                                f"{ai_url}/health", "stand-ai.log"))
+                                f"{ai_url}/health", "stand-ai.log", env={"AI_STUB": "0"}))
     services.append(Service(
         "бэкенд", [sys.executable, str(BACKEND_RUN), "--port", str(args.port), "--quiet"],
         f"http://127.0.0.1:{args.port}/api/health", "stand-backend.log",
@@ -291,7 +292,10 @@ def main():
                    "--url", f"http://127.0.0.1:{args.port}"]
             if args.image:
                 cmd += ["--image", args.image]
-            subprocess.call(cmd)
+            if subprocess.call(cmd) != 0:
+                say("[XX] Проверка сценария не прошла — стенд остановлен. "
+                    "Исправьте ошибки из вывода проверки и запустите снова.")
+                return 1
             say("\nСтенд продолжает работать. Остановить: Ctrl+C")
 
         return watch(services)

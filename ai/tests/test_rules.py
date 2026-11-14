@@ -62,9 +62,12 @@ def test_poor_image_never_no_visible_issues():
 
 
 def test_poor_image_overrides_defect():
-    result = check(image_quality="poor", category="possible_defect")
+    result = check(image_quality="poor", category="possible_defect",
+                   explanation="На снимке видна коррозия на корпусе.")
     assert result.category == "check_recommended"
     assert result.image_quality == "poor"
+    assert result.signs == []
+    assert result.explanation == "По снимку оценить состояние узла нельзя."
 
 
 def test_no_issues_with_signs_becomes_check():

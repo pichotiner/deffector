@@ -88,7 +88,7 @@ def main():
     if args.quiet:
         cmd.append("--no-access-log")
     try:
-        subprocess.call(cmd, cwd=str(BACKEND))
+        return subprocess.call(cmd, cwd=str(BACKEND))
     except KeyboardInterrupt:
         pass
 

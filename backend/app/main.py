@@ -21,7 +21,9 @@ seed.main(["--if-missing"])
 app = FastAPI(
     title="Deffector backend", version="1.0.0",
     description="Контракт API телефон ↔ бэкенд. Ошибки: {\"error\": {\"code\", \"message\"}}.",
-    responses={404: {"model": s.Error}, 422: {"model": s.Error}, 503: {"model": s.Error}},
+    responses={404: {"model": s.Error},
+               422: {"model": s.Error, "description": "Unprocessable Content"},
+               503: {"model": s.Error}},
 )
 
 
@@ -168,6 +170,7 @@ async def equipment_detect(eq_id: str, image: UploadFile = File(...)):
 @app.post("/api/equipment/{eq_id}/components/{cid}/analyze", response_model=s.Component)
 async def component_analyze(eq_id: str, cid: str, image: UploadFile = File(...),
                             detection_confidence: float | None = Form(None)):
+    started_at = config.now_iso(timespec="microseconds")
     data = await _image_bytes(image)
     with db.session() as conn:
         card = _card(conn, eq_id)
@@ -175,7 +178,7 @@ async def component_analyze(eq_id: str, cid: str, image: UploadFile = File(...),
     result = await _ai(ai_client.analyze, data, c["type"], c["name"])  # вне транзакции: идёт секунды
     with db.session() as conn:
         repo.add_visual(conn, eq_id, cid, {
-            **result, "detection_confidence": detection_confidence, "analyzed_at": config.now_iso(),
+            **result, "detection_confidence": detection_confidence, "analyzed_at": started_at,
         })
     with db.session() as conn:
         card = _card(conn, eq_id)
@@ -211,7 +214,7 @@ def create_inspection(eq_id: str, body: s.InspectionIn):
             if vis["category"] != "not_analyzed":
                 visual = vis
 
-        today, now = config.today(), config.now_iso()
+        today, now = config.today(), config.now_iso(timespec="microseconds")
         recommendation = visual["recommendation"] if visual else None
 
         if body.type == "maintenance":
