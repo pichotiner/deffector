@@ -172,9 +172,19 @@
     "tested_code_unchanged": true,
     "repeated": false
   },
+  "offline_acceptance": {
+    "status": "accepted_by_timofey",
+    "accepted_msk": "2026-11-14T13:00:00+03:00",
+    "sources": ["Сообщение Павла 14.11, 12:34", "Подтверждения Тимофея в текущей сессии", "ai/notes/pavel-video-14-11-review.md"],
+    "video_recorded": true,
+    "source_delivered_to_andrey": true,
+    "cold_reboot_visible_in_uploaded_video": false,
+    "separate_cold_reboot_proof_required_for_submission": false,
+    "additional_cold_run_on_timofey_pc_required": false
+  },
+  "call_schedule": {"date": "2026-11-14", "after_msk": "18:00", "exact_time": null},
   "not_confirmed": [
     "Сценарий на телефоне Павла",
-    "Холодная перезагрузка без внешней сети",
     "Эталоны и контрольные кадры с телефона",
     "Скорость на ПК Павла при звонке и трансляции",
     "Окончательный коммит на ПК Павла",
