@@ -1,7 +1,7 @@
 """Изолированный опыт CLIP изображение↔изображение; рабочий сервис не меняется.
 
 Порядок: capture → review → features --phase tune → fit → features --phase holdout
-→ features --phase regression → evaluate → benchmark. Все результаты в отдельной runs/.
+→ features --phase regression → evaluate → benchmark → summarize. Результаты в отдельной runs/.
 """
 from __future__ import annotations
 
@@ -335,19 +335,200 @@ def review(plan_path: Path, root: Path) -> None:
     print(f"Контактные листы: {out}")
 
 
+def live_filter(image: Image.Image, detections: list[dict], rule: dict, bank: np.ndarray,
+                examples: list[dict], identifier) -> list[dict]:
+    if not detections:
+        return []
+    pictures = [decode_image(jpeg(crop(image, row["bbox"], rule["padding"]))) for row in detections]
+    queries = np.concatenate([identifier.embed(pictures[i:i + 16]) for i in range(0, len(pictures), 16)])
+    return [row for row, vector in zip(detections, queries)
+            if keep_box(similarities(bank, examples, vector, row["cv_class"]), rule)]
+
+
+def distribution(values: list[float]) -> dict:
+    return dict(samples=len(values), median_ms=statistics.median(values) * 1000,
+                p95_ms=float(np.percentile(values, 95, method="linear")) * 1000,
+                max_ms=max(values) * 1000)
+
+
+def benchmark(plan_path: Path, root: Path, repeats: int) -> None:
+    target = root / "benchmark.json"
+    if target.exists():
+        raise SystemExit("Замер уже сохранён; не перезаписывать первый результат")
+    if repeats < 1:
+        raise ValueError("Нужны положительные повторы")
+    data = verified_capture(root, plan_path)
+    plan = read(plan_path)
+    frozen = read(root / "frozen.json")
+    if not frozen["selected"]:
+        raise SystemExit("Нет выбранного алгоритма для замера")
+    rule = frozen["selected"]["rule"]
+    service = load_service()
+    bank = bank_vectors(plan, service.identifier)
+    wanted = {"demo/photos/pump_unit_01.jpg", "demo/photos/pump_unit_drawing_01.jpg",
+              "demo/reference/PU-001/case_pump_01.jpg", "demo/photos/motor_corrosion_01.jpg",
+              "demo/photos/flange_corrosion_02.jpg", "docs/case/Запорная арматура/1396430378_7447321.jpg"}
+    inputs = []
+    for name, frame in data["frames"].items():
+        if frame["mode"] == "app640" and frame["source"] in wanted:
+            path = REPO / frame["input_file"]
+            if digest(path) != frame["input_sha256"]:
+                raise ValueError("Изменён вход замера")
+            inputs.append((name, frame, decode_image(path.read_bytes())))
+    if len(inputs) != len(wanted):
+        raise ValueError("Неполный набор для задержки")
+    import torch
+    from app.main import _read_nvidia_smi
+    def detect(image):
+        return [row.as_dict() for row in service.detector.detect(image, None)]
+    for _, frame, image in inputs:
+        for _ in range(3):
+            live_filter(image, detect(image), rule, bank, plan["bank"], service.identifier)
+    torch.cuda.reset_peak_memory_stats()
+    memory_before = _read_nvidia_smi()
+    rows = []
+    for repeat in range(repeats):
+        for name, frame, image in inputs:
+            times = {}
+            # Чередуем порядок измерения, чтобы второй путь не получал постоянный прогрев.
+            modes = ("detect_only", "detect_plus_filter", "filter_only") if repeat % 2 == 0 else (
+                "filter_only", "detect_plus_filter", "detect_only")
+            for mode in modes:
+                torch.cuda.synchronize()
+                started = time.perf_counter()
+                if mode == "filter_only":
+                    live_filter(image, frame["detections"], rule, bank, plan["bank"], service.identifier)
+                else:
+                    boxes = detect(image)
+                    if mode == "detect_plus_filter":
+                        live_filter(image, boxes, rule, bank, plan["bank"], service.identifier)
+                torch.cuda.synchronize()
+                times[mode] = time.perf_counter() - started
+            rows.append(dict(frame=name, source=frame["source"], repeat=repeat, seconds=times))
+    stats = {mode: distribution([row["seconds"][mode] for row in rows])
+             for mode in ("detect_only", "detect_plus_filter", "filter_only")}
+    output = dict(rule=rule, repeats=repeats, warmup_per_frame=3, frames=len(inputs), stats=stats,
+                  health=service.health(), memory_smi_before=memory_before, memory_smi_after=_read_nvidia_smi(),
+                  torch_peak_allocated_mb=torch.cuda.max_memory_allocated() / 2**20,
+                  torch_peak_reserved_mb=torch.cuda.max_memory_reserved() / 2**20, measurements=rows,
+                  note="Внутрипроцессный замер на ПК Тимофея; не HTTP/телефон/звонок. Новые detect только для времени, не для повторной оценки контроля.")
+    write(target, output)
+    print(json.dumps({key: value for key, value in output.items() if key != "measurements"}, ensure_ascii=False, indent=2))
+
+
+def removal_review(plan_path: Path, root: Path) -> None:
+    capture = verified_capture(root, plan_path)["frames"]
+    report = read(root / "evaluation.json")
+    pictures = []
+    for name, result in report.get("frames", {}).items():
+        frame = capture[name]
+        image = decode_image((REPO / frame["input_file"]).read_bytes())
+        for removed in result["removed"]:
+            row = removed["detection"]
+            title = f'{name[:6]} {frame["mode"]} {row["cv_class"]} {removed["status"]}'
+            pictures.append((title, crop(image, row["bbox"], 0)))
+    for page in range(0, len(pictures), 16):
+        contact(pictures[page:page + 16], REPO / f"demo/photos/quality/review/stage2-removed-{page // 16 + 1}.jpg",
+                width=300, height=250)
+    print(f"Удалённых рамок для просмотра: {len(pictures)}")
+
+
+def summarize(plan_path: Path, root: Path) -> None:
+    from collections import Counter
+    data = verified_capture(root, plan_path)
+    result = read(root / "evaluation.json")
+    timing = read(root / "benchmark.json")
+    frozen = read(root / "frozen.json")
+    if result["frozen_sha256"] != digest(root / "frozen.json"):
+        raise ValueError("Правило изменено после контроля")
+    removed, legacy_counts, protected, trace = [], {}, {}, {}
+    vectors = {phase: checked_features(root, phase) for phase in ("tune", "holdout", "regression")}
+    protect = {"demo/photos/pump_unit_drawing_01.jpg", "demo/photos/pump_unit_01.jpg",
+               "demo/reference/PU-001/case_pump_01.jpg"}
+    for name, evaluated in result["frames"].items():
+        frame = data["frames"][name]
+        scores = vectors[frame["phase"]][name][str(result["rule"]["padding"])]
+        if len(scores) != len(frame["detections"]):
+            raise ValueError("Неполный список сходств для трассировки")
+        trace[name] = dict(source=frame["source"], mode=frame["mode"], phase=frame["phase"], predictions=[
+            dict(index=i, detection=detection, clip=scores[i], keep=i in evaluated["kept_indices"],
+                 reason="insufficient_contradiction" if i in evaluated["kept_indices"] else "clear_contradiction")
+            for i, detection in enumerate(frame["detections"])])
+        for row in evaluated["removed"]:
+            removed.append(dict(frame=name, source=frame["source"], phase=frame["phase"], mode=frame["mode"],
+                                index=row["index"], bbox=row["detection"]["bbox"], cv_class=row["detection"]["cv_class"],
+                                confidence=row["detection"]["confidence"], status=row["status"], possible_true=row["possible_true"],
+                                clip_positive=row["clip"]["positive"], clip_competitor=row["clip"]["competitor"],
+                                clip_margin=row["clip"]["margin"], nearest_example=row["clip"]["nearest_example"]))
+        if frame["source"] in protect:
+            protected[name] = dict(source=frame["source"], mode=frame["mode"],
+                                   before=dict(Counter(row["cv_class"] for row in frame["detections"])),
+                                   after=dict(Counter(row["cv_class"] for row in evaluated["detections"])))
+        if frame["legacy"] is None:
+            continue
+        mode = frame["mode"]
+        counter = legacy_counts.setdefault(mode, dict(photos=0, before={c: [0, 0, 0] for c in CLASSES},
+                                                     after={c: [0, 0, 0] for c in CLASSES}))
+        counter["photos"] += 1
+        for side, boxes in (("before", frame["detections"]), ("after", evaluated["detections"])):
+            counts = Counter(row["cv_class"] for row in boxes)
+            for kind in CLASSES:
+                if kind in frame["legacy"].get("skip", []):
+                    continue
+                want, got = frame["legacy"]["nodes"].get(kind, 0), counts[kind]
+                counter[side][kind][0] += min(want, got)
+                counter[side][kind][1] += max(0, got - want)
+                counter[side][kind][2] += max(0, want - got)
+    for mode in legacy_counts.values():
+        for side in ("before", "after"):
+            mode[side] = {kind: dict(found_by_count=v[0], excess_by_count=v[1], missing_by_count=v[2])
+                          for kind, v in mode[side].items()}
+    lost_tp = sum(row["status"] == "tp" for row in removed)
+    possible_true = sum(row["possible_true"] for row in removed)
+    decision = "rejected" if not result["preliminary_pass"] or lost_tp or possible_true else "preliminary_only"
+    # Трассировка соединяет уже сохранённые ответы, без повторной оценки контроля или моделей.
+    write(root / "decisions.json", dict(rule=result["rule"], frames=trace))
+    summary = dict(decision=decision, baseline_head=data["head"],
+                   plan_sha256=data["plan_sha256"], labels_sha256=data["labels_sha256"],
+                   capture_sha256=digest(root / "capture.json"), frozen_sha256=result["frozen_sha256"],
+                   evaluation_sha256=digest(root / "evaluation.json"), tuning=frozen,
+                   decisions_sha256=digest(root / "decisions.json"),
+                   source_phases=dict(Counter(row["phase"] for row in data["frames"].values() if row["mode"] == "original")),
+                   metrics=result["totals"], holdout_removed_fp=result["holdout_removed_fp"],
+                   holdout_removed_tp=result["holdout_removed_tp"], holdout_removed_possible_true=result["holdout_removed_possible_true"],
+                   protected=protected, removed=removed, legacy_count_only=legacy_counts,
+                   timing={key: value for key, value in timing.items() if key != "measurements"},
+                   limitations=read(plan_path)["limitations"])
+    if (root / "tests.xml").is_file():
+        import xml.etree.ElementTree as ET
+        suites = ET.parse(root / "tests.xml").getroot().iter("testsuite")
+        counts = {field: 0 for field in ("tests", "failures", "errors", "skipped")}
+        for suite in suites:
+            for field in counts:
+                counts[field] += int(suite.get(field, 0))
+        counts["passed"] = counts["tests"] - counts["failures"] - counts["errors"] - counts["skipped"]
+        summary["tests"] = counts
+    write(root / "summary.json", summary)
+    print(f"Итог: {summary['decision']}; FP контроля удалено {summary['holdout_removed_fp']}, TP потеряно {summary['holdout_removed_tp']}")
+
+
 def main() -> None:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("action", choices=["capture", "features", "fit", "evaluate", "review"])
+    parser.add_argument("action", choices=["capture", "features", "fit", "evaluate", "review", "removal-review", "benchmark", "summarize"])
     parser.add_argument("--plan", type=Path, default=DEFAULT_PLAN)
     parser.add_argument("--root", type=Path, default=REPO / "runs/stage2")
     parser.add_argument("--phase", choices=["tune", "holdout", "regression"])
+    parser.add_argument("--repeats", type=int, default=20, help="число повторов каждого входа при benchmark")
     args = parser.parse_args()
     if args.action == "features":
         if not args.phase:
             parser.error("features требует --phase")
         features(args.plan, args.root, args.phase)
+    elif args.action == "benchmark":
+        benchmark(args.plan, args.root, args.repeats)
     else:
-        {"capture": capture, "fit": fit, "evaluate": evaluate, "review": review}[args.action](args.plan, args.root)
+        {"capture": capture, "fit": fit, "evaluate": evaluate, "review": review,
+         "removal-review": removal_review, "summarize": summarize}[args.action](args.plan, args.root)
 
 
 if __name__ == "__main__":

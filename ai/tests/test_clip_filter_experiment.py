@@ -48,6 +48,35 @@ def test_empty_detections():
     assert result["detections"] == [] and result["removed"] == []
 
 
+def test_live_empty_detections_do_not_call_clip():
+    class NeverCalled:
+        def embed(self, images):
+            pytest.fail("CLIP не нужна при пустом списке")
+    assert experiment.live_filter(Image.new("RGB", (100, 100)), [], RULE, np.eye(5), [], NeverCalled()) == []
+
+
+def test_live_queries_are_batched_and_bank_is_not_reencoded():
+    kinds = [*experiment.CLASSES, "negative"]
+    bank = [{"cv_class": kind, "id": kind} for kind in kinds]
+    class Embedder:
+        def __init__(self):
+            self.batch_sizes = []
+        def embed(self, images):
+            self.batch_sizes.append(len(images))
+            return np.tile([1., 0, 0, 0, 0], (len(images), 1))
+    embedder = Embedder()
+    boxes = [box() for _ in range(17)]
+    result = experiment.live_filter(Image.new("RGB", (100, 100)), boxes, RULE, np.eye(5), bank, embedder)
+    assert result == boxes
+    assert embedder.batch_sizes == [16, 1]
+
+
+def test_latency_statistics_include_p95_and_sample_count():
+    result = experiment.distribution([.01, .02, .03])
+    assert result["samples"] == 3 and result["median_ms"] == 20
+    assert result["max_ms"] == 30 and result["p95_ms"] == pytest.approx(29)
+
+
 def test_misaligned_features_are_not_silently_zipped():
     with pytest.raises(ValueError, match="разную длину"):
         experiment.compare({"detections": [box()]}, [], RULE)
