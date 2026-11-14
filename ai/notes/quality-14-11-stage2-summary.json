@@ -1,0 +1,1266 @@
+{
+  "decision": "rejected",
+  "baseline_head": "d4959512a5ace37fd84c33d28f81b8491b279653",
+  "plan_sha256": "b7777c33855064f5583ec9c83c348bbc5c1ef8c137ddf2fb260dd1beeb464f45",
+  "labels_sha256": "299b72837c62e6deb6715a84e41c637edcb0dc6b33e6372a442a26b1ab50e971",
+  "capture_sha256": "c77101c0de6a7e522b9462fe5fdb29ebc61c34849edc35e521e287ecd0b20047",
+  "frozen_sha256": "a94bf86226c6fb72a7670a006759579eb26181b393284a783cbbbf7a15252795",
+  "evaluation_sha256": "e17cc1ea126e514f43cd59a89b789b034835cf6be89f09d649cdcff5792ff6a5",
+  "tuning": {
+    "plan_sha256": "b7777c33855064f5583ec9c83c348bbc5c1ef8c137ddf2fb260dd1beeb464f45",
+    "capture_sha256": "c77101c0de6a7e522b9462fe5fdb29ebc61c34849edc35e521e287ecd0b20047",
+    "tune_features_sha256": "d0ff35912f3d8861d9083a490f8d98bf6c5616151769217165983c29d064917a",
+    "selected": {
+      "rule": {
+        "padding": 0.0,
+        "margin": 0.06,
+        "min_competitor": 0.65
+      },
+      "removed_tp": 0,
+      "removed_fp": 3,
+      "possible_true": 0
+    },
+    "trials": [
+      {
+        "rule": {
+          "padding": 0.0,
+          "margin": 0.03,
+          "min_competitor": 0.65
+        },
+        "removed_tp": 0,
+        "removed_fp": 3,
+        "possible_true": 0
+      },
+      {
+        "rule": {
+          "padding": 0.0,
+          "margin": 0.06,
+          "min_competitor": 0.65
+        },
+        "removed_tp": 0,
+        "removed_fp": 3,
+        "possible_true": 0
+      },
+      {
+        "rule": {
+          "padding": 0.0,
+          "margin": 0.1,
+          "min_competitor": 0.65
+        },
+        "removed_tp": 0,
+        "removed_fp": 1,
+        "possible_true": 0
+      },
+      {
+        "rule": {
+          "padding": 0.15,
+          "margin": 0.03,
+          "min_competitor": 0.65
+        },
+        "removed_tp": 0,
+        "removed_fp": 2,
+        "possible_true": 1
+      },
+      {
+        "rule": {
+          "padding": 0.15,
+          "margin": 0.06,
+          "min_competitor": 0.65
+        },
+        "removed_tp": 0,
+        "removed_fp": 1,
+        "possible_true": 1
+      },
+      {
+        "rule": {
+          "padding": 0.15,
+          "margin": 0.1,
+          "min_competitor": 0.65
+        },
+        "removed_tp": 0,
+        "removed_fp": 1,
+        "possible_true": 1
+      }
+    ]
+  },
+  "decisions_sha256": "bf7c465223c2b6dec4ed4234576fb286eaf254cbc59438dac65039b2fd9c4c1c",
+  "source_phases": {
+    "regression": 27,
+    "tune": 4,
+    "bank": 10,
+    "holdout": 6
+  },
+  "metrics": {
+    "regression_original": {
+      "before": {
+        "electric_motor": {
+          "tp": 4,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.8,
+          "recall": 0.8
+        },
+        "pressure_gauge": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 3,
+          "fn": 5,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 3,
+          "fp": 5,
+          "fn": 4,
+          "precision": 0.375,
+          "recall": 0.42857142857142855
+        }
+      },
+      "after": {
+        "electric_motor": {
+          "tp": 4,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.8,
+          "recall": 0.8
+        },
+        "pressure_gauge": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 3,
+          "fn": 5,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 2,
+          "fp": 2,
+          "fn": 5,
+          "precision": 0.5,
+          "recall": 0.2857142857142857
+        }
+      }
+    },
+    "regression_app640": {
+      "before": {
+        "electric_motor": {
+          "tp": 2,
+          "fp": 1,
+          "fn": 3,
+          "precision": 0.6666666666666666,
+          "recall": 0.4
+        },
+        "pressure_gauge": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 3,
+          "fn": 5,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 1,
+          "fp": 1,
+          "fn": 6,
+          "precision": 0.5,
+          "recall": 0.14285714285714285
+        }
+      },
+      "after": {
+        "electric_motor": {
+          "tp": 2,
+          "fp": 1,
+          "fn": 3,
+          "precision": 0.6666666666666666,
+          "recall": 0.4
+        },
+        "pressure_gauge": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 3,
+          "fn": 5,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 6,
+          "precision": 1.0,
+          "recall": 0.14285714285714285
+        }
+      }
+    },
+    "tune_original": {
+      "before": {
+        "electric_motor": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "pressure_gauge": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 2,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 0,
+          "fp": 4,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        }
+      },
+      "after": {
+        "electric_motor": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "pressure_gauge": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        }
+      }
+    },
+    "tune_app640": {
+      "before": {
+        "electric_motor": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "pressure_gauge": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        }
+      },
+      "after": {
+        "electric_motor": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "pressure_gauge": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 1,
+          "precision": null,
+          "recall": 0.0
+        }
+      }
+    },
+    "holdout_original": {
+      "before": {
+        "electric_motor": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pressure_gauge": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 2,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 2,
+          "fp": 3,
+          "fn": 2,
+          "precision": 0.4,
+          "recall": 0.5
+        }
+      },
+      "after": {
+        "electric_motor": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pressure_gauge": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2,
+          "precision": null,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 1,
+          "fp": 3,
+          "fn": 3,
+          "precision": 0.25,
+          "recall": 0.25
+        }
+      }
+    },
+    "holdout_app640": {
+      "before": {
+        "electric_motor": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pressure_gauge": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2,
+          "precision": null,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 3,
+          "fp": 0,
+          "fn": 1,
+          "precision": 1.0,
+          "recall": 0.75
+        }
+      },
+      "after": {
+        "electric_motor": {
+          "tp": 0,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "pressure_gauge": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 2,
+          "precision": null,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 4,
+          "precision": null,
+          "recall": 0.0
+        }
+      }
+    }
+  },
+  "holdout_removed_fp": 3,
+  "holdout_removed_tp": 4,
+  "holdout_removed_possible_true": 4,
+  "protected": {
+    "aadc87c5ce66_original": {
+      "source": "demo/photos/pump_unit_01.jpg",
+      "mode": "original",
+      "before": {
+        "flange": 1,
+        "electric_motor": 1
+      },
+      "after": {
+        "flange": 1,
+        "electric_motor": 1
+      }
+    },
+    "aadc87c5ce66_app640": {
+      "source": "demo/photos/pump_unit_01.jpg",
+      "mode": "app640",
+      "before": {
+        "flange": 1
+      },
+      "after": {
+        "flange": 1
+      }
+    },
+    "8bdea8e57136_original": {
+      "source": "demo/photos/pump_unit_drawing_01.jpg",
+      "mode": "original",
+      "before": {
+        "flange": 2,
+        "electric_motor": 1
+      },
+      "after": {
+        "electric_motor": 1
+      }
+    },
+    "8bdea8e57136_app640": {
+      "source": "demo/photos/pump_unit_drawing_01.jpg",
+      "mode": "app640",
+      "before": {},
+      "after": {}
+    },
+    "9ad793611b8b_original": {
+      "source": "demo/reference/PU-001/case_pump_01.jpg",
+      "mode": "original",
+      "before": {
+        "electric_motor": 1
+      },
+      "after": {
+        "electric_motor": 1
+      }
+    },
+    "9ad793611b8b_app640": {
+      "source": "demo/reference/PU-001/case_pump_01.jpg",
+      "mode": "app640",
+      "before": {},
+      "after": {}
+    }
+  },
+  "removed": [
+    {
+      "frame": "8bdea8e57136_original",
+      "source": "demo/photos/pump_unit_drawing_01.jpg",
+      "phase": "regression",
+      "mode": "original",
+      "index": 0,
+      "bbox": [
+        0.4256,
+        0.2611,
+        0.1664,
+        0.2954
+      ],
+      "cv_class": "flange",
+      "confidence": 0.331,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.5649585723876953,
+      "clip_competitor": 0.6618186235427856,
+      "clip_margin": 0.09686005115509033,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "8bdea8e57136_original",
+      "source": "demo/photos/pump_unit_drawing_01.jpg",
+      "phase": "regression",
+      "mode": "original",
+      "index": 1,
+      "bbox": [
+        0.674,
+        0.0006,
+        0.1559,
+        0.2753
+      ],
+      "cv_class": "flange",
+      "confidence": 0.316,
+      "status": "tp",
+      "possible_true": true,
+      "clip_positive": 0.5902098417282104,
+      "clip_competitor": 0.6913584470748901,
+      "clip_margin": 0.10114860534667969,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "39f3eb0feccf_original",
+      "source": "demo/photos/valve_ball_01.jpg",
+      "phase": "regression",
+      "mode": "original",
+      "index": 3,
+      "bbox": [
+        0.7537,
+        0.5246,
+        0.2455,
+        0.3585
+      ],
+      "cv_class": "flange",
+      "confidence": 0.313,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.5855399370193481,
+      "clip_competitor": 0.6766618490219116,
+      "clip_margin": 0.09112191200256348,
+      "nearest_example": "pipe"
+    },
+    {
+      "frame": "4e72d6a7c629_original",
+      "source": "demo/photos/valve_leak_01.jpg",
+      "phase": "tune",
+      "mode": "original",
+      "index": 2,
+      "bbox": [
+        0.7731,
+        0.2304,
+        0.1316,
+        0.2416
+      ],
+      "cv_class": "flange",
+      "confidence": 0.361,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.5981820821762085,
+      "clip_competitor": 0.6701509952545166,
+      "clip_margin": 0.0719689130783081,
+      "nearest_example": "pipe"
+    },
+    {
+      "frame": "4e72d6a7c629_original",
+      "source": "demo/photos/valve_leak_01.jpg",
+      "phase": "tune",
+      "mode": "original",
+      "index": 3,
+      "bbox": [
+        0.384,
+        0.3151,
+        0.1432,
+        0.1837
+      ],
+      "cv_class": "flange",
+      "confidence": 0.336,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.6266309022903442,
+      "clip_competitor": 0.7332947850227356,
+      "clip_margin": 0.10666388273239136,
+      "nearest_example": "nut"
+    },
+    {
+      "frame": "ba338f0cb4ac_original",
+      "source": "demo/photos/flange_corrosion_02.jpg",
+      "phase": "regression",
+      "mode": "original",
+      "index": 0,
+      "bbox": [
+        0.8552,
+        0.6971,
+        0.1071,
+        0.1556
+      ],
+      "cv_class": "flange",
+      "confidence": 0.308,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.5825960636138916,
+      "clip_competitor": 0.6994252800941467,
+      "clip_margin": 0.11682921648025513,
+      "nearest_example": "nut"
+    },
+    {
+      "frame": "ba338f0cb4ac_app640",
+      "source": "demo/photos/flange_corrosion_02.jpg",
+      "phase": "regression",
+      "mode": "app640",
+      "index": 0,
+      "bbox": [
+        0.6573,
+        0.5198,
+        0.115,
+        0.1679
+      ],
+      "cv_class": "flange",
+      "confidence": 0.311,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.6042952537536621,
+      "clip_competitor": 0.7425868511199951,
+      "clip_margin": 0.138291597366333,
+      "nearest_example": "nut"
+    },
+    {
+      "frame": "171c6a80860b_original",
+      "source": "docs/case/Насосные агрегаты/photo_2026-11-13_12-46-46.jpg",
+      "phase": "holdout",
+      "mode": "original",
+      "index": 0,
+      "bbox": [
+        0.0673,
+        0.283,
+        0.3513,
+        0.6011
+      ],
+      "cv_class": "electric_motor",
+      "confidence": 0.268,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.6258354187011719,
+      "clip_competitor": 0.6957086324691772,
+      "clip_margin": 0.06987321376800537,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "171c6a80860b_app640",
+      "source": "docs/case/Насосные агрегаты/photo_2026-11-13_12-46-46.jpg",
+      "phase": "holdout",
+      "mode": "app640",
+      "index": 0,
+      "bbox": [
+        0.0668,
+        0.2733,
+        0.3508,
+        0.6111
+      ],
+      "cv_class": "electric_motor",
+      "confidence": 0.259,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.5992028713226318,
+      "clip_competitor": 0.695060133934021,
+      "clip_margin": 0.09585726261138916,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "e2858ecf918f_original",
+      "source": "docs/case/Насосные агрегаты/obsledovanie-hvs-gvs-2.jpg",
+      "phase": "holdout",
+      "mode": "original",
+      "index": 0,
+      "bbox": [
+        0.1391,
+        0.6318,
+        0.2237,
+        0.3242
+      ],
+      "cv_class": "flange",
+      "confidence": 0.391,
+      "status": "tp",
+      "possible_true": true,
+      "clip_positive": 0.5186591148376465,
+      "clip_competitor": 0.682440459728241,
+      "clip_margin": 0.16378134489059448,
+      "nearest_example": "motor_body"
+    },
+    {
+      "frame": "e2858ecf918f_original",
+      "source": "docs/case/Насосные агрегаты/obsledovanie-hvs-gvs-2.jpg",
+      "phase": "holdout",
+      "mode": "original",
+      "index": 2,
+      "bbox": [
+        0.6363,
+        0.1569,
+        0.3611,
+        0.1302
+      ],
+      "cv_class": "valve",
+      "confidence": 0.339,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.4342183470726013,
+      "clip_competitor": 0.6815366744995117,
+      "clip_margin": 0.2473183274269104,
+      "nearest_example": "pipe"
+    },
+    {
+      "frame": "e2858ecf918f_app640",
+      "source": "docs/case/Насосные агрегаты/obsledovanie-hvs-gvs-2.jpg",
+      "phase": "holdout",
+      "mode": "app640",
+      "index": 0,
+      "bbox": [
+        0.136,
+        0.6316,
+        0.2367,
+        0.3237
+      ],
+      "cv_class": "flange",
+      "confidence": 0.349,
+      "status": "tp",
+      "possible_true": true,
+      "clip_positive": 0.5721081495285034,
+      "clip_competitor": 0.7655336856842041,
+      "clip_margin": 0.19342553615570068,
+      "nearest_example": "motor_body"
+    },
+    {
+      "frame": "e2858ecf918f_app640",
+      "source": "docs/case/Насосные агрегаты/obsledovanie-hvs-gvs-2.jpg",
+      "phase": "holdout",
+      "mode": "app640",
+      "index": 1,
+      "bbox": [
+        0.5986,
+        0.6329,
+        0.2128,
+        0.3298
+      ],
+      "cv_class": "flange",
+      "confidence": 0.329,
+      "status": "tp",
+      "possible_true": true,
+      "clip_positive": 0.6443698406219482,
+      "clip_competitor": 0.7132748365402222,
+      "clip_margin": 0.06890499591827393,
+      "nearest_example": "motor_body"
+    },
+    {
+      "frame": "fd54bfac64bc_original",
+      "source": "docs/case/Запорная арматура/i.jpg",
+      "phase": "regression",
+      "mode": "original",
+      "index": 0,
+      "bbox": [
+        0.2979,
+        0.0,
+        0.5527,
+        0.9935
+      ],
+      "cv_class": "valve",
+      "confidence": 0.394,
+      "status": "unscored",
+      "possible_true": false,
+      "clip_positive": 0.6479982137680054,
+      "clip_competitor": 0.7619993686676025,
+      "clip_margin": 0.11400115489959717,
+      "nearest_example": "flange"
+    },
+    {
+      "frame": "fd54bfac64bc_app640",
+      "source": "docs/case/Запорная арматура/i.jpg",
+      "phase": "regression",
+      "mode": "app640",
+      "index": 0,
+      "bbox": [
+        0.3047,
+        0.0,
+        0.5283,
+        0.987
+      ],
+      "cv_class": "valve",
+      "confidence": 0.466,
+      "status": "unscored",
+      "possible_true": false,
+      "clip_positive": 0.6245716214179993,
+      "clip_competitor": 0.7151505947113037,
+      "clip_margin": 0.09057897329330444,
+      "nearest_example": "flange"
+    },
+    {
+      "frame": "f14ca64ffc44_original",
+      "source": "docs/case/Запорная арматура/1396430378_7447321.jpg",
+      "phase": "regression",
+      "mode": "original",
+      "index": 0,
+      "bbox": [
+        0.0005,
+        0.0044,
+        0.9868,
+        0.8606
+      ],
+      "cv_class": "pressure_gauge",
+      "confidence": 0.435,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.4400167763233185,
+      "clip_competitor": 0.7084773778915405,
+      "clip_margin": 0.26846060156822205,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "f14ca64ffc44_app640",
+      "source": "docs/case/Запорная арматура/1396430378_7447321.jpg",
+      "phase": "regression",
+      "mode": "app640",
+      "index": 0,
+      "bbox": [
+        0.0024,
+        0.0055,
+        0.9858,
+        0.8585
+      ],
+      "cv_class": "pressure_gauge",
+      "confidence": 0.438,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.4679621756076813,
+      "clip_competitor": 0.7281598448753357,
+      "clip_margin": 0.2601976692676544,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "f14ca64ffc44_app640",
+      "source": "docs/case/Запорная арматура/1396430378_7447321.jpg",
+      "phase": "regression",
+      "mode": "app640",
+      "index": 1,
+      "bbox": [
+        0.0151,
+        0.7758,
+        0.0616,
+        0.0994
+      ],
+      "cv_class": "flange",
+      "confidence": 0.31,
+      "status": "unscored_class",
+      "possible_true": false,
+      "clip_positive": 0.5746585726737976,
+      "clip_competitor": 0.7433323860168457,
+      "clip_margin": 0.1686738133430481,
+      "nearest_example": "nut"
+    },
+    {
+      "frame": "a852153c7bce_original",
+      "source": "docs/case/Трубопровод/stock-photo-rusty-industrial-pipe-and-flange-connection-this-rusty-industrial-pipe-and-flange-connection-2733059369.jpg",
+      "phase": "tune",
+      "mode": "original",
+      "index": 0,
+      "bbox": [
+        0.1064,
+        0.2399,
+        0.8906,
+        0.4807
+      ],
+      "cv_class": "valve",
+      "confidence": 0.339,
+      "status": "fp",
+      "possible_true": false,
+      "clip_positive": 0.5993432402610779,
+      "clip_competitor": 0.6754317879676819,
+      "clip_margin": 0.076088547706604,
+      "nearest_example": "pipe"
+    },
+    {
+      "frame": "ab60216b38e3_original",
+      "source": "docs/case/Насосные агрегаты/photo_2026-11-13_12-48-02.jpg",
+      "phase": "regression",
+      "mode": "original",
+      "index": 0,
+      "bbox": [
+        0.1489,
+        0.0676,
+        0.2712,
+        0.1643
+      ],
+      "cv_class": "electric_motor",
+      "confidence": 0.387,
+      "status": "unscored_class",
+      "possible_true": false,
+      "clip_positive": 0.5857734680175781,
+      "clip_competitor": 0.6648612022399902,
+      "clip_margin": 0.07908773422241211,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "ab60216b38e3_app640",
+      "source": "docs/case/Насосные агрегаты/photo_2026-11-13_12-48-02.jpg",
+      "phase": "regression",
+      "mode": "app640",
+      "index": 0,
+      "bbox": [
+        0.149,
+        0.0679,
+        0.2665,
+        0.1635
+      ],
+      "cv_class": "electric_motor",
+      "confidence": 0.296,
+      "status": "unscored_class",
+      "possible_true": false,
+      "clip_positive": 0.5672026872634888,
+      "clip_competitor": 0.6599622964859009,
+      "clip_margin": 0.09275960922241211,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "3764f9472c7b_original",
+      "source": "docs/case/Насосные агрегаты/silnaja-korrozija-1-450x338.jpg",
+      "phase": "holdout",
+      "mode": "original",
+      "index": 0,
+      "bbox": [
+        0.6816,
+        0.0152,
+        0.3174,
+        0.3015
+      ],
+      "cv_class": "valve",
+      "confidence": 0.409,
+      "status": "unscored_class",
+      "possible_true": false,
+      "clip_positive": 0.5059557557106018,
+      "clip_competitor": 0.6810559034347534,
+      "clip_margin": 0.1751001477241516,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "3764f9472c7b_app640",
+      "source": "docs/case/Насосные агрегаты/silnaja-korrozija-1-450x338.jpg",
+      "phase": "holdout",
+      "mode": "app640",
+      "index": 0,
+      "bbox": [
+        0.6818,
+        0.0159,
+        0.3162,
+        0.3054
+      ],
+      "cv_class": "valve",
+      "confidence": 0.42,
+      "status": "unscored_class",
+      "possible_true": false,
+      "clip_positive": 0.5697824954986572,
+      "clip_competitor": 0.677168071269989,
+      "clip_margin": 0.10738557577133179,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "3764f9472c7b_app640",
+      "source": "docs/case/Насосные агрегаты/silnaja-korrozija-1-450x338.jpg",
+      "phase": "holdout",
+      "mode": "app640",
+      "index": 1,
+      "bbox": [
+        0.6794,
+        0.185,
+        0.2905,
+        0.3713
+      ],
+      "cv_class": "flange",
+      "confidence": 0.383,
+      "status": "tp",
+      "possible_true": true,
+      "clip_positive": 0.6684749126434326,
+      "clip_competitor": 0.7427897453308105,
+      "clip_margin": 0.07431483268737793,
+      "nearest_example": "coupling"
+    },
+    {
+      "frame": "3ced75474c6b_original",
+      "source": "docs/case/Насосные агрегаты/photo_2026-11-13_12-48-03.jpg",
+      "phase": "regression",
+      "mode": "original",
+      "index": 1,
+      "bbox": [
+        0.2847,
+        0.3385,
+        0.4183,
+        0.407
+      ],
+      "cv_class": "valve",
+      "confidence": 0.343,
+      "status": "unscored",
+      "possible_true": false,
+      "clip_positive": 0.5936989784240723,
+      "clip_competitor": 0.7520344853401184,
+      "clip_margin": 0.15833550691604614,
+      "nearest_example": "flange"
+    },
+    {
+      "frame": "3ced75474c6b_app640",
+      "source": "docs/case/Насосные агрегаты/photo_2026-11-13_12-48-03.jpg",
+      "phase": "regression",
+      "mode": "app640",
+      "index": 0,
+      "bbox": [
+        0.2811,
+        0.3384,
+        0.4282,
+        0.4131
+      ],
+      "cv_class": "valve",
+      "confidence": 0.351,
+      "status": "unscored",
+      "possible_true": false,
+      "clip_positive": 0.5954546928405762,
+      "clip_competitor": 0.694399893283844,
+      "clip_margin": 0.09894520044326782,
+      "nearest_example": "flange"
+    }
+  ],
+  "legacy_count_only": {
+    "original": {
+      "photos": 32,
+      "before": {
+        "electric_motor": {
+          "found_by_count": 7,
+          "excess_by_count": 0,
+          "missing_by_count": 1
+        },
+        "pressure_gauge": {
+          "found_by_count": 2,
+          "excess_by_count": 2,
+          "missing_by_count": 1
+        },
+        "valve": {
+          "found_by_count": 6,
+          "excess_by_count": 1,
+          "missing_by_count": 6
+        },
+        "flange": {
+          "found_by_count": 4,
+          "excess_by_count": 8,
+          "missing_by_count": 6
+        }
+      },
+      "after": {
+        "electric_motor": {
+          "found_by_count": 7,
+          "excess_by_count": 0,
+          "missing_by_count": 1
+        },
+        "pressure_gauge": {
+          "found_by_count": 2,
+          "excess_by_count": 1,
+          "missing_by_count": 1
+        },
+        "valve": {
+          "found_by_count": 4,
+          "excess_by_count": 0,
+          "missing_by_count": 8
+        },
+        "flange": {
+          "found_by_count": 1,
+          "excess_by_count": 5,
+          "missing_by_count": 9
+        }
+      }
+    },
+    "app640": {
+      "photos": 32,
+      "before": {
+        "electric_motor": {
+          "found_by_count": 4,
+          "excess_by_count": 1,
+          "missing_by_count": 4
+        },
+        "pressure_gauge": {
+          "found_by_count": 2,
+          "excess_by_count": 2,
+          "missing_by_count": 1
+        },
+        "valve": {
+          "found_by_count": 5,
+          "excess_by_count": 0,
+          "missing_by_count": 7
+        },
+        "flange": {
+          "found_by_count": 2,
+          "excess_by_count": 0,
+          "missing_by_count": 8
+        }
+      },
+      "after": {
+        "electric_motor": {
+          "found_by_count": 4,
+          "excess_by_count": 1,
+          "missing_by_count": 4
+        },
+        "pressure_gauge": {
+          "found_by_count": 2,
+          "excess_by_count": 1,
+          "missing_by_count": 1
+        },
+        "valve": {
+          "found_by_count": 4,
+          "excess_by_count": 0,
+          "missing_by_count": 8
+        },
+        "flange": {
+          "found_by_count": 1,
+          "excess_by_count": 0,
+          "missing_by_count": 9
+        }
+      }
+    }
+  },
+  "timing": {
+    "rule": {
+      "padding": 0.0,
+      "margin": 0.06,
+      "min_competitor": 0.65
+    },
+    "repeats": 20,
+    "warmup_per_frame": 3,
+    "frames": 6,
+    "stats": {
+      "detect_only": {
+        "samples": 120,
+        "median_ms": 39.731599999868195,
+        "p95_ms": 41.083059999346005,
+        "max_ms": 46.63989999971818
+      },
+      "detect_plus_filter": {
+        "samples": 120,
+        "median_ms": 44.24739999967642,
+        "p95_ms": 51.09027000012247,
+        "max_ms": 54.58970000017871
+      },
+      "filter_only": {
+        "samples": 120,
+        "median_ms": 4.20334999989791,
+        "p95_ms": 10.24755500034189,
+        "max_ms": 10.66030000038154
+      }
+    },
+    "health": {
+      "status": "ok",
+      "ready": true,
+      "stub": false,
+      "device": "cuda:0",
+      "models": {
+        "detector": {
+          "name": "owlv2",
+          "ready": true,
+          "error": null,
+          "load_seconds": 3.5
+        },
+        "vlm": {
+          "name": "qwen2.5vl:7b",
+          "ready": true,
+          "error": null,
+          "load_seconds": 1.1
+        },
+        "identifier": {
+          "name": "clip",
+          "ready": true,
+          "error": null,
+          "load_seconds": 0.4
+        }
+      },
+      "classes": [
+        "electric_motor",
+        "pressure_gauge",
+        "valve",
+        "flange"
+      ],
+      "reference_photos": {
+        "PU-001": 4,
+        "PU-002": 3
+      },
+      "gpu": {
+        "name": "NVIDIA GeForce RTX 5070",
+        "memory_total_mb": 12226,
+        "memory_used_mb": 2301
+      }
+    },
+    "memory_smi_before": [
+      8964,
+      12227
+    ],
+    "memory_smi_after": [
+      8964,
+      12227
+    ],
+    "torch_peak_allocated_mb": 982.4150390625,
+    "torch_peak_reserved_mb": 1066.0,
+    "note": "Внутрипроцессный замер на ПК Тимофея; не HTTP/телефон/звонок. Новые detect только для времени, не для повторной оценки контроля."
+  },
+  "limitations": [
+    "Старый control — только регрессия; часть holdout уже встречалась в старом count-наборе.",
+    "Новых независимых изображений манометров вне старых четырёх исходников нет.",
+    "Клеммная коробка — часть двигателя, не hard negative.",
+    "Разметка агентом не заменяет независимый просмотр человеком."
+  ],
+  "tests": {
+    "tests": 157,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 157
+  }
+}
