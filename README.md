@@ -20,12 +20,15 @@
 | Что | Где |
 |---|---|
 | Презентация | [`docs/presentation/slides.pdf`](docs/presentation/slides.pdf); для показа — `slides.html` (работает без интернета) |
-| Видео сценария и ролик «без интернета» | ⟨Андрей: ссылка после монтажа⟩ — `demo/video/scenario.mp4`, `docs/presentation/proof.mp4` |
+| Видео сценария | [Запись экрана телефона, 2:36](demo/video/scenario.mp4) — QR, карточка, AR, анализ арматуры и двигателя, история; [содержание и происхождение](demo/video/README.md) |
 | APK | [Android APK](mobile/dist/deffector-debug.apk), [сборка и установка](mobile/README.md) |
 | Ответы на частые вопросы | [`docs/qa.md`](docs/qa.md) |
 | Соответствие ТЗ по пунктам | [`docs/coverage.md`](docs/coverage.md) |
 | Материалы заказчика и как мы их использовали | [`docs/case/`](docs/case/README.md) |
 | Текст задания | [`docs/tz/TZ.md`](docs/tz/TZ.md) |
+
+Команде перед сдачей: [что выполнить на ПК](docs/pc-check.md) — команды и короткие
+проверки отдельно для Тимофея, Павла и Андрея.
 
 ## Архитектура
 
@@ -71,7 +74,8 @@
 Android-телефон в той же сети Wi-Fi. Интернет — только при первой установке.
 
 ```
-git clone <репозиторий> && cd deffector
+git clone https://github.com/pichotiner/deffector.git
+cd deffector
 python stand.py
 ```
 
@@ -92,7 +96,7 @@ python stand.py
 
 ```
 python stand.py --reset                 # сбросить базу к демо-данным и запустить
-python backend/check_scenario.py --image demo/photos/<снимок>.jpg   # все 10 шагов через бэкенд
+python backend/check_scenario.py --image demo/reference/PU-001/case_pump_01.jpg   # проверка через бэкенд; записывает осмотры и затем сбрасывает локальную БД
 python backend/reset_db.py              # сброс базы
 cd backend && python -m pytest          # автотесты бэкенда
 ```

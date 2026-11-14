@@ -109,7 +109,7 @@
   .arrow svg { width: 60px; height: 22px; }
   .proof { display: flex; gap: 22px; margin-top: 22px; }
   .video { width: 380px; height: 214px; background: #0f1823; border-radius: 12px; overflow: hidden; position: relative; flex: none; }
-  .video video { width: 100%; height: 100%; object-fit: cover; display: block; }
+  .video video { width: 100%; height: 100%; object-fit: contain; display: block; }
   .video .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; text-align: center;
                color: #9fb0c4; font-size: 15px; padding: 20px; line-height: 1.4; }
 
@@ -144,6 +144,8 @@
     html, body { background: #fff; }
     .slide { display: flex !important; position: relative !important; left: auto !important; top: auto !important; transform: none !important;
              margin: 0 !important; box-shadow: none !important; break-after: page; page-break-after: always; }
+    .video video { display: none !important; }
+    .video .ph { display: flex !important; }
   }
   .shot { width: 222px; height: 456px; overflow: hidden; border: 7px solid #16202c; border-radius: 26px; background: #16202c; }
   .shot img { display: block; width: 222px; margin-top: -24px; }
@@ -197,7 +199,7 @@
     </div>
   </div>
   <p class="muted" style="margin-top:20px">Для кого: инженеры эксплуатации и сервиса на обходах, плановых осмотрах и ТО.
-    Демо-данные — из материалов заказчика: паспорта, регламенты ТО, базы вибрации и температуры.</p>
+    Паспорта, регламенты и замеры — из материалов заказчика; недостающий учёт эксплуатации — демо.</p>
   <div class="foot"><span>Deffector · Кибер 102</span><span>2</span></div>
 </section>
 
@@ -258,19 +260,19 @@
   </div>
   <div class="proof">
     <div class="video">
-      <video id="proof" src="proof.mp4" controls muted preload="metadata"></video>
-      <div class="ph" id="proof-ph"><span>Ролик: кабель провайдера вынут, сервер перезагружен,
-        передача данных выключена — сценарий проходит<br><br><span class="todo">Павел: proof.mp4</span></span></div>
+      <video id="proof" src="../../demo/video/scenario.mp4" poster="video-poster.jpg" controls muted preload="metadata" aria-label="Запись сценария на телефоне Павла"></video>
+      <div class="ph" id="proof-ph"><span>Запись экрана Павла · 14.11<br>
+        QR → карточка → AR → анализ → история<br><br>2:36 · demo/video/scenario.mp4</span></div>
     </div>
     <div class="col">
       <h2>Как доказываем</h2>
       <ul class="small">
-        <li>ролик слева: интернет отключён, весь сценарий проходит;</li>
-        <li>проверка сценария одной командой сама пишет «интернет на этом ПК: нет — ВСЁ РАБОТАЕТ»;</li>
+        <li>работа без интернета подтверждена Павлом и Тимофеем;</li>
+        <li>в записи: мобильные данные выключены, анализ и сохранение осмотров работают;</li>
         <li>автотест: сценарий проходит при запрете любых соединений, кроме локальных;</li>
         <li>модели распознавания QR и текста встроены в приложение, веса ИИ — на диске сервера.</li>
       </ul>
-      <p class="small muted" style="margin-top:10px">На защите интернет нужен только видеозвонку.</p>
+      <p class="small muted" style="margin-top:10px"><a href="../../demo/video/scenario.mp4">Открыть полную запись · 2:36</a>. На защите интернет нужен только звонку.</p>
     </div>
   </div>
   <div class="foot"><span>Deffector · Кибер 102</span><span>4</span></div>
@@ -298,7 +300,7 @@
         <li>11 запросов; контракт проверяется на каждом ответе</li>
         <li>база: оборудование → узлы → комплектующие, параметры, осмотры</li>
         <li>тексты для экрана — готовыми</li>
-        <li>87 автотестов, проверка сценария одной командой</li>
+        <li>102 автотеста, проверка сценария одной командой</li>
       </ul>
     </div>
     <div class="col card">
@@ -412,7 +414,7 @@
     <tr><td>4.5 Цифровой двойник</td><td>2 образца из материалов заказчика (Wilo CronoLine-IL, AMS PCP60S12/3), 20 узлов и комплектующих: характеристики, нормативы, даты, история</td></tr>
     <tr><td>4.6 Регистрация осмотра</td><td>проверено, дефект, замечание, обслуживание, замена → история; ресурс пересчитывается</td></tr>
     <tr><td>Сценарий, раздел 3</td><td>все 10 шагов подряд на телефоне</td></tr>
-    <tr><td>Без интернета</td><td>все части только в локальной сети; проверка — с отключённым интернетом после перезагрузки сервера</td></tr>
+    <tr><td>Без интернета</td><td>все части в локальной сети; работа подтверждена участниками, сохранена запись сценария</td></tr>
   </table>
   <p class="small muted" style="margin-top:12px">Матрица по каждому подпункту и чем он подтверждён — docs/coverage.md в репозитории.</p>
   <div class="foot"><span>Deffector · Кибер 102</span><span>8</span></div>
@@ -479,7 +481,7 @@
   var i = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1), 10) || 1) - 1));
   var all = /[?&]all\b/.test(location.search);
 
-  // Ролик: если файла ещё нет — заглушка
+  // При недоступном файле остаётся описание записи; при печати оно заменяет плеер.
   var v = document.getElementById("proof"), ph = document.getElementById("proof-ph");
   v.addEventListener("loadedmetadata", function () { ph.style.display = "none"; });
   v.addEventListener("error", function () { v.style.display = "none"; });
@@ -500,6 +502,7 @@
     else { deck.style.height = ""; slides.forEach(function (el) { el.style.transform = ""; }); }
   }
   document.addEventListener("keydown", function (e) {
+    if (e.target.closest("video, a, button, input")) return;
     if (e.key === "ArrowRight" || e.key === "PageDown" || e.key === " ") { show(i + 1); e.preventDefault(); }
     else if (e.key === "ArrowLeft" || e.key === "PageUp") { show(i - 1); e.preventDefault(); }
     else if (e.key === "Home") show(0);
@@ -510,7 +513,7 @@
     } else if (e.key === "a" || e.key === "A" || e.key === "ф" || e.key === "Ф") { all = !all; mode(); }
   });
   deck.addEventListener("click", function (e) {
-    if (all || e.target.closest("video")) return;
+    if (all || e.target.closest("video, a")) return;
     show(e.clientX > window.innerWidth / 3 ? i + 1 : i - 1);
   });
   window.addEventListener("resize", fit);
