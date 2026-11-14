@@ -85,3 +85,16 @@ SHA-256 **`9d9205ba3657cf00be99f62ddbcd7733955236f1695c131b5dcd3a2cbf1fb244`**.
 `android.json`, `report.pdf`, `report.xlsx`, `pdf-before-traceback.txt`, `video-contact.jpg`.
 JUnit бэкенда/ИИ — `C:/Users/timof/AppData/Local/Temp/opencode/dirac-*.xml`;
 Android XML/Lint — `mobile/app/build/`. Веса, окружения, БД и журналы не публикуются.
+
+## Публикация
+
+Результат отправлен в выбранную ветку коммитом **`ad7b440`**.
+[Черновик PR #48](https://github.com/pichotiner/deffector/pull/48) подготовлен в `main`,
+но не влит: ждёт согласования контракта участниками. `origin/main` включён в ветку;
+посторонние изменения не сбрасывались. Цели 90 локальных Markdown-ссылок существуют,
+`git diff --check` проходит; внешние ссылки и якоря этой проверкой не проверялись.
+
+CI [43632266120](https://github.com/pichotiner/deffector/actions/runs/43632266120)
+**не начал задания**: «The job was not started because recent account payments have
+failed or your spending limit needs to be increased». Это не результат выполнения
+тестов и не зелёный CI; оплату/лимиты и защиты GitHub агент не менял.
