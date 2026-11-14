@@ -11,7 +11,7 @@ fun normalizedBox(b: List<Double>): List<Double> {
     return listOf(x, y, (b[0] + b[2]).coerceIn(x, 1.0), (b[1] + b[3]).coerceIn(y, 1.0))
 }
 fun previewBox(b: List<Double>, imageW: Int, imageH: Int, viewW: Float, viewH: Float): Box {
-    val scale = min(viewW / imageW, viewH / imageH)
+    val scale = max(viewW / imageW, viewH / imageH)
     val dx = (viewW - imageW * scale) / 2; val dy = (viewH - imageH * scale) / 2
     val n = normalizedBox(b)
     return Box(dx + n[0].toFloat() * imageW * scale, dy + n[1].toFloat() * imageH * scale,

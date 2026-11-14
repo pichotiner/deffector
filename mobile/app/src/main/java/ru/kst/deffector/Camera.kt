@@ -40,7 +40,7 @@ fun CameraFeed(modifier: Modifier, onFrame: suspend (Bitmap) -> Unit, onError: (
         }
         return
     }
-    val previewView = remember { PreviewView(context).apply { scaleType = PreviewView.ScaleType.FIT_CENTER; implementationMode = PreviewView.ImplementationMode.COMPATIBLE } }
+    val previewView = remember { PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER; implementationMode = PreviewView.ImplementationMode.COMPATIBLE } }
     AndroidView(factory = { previewView }, modifier = modifier)
     DisposableEffect(owner, previewView) {
         val executor = Executors.newSingleThreadExecutor()

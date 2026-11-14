@@ -16,11 +16,11 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -35,10 +35,6 @@ fun ArScreen(vm: AppState) {
     var expanded by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     val snapshot = vm.frame
     val density = LocalDensity.current
-    val fontScale = density.fontScale.coerceAtLeast(1f)
-    val labelHeight = with(density) { (92.dp * fontScale).toPx() }
-    val headerHeight = with(density) { (94.dp * fontScale).toPx() }
-    val capacity = ((area.height - headerHeight) / labelHeight).toInt().coerceIn(0, 3)
     LaunchedEffect(snapshot) {
         if (snapshot != null) tracks = tracker.update(snapshot.result.detections, snapshot.at, snapshot.bitmap.width, snapshot.bitmap.height)
     }
@@ -49,10 +45,10 @@ fun ArScreen(vm: AppState) {
         }
     }
     Column(Modifier.fillMaxSize()) {
-        Box(Modifier.weight(1f).fillMaxWidth().background(Color.Black).onSizeChanged { area = it }) {
+        Box(Modifier.weight(1f).fillMaxWidth().clipToBounds().background(Color.Black).onSizeChanged { area = it }) {
             CameraFeed(Modifier.fillMaxSize(), vm::onFrame, vm::cameraFailed)
             CameraHeading("Осмотр узлов", "Нажмите на метку, чтобы открыть анализ")
-            tracks.forEachIndexed { index, track -> key(track.key) {
+            tracks.forEach { track -> key(track.key) {
                 val target = previewBox(track.box, track.width, track.height, area.width.toFloat(), area.height.toFloat())
                 val left by animateFloatAsState(target.left, tween(420), label = "left")
                 val top by animateFloatAsState(target.top, tween(420), label = "top")
@@ -75,31 +71,22 @@ fun ArScreen(vm: AppState) {
                         drawLine(color, p, p + Offset(if (i % 2 == 0) length else -length, 0f), 3.dp.toPx())
                         drawLine(color, p, p + Offset(0f, if (i < 2) length else -length), 3.dp.toPx())
                     }
-                    if (index < capacity) drawLine(color.copy(alpha = .35f), Offset(left, top),
-                        Offset(20.dp.toPx(), headerHeight + index * labelHeight + 12.dp.toPx()), 1.dp.toPx())
                 }
-                Box(Modifier.offset { IntOffset(left.roundToInt(), top.roundToInt()) }
-                    .size(with(density) { (right - left).coerceAtLeast(1f).toDp() }, with(density) { (bottom - top).coerceAtLeast(1f).toDp() })
+                val hitLeft = left.coerceIn(0f, area.width.toFloat())
+                val hitTop = top.coerceIn(0f, area.height.toFloat())
+                val hitRight = right.coerceIn(0f, area.width.toFloat())
+                val hitBottom = bottom.coerceIn(0f, area.height.toFloat())
+                Box(Modifier.offset { IntOffset(hitLeft.roundToInt(), hitTop.roundToInt()) }
+                    .size(with(density) { (hitRight - hitLeft).coerceAtLeast(1f).toDp() }, with(density) { (hitBottom - hitTop).coerceAtLeast(1f).toDp() })
                     .semantics { contentDescription = track.detection.label + ", " + percent(track.detection.detection_confidence) }
-                    .clickable(enabled = selectable) { vm.choose(track.detection, snapshot) })
-                if (index < capacity) Surface(color = CameraGlass, shape = RoundedCornerShape(14.dp),
-                    border = BorderStroke(1.dp, color.copy(alpha = .5f)),
-                    modifier = Modifier.offset { IntOffset(16.dp.roundToPx(), (headerHeight + index * labelHeight).roundToInt()) }
-                        .widthIn(max = 224.dp).fillMaxWidth(.62f).height(86.dp * fontScale).graphicsLayer { this.alpha = alpha }
-                        .clickable(enabled = selectable) { vm.choose(track.detection, snapshot) }) {
-                    Column(Modifier.padding(horizontal = 12.dp, vertical = 9.dp), verticalArrangement = Arrangement.spacedBy(3.dp)) {
-                        Text("${symbol(track.detection.attention_level)} ${track.detection.label} · ${percent(track.detection.detection_confidence)}",
-                            color = color, style = MaterialTheme.typography.labelLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(track.detection.reason.orEmpty(), color = Color.White, style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                        Text(track.detection.recommended_action.orEmpty(), color = Color(0xFFC0D5DF), style = MaterialTheme.typography.bodySmall, maxLines = 1, overflow = TextOverflow.Ellipsis)
-                    }
-                }
+                    .clickable(enabled = selectable && hitRight > hitLeft && hitBottom > hitTop) { vm.choose(track.detection, snapshot) })
             } }
             if (tracks.none { it.visible }) Surface(color = CameraGlass, shape = RoundedCornerShape(14.dp),
                 modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
                 Text(if (snapshot == null) "Ищем узлы в кадре…" else "Измените ракурс или подойдите ближе",
                     color = Color.White, style = MaterialTheme.typography.bodyMedium, modifier = Modifier.padding(14.dp))
             }
+            CameraMessages(vm, Modifier.align(Alignment.TopCenter).padding(start = 16.dp, end = 16.dp, top = 96.dp))
         }
         Surface(shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp), color = MaterialTheme.colorScheme.surface) {
             Column(Modifier.fillMaxWidth().heightIn(max = if (expanded) 340.dp else 210.dp)
@@ -108,7 +95,6 @@ fun ArScreen(vm: AppState) {
                     Text("Требуют проверки", style = MaterialTheme.typography.titleMedium)
                     TextButton(onClick = { expanded = !expanded }) { Text(if (expanded) "Свернуть" else "Все · ${vm.attention.size}") }
                 }
-                vm.cameraError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
                 if (vm.attention.isEmpty()) Text("Узлов, требующих проверки, нет", color = MaterialTheme.colorScheme.onSurfaceVariant)
                 vm.attention.forEach { a ->
                     val color = statusColor(a.level)
@@ -124,7 +110,7 @@ fun ArScreen(vm: AppState) {
                         }
                     }
                 }
-                if (tracks.size > capacity) {
+                if (tracks.any { it.visible && it.missingSince == null }) {
                     Text("Распознанные узлы", style = MaterialTheme.typography.titleMedium)
                     tracks.filter { it.visible && it.missingSince == null }.forEach { t ->
                         TextButton(onClick = { vm.choose(t.detection, snapshot) }, enabled = !vm.busy && t.seen == snapshot?.at) {

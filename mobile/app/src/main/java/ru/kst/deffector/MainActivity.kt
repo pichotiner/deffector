@@ -91,19 +91,21 @@ fun App(vm: AppState) {
         }, colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background))
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
-            if (vm.busy) {
-                LinearProgressIndicator(Modifier.fillMaxWidth())
-                Text("Выполняется запрос…", Modifier.padding(horizontal = 16.dp), style = MaterialTheme.typography.labelMedium)
-            }
-            vm.error?.let { message ->
-                Surface(color = MaterialTheme.colorScheme.errorContainer) {
-                    Column(Modifier.fillMaxWidth().padding(12.dp)) {
-                        Text(message)
-                        TextButton(enabled = !vm.busy, onClick = vm::repeat) { Text("Повторить") }
+            if (vm.screen != Screen.CAMERA && vm.screen != Screen.AR) {
+                if (vm.busy) {
+                    LinearProgressIndicator(Modifier.fillMaxWidth())
+                    Text("Выполняется запрос…", Modifier.padding(horizontal = 16.dp), style = MaterialTheme.typography.labelMedium)
+                }
+                vm.error?.let { message ->
+                    Surface(color = MaterialTheme.colorScheme.errorContainer) {
+                        Column(Modifier.fillMaxWidth().padding(12.dp)) {
+                            Text(message)
+                            TextButton(enabled = !vm.busy, onClick = vm::repeat) { Text("Повторить") }
+                        }
                     }
                 }
+                vm.notice?.let { Text(it, Modifier.padding(12.dp), color = MaterialTheme.colorScheme.primary) }
             }
-            vm.notice?.let { Text(it, Modifier.padding(12.dp), color = MaterialTheme.colorScheme.primary) }
             when (vm.screen) {
                 Screen.CAMERA -> IdentifyScreen(vm)
                 Screen.LIST -> ManualScreen(vm)
@@ -156,6 +158,28 @@ fun App(vm: AppState) {
     }
 }
 
+@Composable fun CameraMessages(vm: AppState, modifier: Modifier = Modifier) {
+    val error = vm.error ?: vm.cameraError
+    val message = error ?: vm.notice ?: when {
+        vm.server.isBlank() -> "Задайте адрес ПК в настройках"
+        vm.manualHint -> "Не удалось определить? Выберите оборудование вручную."
+        else -> null
+    }
+    if (message == null && !vm.busy) return
+    Surface(modifier = modifier.fillMaxWidth(), shape = RoundedCornerShape(16.dp), shadowElevation = 4.dp,
+        color = if (error != null) MaterialTheme.colorScheme.errorContainer else MaterialTheme.colorScheme.surface,
+        contentColor = if (error != null) MaterialTheme.colorScheme.onErrorContainer else MaterialTheme.colorScheme.onSurface) {
+        Column(Modifier.heightIn(max = 220.dp).verticalScroll(rememberScrollState()).padding(14.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
+            if (vm.busy) {
+                LinearProgressIndicator(Modifier.fillMaxWidth())
+                Text("Выполняется запрос…", style = MaterialTheme.typography.labelMedium)
+            }
+            message?.let { Text(it, style = MaterialTheme.typography.bodyMedium) }
+            if (vm.error != null) TextButton(enabled = !vm.busy, onClick = vm::repeat) { Text("Повторить") }
+        }
+    }
+}
+
 @Composable fun IdentifyScreen(vm: AppState) {
     var number by rememberSaveableInput { "" }
     var mode by rememberSaveableInput { "serial" }
@@ -170,11 +194,9 @@ fun App(vm: AppState) {
                 Text("QR-код и текст считываются автоматически", color = Color.White,
                     style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
             }
+            CameraMessages(vm, Modifier.align(Alignment.TopCenter).padding(start = 16.dp, end = 16.dp, top = 96.dp))
         }
         Column(Modifier.fillMaxWidth().heightIn(max = 360.dp).verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            vm.cameraError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
-            if (vm.server.isBlank()) Text("Задайте адрес ПК в настройках")
-            if (vm.manualHint) Text("Не удалось определить? Выберите оборудование вручную.")
             Action("Определить по фото", !vm.busy && vm.server.isNotBlank(), vm::identify)
             SecondaryAction("Выбрать оборудование вручную", !vm.busy, vm::manual)
             TextButton(onClick = { enterNumber = !enterNumber }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
