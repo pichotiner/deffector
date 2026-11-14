@@ -1,6 +1,9 @@
 {
   "checked_msk": "2026-11-14T11:07:39.859928+03:00",
   "baseline_head": "de225eecdad692664471f18aa8a5955f15bb97d0",
+  "first_status_commit": "a903bc8",
+  "pull_request": {"number": 30, "url": "https://github.com/pichotiner/deffector/pull/30", "draft": true, "merged": false},
+  "ci": {"run": 43575778227, "jobs_started": false, "reason": "GitHub сообщил ограничение оплаты/лимита аккаунта; это не результат выполнения тестов", "source": "https://github.com/pichotiner/deffector/actions/runs/43575778227"},
   "pc": "Тимофей: Windows / RTX 5070 12 ГБ",
   "pavel_access": "not_provided",
   "runtime_unchanged_from": "2f0e022",
