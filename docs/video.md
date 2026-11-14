@@ -65,7 +65,19 @@
 
 ## Монтаж — Андрей
 
-Любой редактор с разделённым экраном и текстом: Clipchamp (есть в Windows 11),
+**Быстрый способ — скрипт** [`docs/video/make_video.py`](video/make_video.py): по списку
+вырезок сам собирает ролик — заставка, разделённый экран (запись экрана слева, съёмка со
+стороны справа), подписи внизу, ускорение, MP4 H.264 1080p без звука. Нужен `ffmpeg`
+(Windows: `winget install Gyan.FFmpeg`).
+
+1. Записи положить в `docs/video/raw/` (в репозиторий эта папка не попадает).
+2. В [`docs/video/scenario.json`](video/scenario.json) и [`proof.json`](video/proof.json)
+   вписать имена файлов и время каждой вырезки; подписи там уже стоят. `side_shift` —
+   на сколько секунд съёмка со стороны началась раньше записи экрана.
+3. `python docs/video/make_video.py docs/video/scenario.json` — получится
+   `demo/video/scenario.mp4`; с `proof.json` — `docs/presentation/proof.mp4`.
+
+Вручную — любой редактор с разделённым экраном и текстом: Clipchamp (есть в Windows 11),
 DaVinci Resolve, Shotcut.
 
 1. Синхронизировать две дорожки по хлопку или по моменту наведения на QR.
