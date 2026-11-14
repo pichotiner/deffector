@@ -12,8 +12,8 @@ system knows (data + calculations).
 | | Role | Owns requirements |
 |---|---|---|
 | Pavel | Mobile & AR developer | 4.1 (identification UI), 4.4, 4.6 (UI) |
-| Timofey | AI / computer vision engineer | 4.2 |
-| Andrey | Backend, data & digital twin — also team lead and presenter | 4.3, 4.5, 4.1 and 4.6 (server side), section 5 presentation |
+| Timofey | AI / computer vision engineer — also team lead | 4.2 |
+| Andrey | Backend, data & digital twin — also presenter | 4.3, 4.5, 4.1 and 4.6 (server side), section 5 presentation |
 
 ---
 
@@ -36,7 +36,7 @@ Pavel has the only Android phone in the team, so his device is also the demo dev
 
 **Delivers:** the installable app that runs the full 10-step user scenario.
 
-## Timofey — AI / computer vision engineer
+## Timofey — AI / computer vision engineer (team lead)
 
 Owns the vision pipeline and the wording of its conclusions.
 
@@ -57,7 +57,7 @@ Owns the vision pipeline and the wording of its conclusions.
 **Delivers:** an analysis service — image in; components, positions, category,
 confidence, explanation out.
 
-## Andrey — Backend, data & digital twin (team lead, presenter)
+## Andrey — Backend, data & digital twin (presenter)
 
 Owns the data, the calculations, and the integration of the three parts.
 

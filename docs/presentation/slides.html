@@ -7,9 +7,10 @@
 <!--
   Презентация к защите 15.11. Работает без интернета: шрифты системные, иконки и схемы — SVG прямо в файле.
   Показ: открыть в браузере, F — во весь экран, ← → / пробел — листать, Home / End, A — все слайды списком.
-  PDF: python docs/presentation/make_pdf.py (или в Chrome: Печать → Сохранить как PDF,
+  PDF: python docs/presentation/make_pdf.py (или открыть slides.html?all&pdf в Chrome: Печать → Сохранить как PDF,
   поля «Нет», «Фон» включить).
   Постановку задачи в презентации не показываем (требование организаторов); регламент — 7 минут: 3 на показ, 4 на вопросы.
+  Порядок и хронометраж по секундам — speech.md: слайды 1–6 (0:42) → живой показ Павла (1:35) → слайды 7–9 (0:21); с переключениями трансляции — 2:48.
   Анимация появления работает только в показе; в PDF и в режиме «все слайды» её нет.
 -->
 <style>
@@ -98,7 +99,7 @@
     .present .slide.on .bar > i { transform-origin: left center; animation: grow .9s cubic-bezier(.2,.7,.2,1) both; animation-delay: calc(var(--d, 0) * 90ms + 250ms); }
   }
 
-  /* ---------- 1. титул ---------- */
+  /* ---------- титул ---------- */
   .title { justify-content: center; }
   .title .kicker { color: #9cc3ff; position: relative; }
   .title h1 { font-size: 88px; margin-bottom: 12px; letter-spacing: -.02em; position: relative; }
@@ -115,20 +116,9 @@
   .status-bar span { width: 56px; height: 8px; border-radius: 4px; }
   .hero { position: absolute; right: 36px; top: 138px; width: 616px; height: 440px; }
 
-  /* ---------- 2. задача ---------- */
-  .before { display: flex; align-items: center; gap: 10px; margin-bottom: 26px; }
-  .before .lbl { white-space: nowrap; font-size: 14px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--ink-3); margin-right: 6px; }
-  .before span.x { font-size: 15.5px; white-space: nowrap; color: #78859a; background: var(--grey-bg); border-radius: 999px; padding: 7px 16px; }
-  .flowlbl { font-size: 15px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--blue); margin-bottom: 14px; }
-  .flow { display: flex; align-items: stretch; }
-  .flow .step { flex: 1; border: 1.5px solid var(--line); border-radius: 20px; padding: 30px 24px 28px; min-height: 300px; background: #fff;
-                box-shadow: 0 10px 26px rgba(19,32,47,.07); position: relative; }
-    .flow .step h2 { margin: 26px 0 8px; font-size: 27px; }
-  .flow .step p { font-size: 18px; color: var(--ink-2); line-height: 1.38; }
-  .flow .go { width: 38px; display: flex; align-items: center; justify-content: center; color: #9fb4d2; font-size: 26px; flex: none; }
   .note { font-size: 16px; color: var(--ink-2); line-height: 1.4; }
 
-  /* ---------- 3. сценарий ---------- */
+  /* ---------- сценарий ---------- */
   .s3 { padding-right: 410px; }
   .s3 .steps { display: grid; grid-auto-flow: column; grid-template-rows: repeat(5, auto); grid-template-columns: 1fr 1fr; gap: 10px 14px; }
   .s3 .st { display: flex; gap: 12px; align-items: center; background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.14);
@@ -144,7 +134,7 @@
            box-shadow: 0 0 0 2px #29415f, 0 30px 70px rgba(0,0,0,.55), 0 0 120px rgba(47,125,225,.35); height: 636px; }
   .phone img { display: block; width: 290px; margin-top: -12px; }
 
-  /* ---------- 4. архитектура ---------- */
+  /* ---------- архитектура ---------- */
   .perimeter { border: 2px dashed #8fb2dc; border-radius: 20px; padding: 30px 22px 20px; position: relative; background: linear-gradient(180deg, #f8fbff, #fff); }
   .perimeter > .tag { position: absolute; top: -14px; left: 24px; background: var(--paper); padding: 0 12px; color: var(--blue); font-weight: 700; font-size: 15px;
                       display: flex; align-items: center; gap: 8px; }
@@ -167,8 +157,11 @@
   .pr { display: flex; gap: 16px; align-items: center; }
   .pr p { font-size: 19px; line-height: 1.35; }
   .pr b { font-weight: 700; }
+  .pdf-only { display: none; }
+  .pdf .pdf-only { display: inline; }
+  .pdf .screen-only { display: none; }
 
-  /* ---------- 5. технологии ---------- */
+  /* ---------- технологии ---------- */
   .tech { display: flex; gap: 22px; }
   .tcard { flex: 1; background: #fff; border: 1.5px solid var(--line); border-top: 6px solid var(--c, #1d5fae); border-radius: 18px; padding: 24px; display: flex; flex-direction: column; min-height: 330px; }
   .tcard .head { display: flex; gap: 14px; align-items: center; margin-bottom: 20px; }
@@ -181,7 +174,7 @@
   .takeaway b { display: block; font-size: 24px; font-weight: 750; line-height: 1.25; color: #fff; }
   .takeaway span { display: block; font-size: 16px; color: #b8cde8; margin-top: 4px; }
 
-  /* ---------- 6. ИИ ---------- */
+  /* ---------- ИИ-анализ ---------- */
   .pipe { display: flex; align-items: center; gap: 10px; }
   .pipe .pc { flex: 1; background: var(--tint); border-radius: 14px; padding: 12px 16px; display: flex; gap: 12px; align-items: center; }
   .pipe .pc h2 { font-size: 18px; margin: 0; }
@@ -203,7 +196,7 @@
   .guard { margin-top: 16px; font-size: 16px; color: var(--ink-2); line-height: 1.4; }
   .guard b { color: var(--ink); }
 
-  /* ---------- 7. ресурс ---------- */
+  /* ---------- расчёт ресурса ---------- */
   .three { display: flex; gap: 16px; }
   .tb { flex: 1; border-radius: 16px; padding: 20px 20px; background: var(--tint); display: flex; gap: 14px; align-items: flex-start; }
   .tb.blue { background: var(--blue-2); }
@@ -225,7 +218,7 @@
   .rhead .thr { position: relative; height: 16px; }
   .rhead .thr span { position: absolute; left: 80%; bottom: 0; transform: translateX(-50%); font-size: 14px; font-weight: 700; color: #44546a; white-space: nowrap; }
 
-  /* ---------- 8. соответствие ТЗ ---------- */
+  /* ---------- соответствие ТЗ ---------- */
   .tiles { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
   .tile { background: var(--tint); border-radius: 18px; padding: 20px 22px 18px; min-height: 222px; }
   .tile .top { display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
@@ -236,7 +229,7 @@
   .tile h2 { font-size: 21px; margin-bottom: 5px; line-height: 1.2; }
   .tile p { font-size: 16.5px; color: var(--ink-2); line-height: 1.35; }
 
-  /* ---------- 9. ограничения и риски ---------- */
+  /* ---------- ограничения и риски ---------- */
   .lgroups { display: grid; grid-template-columns: repeat(3, 1fr); gap: 34px; }
   .lg .lt { font-size: 14px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--ink-3); margin-bottom: 10px; padding-bottom: 8px; border-bottom: 2px solid var(--line); }
   .lg ul { list-style: none; margin: 0; padding: 0; }
@@ -251,7 +244,7 @@
   .verdict { margin-top: auto; margin-bottom: 20px; display: flex; align-items: center; gap: 18px; background: linear-gradient(135deg, #0f1f33, #1d4f8f); border-radius: 18px; padding: 18px 26px; }
   .verdict b { font-size: 23px; font-weight: 750; line-height: 1.25; color: #fff; }
 
-  /* ---------- 10. развитие ---------- */
+  /* ---------- развитие ---------- */
   .fut { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
   .ft { border: 1.5px solid var(--line); border-radius: 18px; padding: 18px 18px 16px; min-height: 168px; background: #fff; box-shadow: 0 8px 22px rgba(19,32,47,.06); }
   .ft h2 { font-size: 18px; margin: 14px 0 4px; line-height: 1.2; }
@@ -315,7 +308,7 @@
 
 <div class="deck" id="deck">
 
-<!-- 1 ============================================================ -->
+<!-- 1. Титул ====================================================== -->
 <section class="slide title dark">
   <div class="gridbg"></div>
   <div class="status-bar">
@@ -384,9 +377,9 @@
   </div>
 </section>
 
-<!-- 4 ============================================================ -->
+<!-- 2. Архитектура ================================================ -->
 <section class="slide">
-  <p class="kicker">1 · Архитектура</p>
+  <p class="kicker">Архитектура</p>
   <h1>Всё в локальной сети — данные не уходят наружу</h1>
   <div class="perimeter rise" style="--d:0">
     <span class="tag"><svg class="ic"><use href="#i-nowifi"/></svg>Локальная сеть предприятия · без выхода в интернет</span>
@@ -426,15 +419,15 @@
         <div class="ico green sm"><svg class="ic"><use href="#i-lock"/></svg></div>
         <p><b>Модели — у нас:</b> веса ИИ на диске сервера, QR и текст распознаются моделями внутри APK</p>
       </div>
-      <p class="note rise" style="--d:6">Запись открывается по нажатию на превью слева.</p>
+      <p class="note rise" style="--d:6"><span class="screen-only">Запись открывается по нажатию на превью слева.</span><span class="pdf-only">Запись сценария — в репозитории: <b>demo/video/scenario.mp4</b></span></p>
     </div>
   </div>
   <div class="foot"><span>Deffector · Кибер 102</span><span>2</span></div>
 </section>
 
-<!-- 5 ============================================================ -->
+<!-- 3. Технологии ================================================= -->
 <section class="slide">
-  <p class="kicker">2 · Технологии</p>
+  <p class="kicker">Технологии</p>
   <h1>Проверенные компоненты — в одном инструменте</h1>
   <div class="tech">
     <div class="tcard rise" style="--d:0; --c:#1d5fae">
@@ -464,9 +457,9 @@
   <div class="foot"><span>Deffector · Кибер 102</span><span>3</span></div>
 </section>
 
-<!-- 6 ============================================================ -->
+<!-- 4. ИИ-анализ ================================================== -->
 <section class="slide">
-  <p class="kicker">3 · ИИ-анализ</p>
+  <p class="kicker">ИИ-анализ</p>
   <h1>ИИ находит видимое — и честно говорит, чего не знает</h1>
   <div class="pipe rise" style="--d:0">
     <div class="pc"><div class="ico soft sm"><svg class="ic"><use href="#i-scan"/></svg></div>
@@ -493,9 +486,9 @@
   <div class="foot"><span>Deffector · Кибер 102</span><span>4</span></div>
 </section>
 
-<!-- 7 ============================================================ -->
+<!-- 5. Расчёт ресурса ============================================= -->
 <section class="slide">
-  <p class="kicker">4 · Расчёт ресурса</p>
+  <p class="kicker">Расчёт ресурса</p>
   <h1>Норматив, расчёт, факт — три раздельных блока</h1>
   <div class="three">
     <div class="tb rise" style="--d:0">
@@ -535,10 +528,10 @@
   <div class="foot"><span>Deffector · Кибер 102</span><span>5</span></div>
 </section>
 
-<!-- 3 ============================================================ -->
+<!-- 6. Сценарий → живой показ ===================================== -->
 <section class="slide dark s3">
   <div class="gridbg"></div>
-  <p class="kicker" style="position:relative">5 · Сценарий</p>
+  <p class="kicker" style="position:relative">Сценарий</p>
   <h1 style="position:relative">10 шагов из ТЗ — подряд на телефоне</h1>
   <div class="steps" style="position:relative">
     <div class="st rise" style="--d:0"><span class="n">1</span><div><b>Камера</b><small>приложение открывается на ней</small></div></div>
@@ -562,9 +555,9 @@
   <div class="phone rise" style="--d:2"><img src="screen.png" alt="Экран AR-осмотра на телефоне"></div>
 </section>
 
-<!-- 8 ============================================================ -->
+<!-- 7. Соответствие ТЗ ============================================ -->
 <section class="slide">
-  <p class="kicker">6 · Соответствие ТЗ</p>
+  <p class="kicker">Соответствие ТЗ</p>
   <h1>Как закрываем каждый пункт ТЗ</h1>
   <div class="tiles">
     <div class="tile rise" style="--d:0"><div class="top"><div class="ico sm soft"><svg class="ic"><use href="#i-qr"/></svg></div><span class="tag">4.1</span></div>
@@ -588,9 +581,9 @@
   <div class="foot"><span>Deffector · Кибер 102</span><span>7</span></div>
 </section>
 
-<!-- 9 ============================================================ -->
+<!-- 8. Ограничения и риски ======================================== -->
 <section class="slide">
-  <p class="kicker">7 · Ограничения и риски</p>
+  <p class="kicker">Ограничения и риски</p>
   <h1>Что прототип не умеет — говорим прямо</h1>
   <div class="lgroups rise" style="--d:0">
     <div class="lg"><p class="lt">Данные</p><ul>
@@ -616,9 +609,9 @@
   <div class="foot"><span>Deffector · Кибер 102</span><span>8</span></div>
 </section>
 
-<!-- 10 =========================================================== -->
+<!-- 9. Развитие, команда ========================================== -->
 <section class="slide">
-  <p class="kicker">8 · Развитие</p>
+  <p class="kicker">Развитие</p>
   <h1>Что дальше</h1>
   <div class="fut">
     <div class="ft rise" style="--d:0"><div class="ico soft sm"><svg class="ic"><use href="#i-db"/></svg></div><h2>Интеграция с ТОиР и датчиками</h2><p>Без ручного ввода, отклонения сразу</p></div>
@@ -631,9 +624,9 @@
     <div class="ft rise" style="--d:7"><div class="ico soft sm"><svg class="ic"><use href="#i-thermo"/></svg></div><h2>Тепловизор, звук, вибрация</h2><p>Признаки, которых не видно на снимке</p></div>
   </div>
   <div class="team-row">
-    <div class="person"><div class="av">А</div><div><b>Андрей</b><span>бэкенд, данные, расчёт ресурса; тимлид</span></div></div>
+    <div class="person"><div class="av">А</div><div><b>Андрей</b><span>бэкенд, данные, расчёт ресурса</span></div></div>
     <div class="person"><div class="av">П</div><div><b>Павел</b><span>Android-приложение и AR, стенд</span></div></div>
-    <div class="person"><div class="av">Т</div><div><b>Тимофей</b><span>ИИ и компьютерное зрение</span></div></div>
+    <div class="person"><div class="av">Т</div><div><b>Тимофей</b><span>ИИ и компьютерное зрение; тимлид</span></div></div>
     <div class="person thx"><div><b>Спасибо!</b><span>Ответим на вопросы</span></div></div>
   </div>
   <div class="foot"><span>Deffector · Кибер 102</span><span>9</span></div>
@@ -647,6 +640,11 @@
   var slides = Array.prototype.slice.call(deck.querySelectorAll(".slide"));
   var i = Math.max(0, Math.min(slides.length - 1, (parseInt(location.hash.slice(1), 10) || 1) - 1));
   var all = /[?&]all\b/.test(location.search);
+  // ?all&pdf — сборка PDF: локальная ссылка на запись в PDF не откроется, показываем путь в репозитории
+  if (/[?&]pdf\b/.test(location.search)) {
+    document.documentElement.classList.add("pdf");
+    Array.prototype.forEach.call(deck.querySelectorAll("a.vid"), function (a) { a.removeAttribute("href"); a.removeAttribute("title"); });
+  }
 
   function fit() {
     if (all) return;

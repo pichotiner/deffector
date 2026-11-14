@@ -5,6 +5,8 @@
 
 Печатает slides.html в slides.pdf браузером Edge или Chrome в фоновом режиме
 (в Windows Edge есть всегда). Один слайд — одна страница 16:9.
+Параметр ?pdf в адресе убирает из PDF локальную ссылку на запись сценария: в файле,
+выложенном на диск, она не откроется — вместо неё на слайде путь в репозитории.
 """
 
 import argparse
@@ -47,7 +49,7 @@ def main():
         print("Не нашёл Edge или Chrome. Укажите путь: --browser <путь>, или откройте slides.html "
               "в браузере → Печать → Сохранить как PDF (поля «Нет», фон включить).")
         return 1
-    url = (HERE / "slides.html").as_uri() + "?all"
+    url = (HERE / "slides.html").as_uri() + "?all&pdf"
     out = Path(args.out).resolve()
     # Headless сам берёт временный профиль и не мешает открытому браузеру
     cmd = [browser, "--headless=new", "--disable-gpu", "--no-first-run",
