@@ -20,12 +20,13 @@
 | Что | Где |
 |---|---|
 | Презентация | [`docs/presentation/slides.pdf`](docs/presentation/slides.pdf); для показа — `slides.html` (работает без интернета) |
-| Видео сценария и ролик «без интернета» | ⟨Андрей: ссылка после монтажа⟩ — `demo/video/scenario.mp4`, `docs/presentation/proof.mp4` |
+| Видео сценария и ролик «без интернета» | Пока не приложены; [что записать и как собрать](docs/video.md) |
 | APK | [Android APK](mobile/dist/deffector-debug.apk), [сборка и установка](mobile/README.md) |
 | Ответы на частые вопросы | [`docs/qa.md`](docs/qa.md) |
 | Соответствие ТЗ по пунктам | [`docs/coverage.md`](docs/coverage.md) |
 | Материалы заказчика и как мы их использовали | [`docs/case/`](docs/case/README.md) |
 | Текст задания | [`docs/tz/TZ.md`](docs/tz/TZ.md) |
+| Итоговая готовность и порядок сдачи | [`docs/release-readiness.md`](docs/release-readiness.md) — проверки, ограничения, оставшиеся действия |
 
 ## Архитектура
 

@@ -1,6 +1,5 @@
 package ru.kst.deffector
 
-import android.os.SystemClock
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.*
@@ -23,7 +22,14 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 
-private data class Track(val key: String, val detection: Detection, val seen: Long, val w: Int, val h: Int, val visible: Boolean = true)
+private data class Track(
+    val key: String,
+    val detection: Detection,
+    val w: Int,
+    val h: Int,
+    val source: DetectionFrame?,
+    val visible: Boolean = true
+)
 
 @Composable
 fun ArScreen(vm: AppState) {
@@ -36,9 +42,10 @@ fun ArScreen(vm: AppState) {
         val incoming = snapshot.result.detections.filter { runCatching { normalizedBox(it.bbox) }.isSuccess }.map { d ->
             val base = d.component_id ?: d.cv_class
             val i = occurrences.getOrDefault(base, 0); occurrences[base] = i + 1
-            Track("$base:$i", d, snapshot.at, snapshot.bitmap.width, snapshot.bitmap.height)
+            Track("$base:$i", d, snapshot.bitmap.width, snapshot.bitmap.height, snapshot)
         }
-        val absent = tracks.filter { old -> incoming.none { it.key == old.key } }.map { it.copy(visible = false) }
+        val absent = tracks.filter { old -> incoming.none { it.key == old.key } }
+            .map { it.copy(source = null, visible = false) }
         tracks = incoming + absent
         delay(500)
         tracks = tracks.filter { it.visible }
@@ -58,6 +65,7 @@ fun ArScreen(vm: AppState) {
             val labelHeight = with(density) { 98.dp.toPx() }
             val capacity = (area.height / labelHeight).toInt().coerceAtLeast(1)
             tracks.forEachIndexed { index, track -> key(track.key) {
+                val select: () -> Unit = { track.source?.let { vm.choose(track.detection, it) } }
                 val target = previewBox(track.detection.bbox, track.w, track.h, area.width.toFloat(), area.height.toFloat())
                 val left by animateFloatAsState(target.left, tween(160), label = "left")
                 val top by animateFloatAsState(target.top, tween(160), label = "top")
@@ -71,12 +79,12 @@ fun ArScreen(vm: AppState) {
                 }
                 Box(Modifier.offset { IntOffset(left.roundToInt(), top.roundToInt()) }
                     .size(with(density) { (right - left).coerceAtLeast(1f).toDp() }, with(density) { (bottom - top).coerceAtLeast(1f).toDp() })
-                    .clickable(enabled = track.visible && !vm.busy) { vm.choose(track.detection) })
+                    .clickable(enabled = track.visible && !vm.busy, onClick = select))
                 if (index < capacity) Surface(color = Color(0xEA11272B), shape = RoundedCornerShape(8.dp),
                     modifier = Modifier.offset { IntOffset(8.dp.roundToPx(), (index * labelHeight).roundToInt()) }
                         .width(244.dp).height(94.dp).graphicsLayer { this.alpha = alpha }
                         .border(1.dp, color, RoundedCornerShape(8.dp))
-                        .clickable(enabled = track.visible && !vm.busy) { vm.choose(track.detection) }) {
+                        .clickable(enabled = track.visible && !vm.busy, onClick = select)) {
                     Column(Modifier.padding(8.dp)) {
                         Text("${symbol(track.detection.attention_level)} ${track.detection.label} · ${percent(track.detection.detection_confidence)}", color = Color.White,
                             style = MaterialTheme.typography.labelLarge, maxLines = 1, overflow = TextOverflow.Ellipsis)
@@ -93,7 +101,7 @@ fun ArScreen(vm: AppState) {
             if (snapshot == null && vm.error == null) Text("Ожидание распознавания узлов…")
             if (tracks.size > (area.height / with(LocalDensity.current) { 98.dp.toPx() }).toInt()) {
                 Text("Распознанные узлы")
-                tracks.filter { it.visible }.forEach { t -> TextButton(onClick = { vm.choose(t.detection) }, enabled = !vm.busy) { Text("${symbol(t.detection.attention_level)} ${t.detection.label}") } }
+                tracks.filter { it.visible }.forEach { t -> TextButton(onClick = { t.source?.let { vm.choose(t.detection, it) } }, enabled = !vm.busy) { Text("${symbol(t.detection.attention_level)} ${t.detection.label}") } }
             }
             Text("Требуют проверки", style = MaterialTheme.typography.titleMedium)
             if (vm.attention.isEmpty()) Text("Узлов, требующих проверки, нет")

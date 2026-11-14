@@ -32,6 +32,21 @@ def test_reading_is_taken_from_case_dataset():
         "2026-11-13T09:00:00+03:00"
 
 
+def test_reset_keeps_existing_data_if_seed_fails(monkeypatch):
+    with db.session() as conn:
+        conn.execute("UPDATE equipment SET name = 'До сброса' WHERE id = 'PU-001'")
+
+    def broken_parameters():
+        raise ValueError("Не удалось загрузить параметры")
+
+    monkeypatch.setattr(seed, "parameters", broken_parameters)
+    with pytest.raises(ValueError), db.session() as conn:
+        seed.seed(conn)
+
+    with db.session() as conn:
+        assert conn.execute("SELECT name FROM equipment WHERE id = 'PU-001'").fetchone()[0] == "До сброса"
+
+
 def test_case_diagnosis_matches_our_evaluation():
     """Наш статус совпадает с диагнозом заказчика в каждой строке базы вибрации."""
     rows = telemetry._load("vibration")

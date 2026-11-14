@@ -74,7 +74,9 @@ def main():
     env["JAVA_HOME"] = str(jdk)
     env["ANDROID_HOME"] = str(sdk)
     env["ANDROID_SDK_ROOT"] = str(sdk)
-    env["PATH"] = str(jdk / "bin") + os.pathsep + env.get("PATH", "")
+    # Gradle копирует PATH в java.library.path: кавычки ломают запуск JVM тестов.
+    path_entries = env.get("PATH", "").replace('"', '').split(os.pathsep)
+    env["PATH"] = os.pathsep.join([str(jdk / "bin"), *path_entries])
     if args.setup:
         # Запускаем штатный скрипт SDK; собственные скрипты проекта — на Python.
         run(["cmd.exe", "/c", sdk / "cmdline-tools/latest/bin/sdkmanager.bat", f"--sdk_root={sdk}", "--licenses"], env, "y\n" * 100)

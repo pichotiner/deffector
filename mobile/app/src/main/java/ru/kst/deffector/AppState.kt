@@ -17,7 +17,7 @@ import okhttp3.RequestBody.Companion.toRequestBody
 
 enum class Screen { CAMERA, LIST, EQUIPMENT, AR, COMPONENT, INSPECTION, SETTINGS }
 data class Candidate(val id: String, val name: String, val confidence: Double?)
-data class DetectionFrame(val result: DetectResult, val bitmap: Bitmap, val at: Long = android.os.SystemClock.elapsedRealtime())
+data class DetectionFrame(val result: DetectResult, val bitmap: Bitmap)
 
 class AppState(app: Application) : AndroidViewModel(app) {
     private val prefs = app.getSharedPreferences("settings", 0)
@@ -31,6 +31,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
     var attention by mutableStateOf<List<AttentionItem>>(emptyList()); private set
     var frame by mutableStateOf<DetectionFrame?>(null); private set
     var selected by mutableStateOf<Detection?>(null); private set
+    private var selectedFrame: DetectionFrame? = null
     var candidates by mutableStateOf<List<Candidate>>(emptyList()); private set
     var busy by mutableStateOf(false); private set
     var error by mutableStateOf<String?>(null); private set
@@ -49,7 +50,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
 
     fun go(next: Screen) {
         if (next == Screen.SETTINGS) settingsReturn = screen
-        screen = next; error = null; notice = null; cameraError = null; selected = null; frame = null; latest = null
+        screen = next; error = null; notice = null; cameraError = null; clearSelection(); frame = null; latest = null
         if (next == Screen.CAMERA) { manualHint = false; seen.clear() }
     }
     fun back() = go(when (screen) {
@@ -124,8 +125,14 @@ class AppState(app: Application) : AndroidViewModel(app) {
     fun openAr() = task {
         attention = service().attention(requireNotNull(card).id).items; go(Screen.AR)
     }
-    fun choose(d: Detection) { selected = d }
-    fun clearSelection() { selected = null }
+    fun choose(d: Detection, source: DetectionFrame) {
+        selectedFrame = source
+        selected = d
+    }
+    fun clearSelection() {
+        selected = null
+        selectedFrame = null
+    }
     fun selectCandidate(id: String) { selected = selected?.copy(component_id = id, match = "matched") }
     fun identify() = task {
         val image = latest ?: throw IllegalStateException("Дождитесь изображения с камеры")
@@ -144,12 +151,14 @@ class AppState(app: Application) : AndroidViewModel(app) {
             try {
                 val image = withContext(Dispatchers.Default) { jpeg(resize(bitmap, 640)) }
                 val result = service().detect(requireNotNull(card).id, Network.image(image))
-                if (screen == Screen.AR) frame = DetectionFrame(result, bitmap)
+                if (screen == Screen.AR && selected == null) frame = DetectionFrame(result, bitmap)
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) {
-                frame = null
-                error = Network.message(e)
-                retry = { error = null }
+                if (screen == Screen.AR && selected == null) {
+                    frame = null
+                    error = Network.message(e)
+                    retry = { error = null }
+                }
             }
         } else if (screen == Screen.CAMERA && now - lastScan > 1100 && error == null) {
             lastScan = now
@@ -176,7 +185,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
     }
     fun analyze() = task {
         val d = selected ?: throw IllegalStateException("Выберите рамку узла")
-        val snapshot = frame ?: throw IllegalStateException("Дождитесь распознавания узла")
+        val snapshot = selectedFrame ?: throw IllegalStateException("Дождитесь распознавания узла")
         val id = d.component_id ?: throw IllegalStateException("Сначала выберите узел из карточки")
         val image = withContext(Dispatchers.Default) { jpeg(crop(snapshot.bitmap, d.bbox)) }
         component = service().analyze(requireNotNull(card).id, id, Network.image(image),

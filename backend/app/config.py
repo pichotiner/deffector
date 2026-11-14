@@ -56,5 +56,5 @@ def today() -> date:
     return datetime.now(MSK).date()
 
 
-def now_iso() -> str:
-    return datetime.now(MSK).isoformat(timespec="seconds")
+def now_iso(timespec="seconds") -> str:
+    return datetime.now(MSK).isoformat(timespec=timespec)

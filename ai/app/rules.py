@@ -223,19 +223,14 @@ def allowed_signs(component_type: str) -> list[str]:
 
 def enforce(assessment: Assessment, component_name: str, component_type: str = "") -> Assessment:
     """Приводит разобранный ответ модели к правилам классификации и формулировок."""
+    if assessment.image_quality == "poor":
+        return poor_quality(None)
+
     allowed = {SIGNS[code] for code in allowed_signs(component_type)}
     kept = [s for s in assessment.signs if s in allowed]
     # модель назвала признак, неуместный для этого узла: она что-то увидела — зелёным не отвечаем
     dropped = len(kept) != len(assessment.signs)
     assessment = Assessment(**{**assessment.__dict__, "signs": kept})
-    if assessment.image_quality == "poor":
-        result = poor_quality(None)
-        explanation = _clean_text(assessment.explanation)
-        # объяснение модели оставляем, только если оно действительно про качество снимка
-        if _text_ok(explanation) and re.search(r"снимк|изображен|фото|кадр", explanation, re.IGNORECASE):
-            result.explanation = explanation
-        return result
-
     category = assessment.category
     signs = list(assessment.signs)
     # «Видимых проблем не обнаружено» — только при хорошем снимке без признаков.
