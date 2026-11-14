@@ -95,7 +95,7 @@ python docs/video/make_video.py docs/video/scenario.json   # монтаж вид
 | `docs/stand.md` | инструкция для стенда и чек-листы: без интернета, утро защиты, пробный звонок |
 | `docs/qa.md` | ответы на вопросы жюри |
 | `docs/coverage.md` | матрица покрытия ТЗ с отметками, чем подтверждён каждый пункт |
-| `docs/presentation/` | презентация: `slides.html`, `slides.pdf` (`make_pdf.py`), текст выступления `speech.md` |
+| `docs/presentation/` | презентация: `slides.html`, `slides.pdf` (`make_pdf.py`), текст выступления `speech.md`, памятка по ИИ к защите `ai-cheatsheet.md` |
 | `docs/video.md`, `docs/video/` | что снять для видео и ролика-доказательства; монтаж — `make_video.py` по спискам вырезок `scenario.json`, `proof.json` |
 | `README.md` | сопроводительная документация для жюри |
 | `backend/` | FastAPI + SQLite; подробности — `backend/README.md` |
