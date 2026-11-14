@@ -4,12 +4,25 @@ import org.junit.Assert.*
 import org.junit.Test
 
 class GeometryTest {
-    @Test fun portraitPreviewAccountsForLetterbox() {
+    @Test fun portraitPreviewAccountsForCenterCrop() {
         val b = previewBox(listOf(.25, .25, .5, .5), 640, 480, 1080f, 1920f)
-        assertEquals(270f, b.left, .01f)
-        assertEquals(757.5f, b.top, .01f)
-        assertEquals(810f, b.right, .01f)
-        assertEquals(1162.5f, b.bottom, .01f)
+        assertEquals(-100f, b.left, .01f)
+        assertEquals(480f, b.top, .01f)
+        assertEquals(1180f, b.right, .01f)
+        assertEquals(1440f, b.bottom, .01f)
+    }
+    @Test fun widePreviewAccountsForVerticalCenterCrop() {
+        val b = previewBox(listOf(.25, .25, .5, .5), 480, 640, 1920f, 1080f)
+        assertEquals(480f, b.left, .01f)
+        assertEquals(-100f, b.top, .01f)
+        assertEquals(1440f, b.right, .01f)
+        assertEquals(1180f, b.bottom, .01f)
+    }
+    @Test fun fullImageAlwaysCoversPreviewWithoutBars() {
+        listOf(1080f to 1920f, 1920f to 1080f, 720f to 720f).forEach { (w, h) ->
+            val b = previewBox(listOf(0.0, 0.0, 1.0, 1.0), 640, 480, w, h)
+            assertTrue(b.left <= 0 && b.top <= 0 && b.right >= w && b.bottom >= h)
+        }
     }
     @Test fun portraitImageMatchesPreview() {
         val b = previewBox(listOf(.1, .2, .3, .4), 480, 640, 480f, 640f)
