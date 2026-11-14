@@ -96,6 +96,27 @@ CREATE INDEX IF NOT EXISTS ix_inspection_eq ON inspection(equipment_id, performe
 CREATE INDEX IF NOT EXISTS ix_visual_comp ON visual_result(component_id, analyzed_at);
 """
 
+# Учётные записи и входы. Сброс демо-данных (seed) эти таблицы не трогает:
+# после `reset_db.py` вошедшие пользователи остаются вошедшими.
+AUTH_SCHEMA = """
+CREATE TABLE IF NOT EXISTS account (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    email TEXT NOT NULL UNIQUE,      -- почта в нижнем регистре, она же логин
+    name TEXT NOT NULL,              -- как подписываются записи осмотров
+    role TEXT NOT NULL CHECK (role IN ('engineer', 'master', 'admin')),
+    password_hash TEXT NOT NULL,     -- pbkdf2_sha256$итерации$соль$хэш, сам пароль не хранится
+    active INTEGER NOT NULL DEFAULT 1,
+    created_at TEXT NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS auth_session (
+    token_hash TEXT PRIMARY KEY,     -- SHA-256 токена, сам токен есть только у клиента
+    account_id INTEGER NOT NULL REFERENCES account(id),
+    created_at TEXT NOT NULL,
+    expires_at TEXT NOT NULL
+);
+"""
+
 JSON_COLUMNS = {"characteristics", "signs", "visual"}
 
 
@@ -120,9 +141,9 @@ def session(path=None):
         conn.close()
 
 
-def create_schema(conn):
+def create_schema(conn, schema=SCHEMA):
     # executescript() завершает уже открытую транзакцию до выполнения SQL.
-    for statement in SCHEMA.split(";"):
+    for statement in schema.split(";"):
         if statement.strip():
             conn.execute(statement)
 

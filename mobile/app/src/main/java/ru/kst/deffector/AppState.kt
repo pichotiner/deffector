@@ -2,6 +2,7 @@ package ru.kst.deffector
 
 import android.app.Application
 import android.graphics.Bitmap
+import android.net.Uri
 import androidx.compose.runtime.*
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,16 +16,24 @@ import kotlinx.coroutines.*
 import kotlinx.coroutines.tasks.await
 import okhttp3.RequestBody.Companion.toRequestBody
 
-enum class Screen { CAMERA, LIST, EQUIPMENT, AR, COMPONENT, INSPECTION, SETTINGS }
+enum class Screen { CAMERA, LIST, EQUIPMENT, AR, COMPONENT, INSPECTION, SETTINGS, LOGIN }
+data class SavedReport(val uri: Uri, val mime: String)
 data class Candidate(val id: String, val name: String, val confidence: Double?)
 data class DetectionFrame(val result: DetectResult, val bitmap: Bitmap, val at: Long = android.os.SystemClock.elapsedRealtime())
 
 class AppState(app: Application) : AndroidViewModel(app) {
     private val prefs = app.getSharedPreferences("settings", 0)
     var server by mutableStateOf(prefs.getString("server", "").orEmpty()); private set
-    var engineer by mutableStateOf(prefs.getString("engineer", "").orEmpty()); private set
-    private var api: Api? = server.takeIf { it.isNotBlank() }?.let { runCatching { Network.create(it) }.getOrNull() }
-    var screen by mutableStateOf(Screen.CAMERA); private set
+    // Вход: токен и учётная запись хранятся в настройках приложения до выхода или истечения срока.
+    private var token: String? = prefs.getString("token", null)
+    var user by mutableStateOf(prefs.getString("user", null)?.let { saved ->
+        runCatching { Network.json.decodeFromString(User.serializer(), saved) }.getOrNull()
+    }?.takeIf { token != null }); private set
+    val engineer: String get() = user?.name.orEmpty()
+    fun can(permission: String) = user?.permissions?.contains(permission) == true
+    private var api: Api? = server.takeIf { it.isNotBlank() }?.let { runCatching { Network.create(it) { token } }.getOrNull() }
+    var screen by mutableStateOf(if (user == null) Screen.LOGIN else Screen.CAMERA); private set
+    var savedReport by mutableStateOf<SavedReport?>(null); private set
     var card by mutableStateOf<EquipmentCard?>(null); private set
     var component by mutableStateOf<Component?>(null); private set
     var items by mutableStateOf<List<EquipmentShort>>(emptyList()); private set
@@ -49,9 +58,12 @@ class AppState(app: Application) : AndroidViewModel(app) {
     private val text = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
     private fun service() = api ?: throw IllegalStateException("Укажите адрес ПК в настройках")
 
-    fun go(next: Screen) {
+    fun go(target: Screen) {
+        // Без входа доступны только экран входа и настройки подключения.
+        val next = if (user == null && target != Screen.SETTINGS) Screen.LOGIN else target
         if (next == Screen.SETTINGS) settingsReturn = screen
         screen = next; error = null; notice = null; cameraError = null; selected = null; selectedFrame = null; frame = null; latest = null
+        savedReport = null
         manualHint = false; recognitionSeen = false
         if (next == Screen.CAMERA) seen.clear()
     }
@@ -75,6 +87,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
             busy = true; error = null; notice = null
             try { action() } catch (e: CancellationException) { throw e }
             catch (e: Exception) {
+                if (expired(e)) return@launch
                 error = Network.message(e)
                 if (!allowRetry) {
                     error += " Проверьте историю перед повторной записью: осмотр мог сохраниться."
@@ -84,13 +97,55 @@ class AppState(app: Application) : AndroidViewModel(app) {
             finally { busy = false }
         }
     }
-    fun saveSettings(url: String, name: String) = task {
-        val checked = Network.address(url).toString().trimEnd('/')
-        if (checked != server) { card = null; component = null; settingsReturn = Screen.CAMERA }
-        api = Network.create(checked); server = checked; engineer = name.trim()
-        prefs.edit().putString("server", server).putString("engineer", engineer).apply()
-        notice = "Настройки сохранены"
+    // Сервер ответил 401 при действующем входе: вход истёк или завершён — нужен новый.
+    private fun expired(e: Exception): Boolean {
+        if (!Network.unauthorized(e) || user == null) return false
+        signOut(Network.message(e))
+        return true
     }
+    private fun forgetSession() {
+        token = null; user = null; card = null; component = null
+        prefs.edit().remove("token").remove("user").apply()
+    }
+    private fun signOut(message: String?) {
+        forgetSession(); settingsReturn = Screen.LOGIN
+        go(Screen.LOGIN); error = message; retry = { error = null }
+    }
+    fun login(email: String, password: String) = task {
+        val result = service().login(LoginIn(email.trim(), password))
+        token = result.token; user = result.user
+        prefs.edit().putString("token", result.token)
+            .putString("user", Network.json.encodeToString(User.serializer(), result.user)).apply()
+        go(Screen.CAMERA)
+        notice = "Вход выполнен: ${result.user.name}, ${result.user.role_name}"
+    }
+    fun logout() {
+        val service = api; val bearer = token
+        // Сервер завершает вход; без связи он истечёт сам по сроку.
+        if (service != null && bearer != null) viewModelScope.launch { runCatching { service.logout("Bearer $bearer") } }
+        signOut(null)
+    }
+    fun saveSettings(url: String) = task {
+        val checked = Network.address(url).toString().trimEnd('/')
+        val changed = checked != server
+        api = Network.create(checked) { token }; server = checked
+        prefs.edit().putString("server", server).apply()
+        // Вход действует только на том сервере, где он выполнен.
+        if (changed) { forgetSession(); settingsReturn = Screen.LOGIN }
+        notice = if (changed) "Настройки сохранены. Войдите в систему" else "Настройки сохранены"
+    }
+    fun saveReport(uri: Uri, format: String) = task {
+        val id = requireNotNull(card).id
+        val bytes = withContext(Dispatchers.IO) { service().report(id, format).use { it.bytes() } }
+        withContext(Dispatchers.IO) {
+            val output = getApplication<Application>().contentResolver.openOutputStream(uri)
+                ?: throw IllegalStateException("Не удалось открыть файл для записи")
+            output.use { it.write(bytes) }
+        }
+        savedReport = SavedReport(uri, if (format == "pdf") "application/pdf" else Network.XLSX)
+        notice = "Отчёт сохранён"
+    }
+    fun reportNotOpened() { notice = "Отчёт сохранён, но на телефоне нет приложения для его просмотра" }
     fun health() = task {
         val h = service().health()
         notice = "Бэкенд: ${h.status}. ИИ: ${h.ai.status}, режим ${h.ai.mode}. ${h.time}"
@@ -162,6 +217,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
                 }
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) {
+                if (expired(e)) return
                 if (screen == Screen.AR && selected == null && !busy && card?.id == equipmentId) {
                     frame = null
                     error = Network.message(e)
@@ -186,7 +242,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
                     }
                 }
             } catch (e: CancellationException) { throw e }
-            catch (e: Exception) { error = Network.message(e); retry = { error = null; seen.clear() } }
+            catch (e: Exception) { if (!expired(e)) { error = Network.message(e); retry = { error = null; seen.clear() } } }
         }
     }
     private fun shouldLookup(key: String, now: Long): Boolean {
@@ -205,7 +261,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
     }
     fun inspection(whole: Boolean = false) { if (whole) component = null; go(Screen.INSPECTION) }
     fun submit(type: String, comment: String, attach: Boolean) = task(allowRetry = false) {
-        require(engineer.isNotBlank()) { "Укажите имя инженера в настройках" }
+        require(can("inspect")) { "Для записи осмотра нужна роль инженера или мастера" }
         require(type !in listOf("defect", "remark") || comment.isNotBlank()) { "Для дефекта и замечания нужен комментарий" }
         val eq = requireNotNull(card).id
         val result = service().inspect(eq, InspectionIn(component?.id, type, comment.trim().ifBlank { null }, engineer, attach))

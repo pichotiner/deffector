@@ -10,6 +10,7 @@ import okhttp3.MultipartBody
 import okhttp3.OkHttpClient
 import okhttp3.RequestBody
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.ResponseBody
 import retrofit2.HttpException
 import retrofit2.Retrofit
 import retrofit2.converter.kotlinx.serialization.asConverterFactory
@@ -19,6 +20,13 @@ import java.util.concurrent.TimeUnit
 
 interface Api {
     @GET("api/health") suspend fun health(): Health
+    @POST("api/auth/login") suspend fun login(@Body body: LoginIn): LoginResult
+    @GET("api/auth/me") suspend fun me(): User
+    // Токен передаётся явно: к моменту запроса приложение его уже забыло.
+    @POST("api/auth/logout") suspend fun logout(@Header("Authorization") bearer: String): retrofit2.Response<ResponseBody>
+    @GET("api/equipment/{id}/report") suspend fun report(
+        @Path("id") id: String, @Query("format") format: String
+    ): ResponseBody
     @GET("api/equipment") suspend fun list(@Query("q") q: String): EquipmentList
     @GET("api/equipment/lookup") suspend fun lookup(
         @Query("qr") qr: String? = null, @Query("serial") serial: String? = null,
@@ -63,7 +71,10 @@ object Network {
         return url
     }
 
-    fun create(value: String): Api {
+    const val XLSX = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+
+    // token — текущий вход: читается при каждом запросе и уходит в заголовке Authorization.
+    fun create(value: String, token: () -> String? = { null }): Api {
         val url = address(value)
         val client = OkHttpClient.Builder().proxy(Proxy.NO_PROXY)
             .followRedirects(false).followSslRedirects(false)
@@ -72,7 +83,9 @@ object Network {
             .addInterceptor { chain ->
                 val target = chain.request().url
                 check(target.host == url.host && target.port == url.port && target.scheme == url.scheme)
-                chain.proceed(chain.request())
+                val bearer = token()
+                chain.proceed(if (bearer.isNullOrBlank() || chain.request().header("Authorization") != null) chain.request()
+                    else chain.request().newBuilder().header("Authorization", "Bearer $bearer").build())
             }.build()
         return Retrofit.Builder().baseUrl(url).client(client)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType())).build().create(Api::class.java)
@@ -81,6 +94,8 @@ object Network {
     fun image(bytes: ByteArray) = MultipartBody.Part.createFormData(
         "image", "frame.jpg", bytes.toRequestBody("image/jpeg".toMediaType())
     )
+
+    fun unauthorized(t: Throwable) = t is HttpException && t.code() == 401
 
     fun message(t: Throwable): String = when (t) {
         is HttpException -> runCatching {

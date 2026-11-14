@@ -4,9 +4,10 @@
     python backend/check_scenario.py --image demo/photos/pump.jpg   # снимок для ИИ
     python backend/check_scenario.py --url http://192.168.1.20:8000
 
-Проходит через бэкенд все 10 шагов сценария ТЗ так же, как это делает телефон,
-и в конце пишет «ВСЁ РАБОТАЕТ» или какие шаги не прошли. Нужен только Python —
-окружение бэкенда не требуется.
+Проходит через бэкенд вход пользователя, все 10 шагов сценария ТЗ и выгрузку отчёта
+так же, как это делает телефон, и в конце пишет «ВСЁ РАБОТАЕТ» или какие шаги не прошли.
+Нужен только Python — окружение бэкенда не требуется. Вход — демо-учётной записью мастера
+(осмотр и отчёты); другая запись: --email и --password.
 
 Когда запускать: на контроле 2, после холодной перезагрузки без интернета, утром перед
 защитой. Проверка пишет в базу (анализ и запись осмотра), поэтому в конце база
@@ -50,12 +51,15 @@ class Check:
         self.image = image
         self.failed, self.warnings = [], []
         self.step = ""
+        self.token = None       # вход: после login() уходит в каждом запросе
 
     # ---------- HTTP ----------
 
     def call(self, method, path, json_body=None, form=None, image=False, timeout=30):
         url = self.base + path
         headers, data = {}, None
+        if self.token:
+            headers["Authorization"] = f"Bearer {self.token}"
         if json_body is not None:
             data = json.dumps(json_body).encode()
             headers["Content-Type"] = "application/json"
@@ -80,6 +84,17 @@ class Check:
         except ValueError:
             payload = {"raw": body[:200].decode("utf-8", "replace")}
         return status, payload, ms
+
+    def download(self, path, timeout=30):
+        req = urllib.request.Request(self.base + path,
+                                     headers={"Authorization": f"Bearer {self.token}"})
+        t = time.perf_counter()
+        try:
+            with _OPENER.open(req, timeout=timeout) as r:
+                body, status = r.read(), r.status
+        except urllib.error.HTTPError as e:
+            body, status = e.read(), e.code
+        return status, body, (time.perf_counter() - t) * 1000
 
     # ---------- вывод ----------
 
@@ -113,7 +128,50 @@ def internet_available():
     return False
 
 
-def run(c: Check, eq="PU-001"):
+def login(c: Check, email, password):
+    """Вход и права по ролям. → False, если дальше идти нельзя."""
+    c.title("Вход пользователя")
+    st, _, _ = c.call("GET", "/api/equipment")
+    if st == 200:
+        c.warn("вход отключён (auth_required: false) — запасной режим стенда, отчёты недоступны")
+    else:
+        c.expect(st == 401, "без входа запросы отклоняются", f"запрос без входа: код {st}")
+    st, r, _ = c.call("POST", "/api/auth/login", json_body={"email": email, "password": "не тот пароль"})
+    c.expect(st == 401, "неверный пароль отклонён", f"вход с неверным паролем: код {st}")
+    st, r, _ = c.call("POST", "/api/auth/login", json_body={"email": email, "password": password})
+    if not c.expect(st == 200, "вход по почте и паролю выполнен", f"вход {email}: код {st} {r}"):
+        return False
+    c.token = r["token"]
+    user = r["user"]
+    c.ok(f"{user['name']}, роль «{user['role_name']}», права: {', '.join(user['permissions'])}")
+    if not c.expect({"inspect", "report"} <= set(user["permissions"]),
+                    "роль позволяет осмотр и выгрузку отчётов",
+                    "для полной проверки нужна роль с осмотром и отчётами (мастер)"):
+        return False
+    st, e, _ = c.call("POST", "/api/auth/login",
+                      json_body={"email": "engineer@kst.local", "password": "Engineer-102"})
+    if st == 200:
+        master, c.token = c.token, e["token"]
+        st, _, _ = c.call("GET", "/api/equipment/PU-001/report?format=xlsx")
+        c.expect(st == 403, "права проверяет сервер: инженеру выгрузка отчёта закрыта",
+                 f"отчёт для роли «Инженер»: код {st}, ожидался 403")
+        c.call("POST", "/api/auth/logout")
+        c.token = master
+    else:
+        c.warn("демо-запись инженера недоступна — разграничение прав не проверено")
+    return True
+
+
+def report(c: Check, eq="PU-001"):
+    c.title("Выгрузка отчёта")
+    for fmt, magic, name in (("xlsx", b"PK", "Excel"), ("pdf", b"%PDF-", "PDF")):
+        st, body, ms = c.download(f"/api/equipment/{eq}/report?format={fmt}")
+        c.expect(st == 200 and body.startswith(magic),
+                 f"отчёт {name}: {len(body) // 1024 + 1} КБ за {ms:.0f} мс",
+                 f"отчёт {name}: код {st} {body[:200].decode('utf-8', 'replace')}")
+
+
+def run(c: Check, eq="PU-001", credentials=("master@kst.local", "Master-102")):
     # ---- связь ----
     c.title("Связь")
     try:
@@ -130,6 +188,9 @@ def run(c: Check, eq="PU-001"):
     real_ai = ai.get("mode") == "real"
     print(f"  [..] интернет на этом ПК: {'ЕСТЬ' if internet_available() else 'нет'}"
           " (для проверки без интернета должно быть «нет»)")
+
+    if not login(c, *credentials):
+        return
 
     # ---- 1–2. идентификация ----
     c.title("Шаги 1–2. Идентификация оборудования")
@@ -249,6 +310,12 @@ def run(c: Check, eq="PU-001"):
         st, h, _ = c.call("GET", f"/api/equipment/{eq}/history")
         c.expect(h["items"][0]["id"] == r["inspection"]["id"], "запись видна в истории первой",
                  "записи нет в истории")
+        c.expect(r["inspection"]["performed_by"] != "check_scenario",
+                 f"запись подписана вошедшим пользователем: {r['inspection']['performed_by']}",
+                 "автор записи взят из запроса, а не из входа")
+
+    report(c, eq)
+    c.call("POST", "/api/auth/logout")
 
 
 def is_local(url):
@@ -266,6 +333,8 @@ def main():
     ap.add_argument("--url", default="http://127.0.0.1:8000")
     ap.add_argument("--image", help="JPEG со снимком оборудования для ИИ")
     ap.add_argument("--no-reset", action="store_true", help="не сбрасывать базу в конце")
+    ap.add_argument("--email", default="master@kst.local", help="почта учётной записи для входа")
+    ap.add_argument("--password", default="Master-102", help="пароль этой учётной записи")
     args = ap.parse_args()
 
     image = Path(args.image).read_bytes() if args.image else _GRAY_JPEG
@@ -273,7 +342,7 @@ def main():
     print(f"Проверка сценария: {args.url}" + ("" if args.image else "  (снимок не указан — серый кадр)"))
     started = time.perf_counter()
     try:
-        run(c)
+        run(c, credentials=(args.email, args.password))
     except Exception as e:  # noqa: BLE001 — любая неожиданность = провал проверки
         c.fail(f"проверка прервалась: {type(e).__name__}: {e}")
 

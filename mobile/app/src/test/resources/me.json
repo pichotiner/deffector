@@ -1,0 +1,13 @@
+{
+  "id": 2,
+  "email": "master@kst.local",
+  "name": "Петров П. П.",
+  "role": "master",
+  "role_name": "Мастер",
+  "active": true,
+  "permissions": [
+    "view",
+    "inspect",
+    "report"
+  ]
+}

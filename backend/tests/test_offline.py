@@ -63,6 +63,21 @@ def test_scenario_without_internet_real_ai(no_internet, fake_ai):  # noqa: F811
     scenario()
 
 
+def test_login_and_both_report_formats_without_internet(no_internet):
+    """Новые запросы тоже не требуют внешней сети; PDF-шрифт берётся с диска."""
+    with TestClient(app) as employee:
+        r = employee.post("/api/auth/login", json={
+            "email": "master@kst.local", "password": "Master-102"})
+        assert r.status_code == 200
+        employee.headers["Authorization"] = f"Bearer {r.json()['token']}"
+        assert employee.get("/api/auth/me").json()["role"] == "master"
+        for fmt, magic in (("pdf", b"%PDF-"), ("xlsx", b"PK")):
+            report = employee.get(f"/api/equipment/PU-001/report?format={fmt}")
+            assert report.status_code == 200 and report.content.startswith(magic)
+        assert employee.post("/api/auth/logout").status_code == 204
+        assert employee.get("/api/equipment").status_code == 401
+
+
 def test_guard_really_blocks(no_internet):
     with pytest.raises(OSError):
         socket.create_connection(("1.1.1.1", 443), timeout=1)

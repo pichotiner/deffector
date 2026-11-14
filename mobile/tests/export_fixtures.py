@@ -28,6 +28,7 @@ def main():
         process = subprocess.Popen([sys.executable, "-m", "uvicorn", "app.main:app", "--host", "127.0.0.1", "--port", str(port)],
                                    cwd=ROOT.parent / "backend", env=os.environ.copy(), stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL)
         class Client:
+            token = None
             def get(self, path):
                 return self.request(path)
             def post(self, path, files=None, json=None):
@@ -36,7 +37,10 @@ def main():
                 content_type = "multipart/form-data; boundary=mobile-test" if files else "application/json"
                 return self.request(path, data, content_type)
             def request(self, path, data=None, content_type="application/json"):
-                request = urllib.request.Request(f"http://127.0.0.1:{port}" + path, data=data, headers={"Content-Type": content_type})
+                headers = {"Content-Type": content_type}
+                if self.token:
+                    headers["Authorization"] = "Bearer " + self.token
+                request = urllib.request.Request(f"http://127.0.0.1:{port}" + path, data=data, headers=headers)
                 opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
                 with opener.open(request, timeout=10) as response:
                     return response.read().decode("utf-8")
@@ -52,7 +56,11 @@ def main():
                     time.sleep(.1)
             else:
                 raise RuntimeError("Бэкенд не запустился за 10 секунд")
+            login = client.post("/api/auth/login", json={"email": "master@kst.local", "password": "Master-102"})
+            client.token = json.loads(login)["token"]
             responses = {
+                "login": login,
+                "me": client.get("/api/auth/me"),
                 "health": client.get("/api/health"),
                 "equipment-list": client.get("/api/equipment"),
                 "lookup": client.get("/api/equipment/lookup?qr=KST:PU-001"),

@@ -1,9 +1,12 @@
 package ru.kst.deffector
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
@@ -16,11 +19,13 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -61,7 +66,7 @@ fun percent(value: Double?) = value?.let { "${(it * 100).toInt()} %" } ?: "не�
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun App(vm: AppState) {
-    BackHandler(vm.screen != Screen.CAMERA && !vm.busy) { vm.back() }
+    BackHandler(vm.screen != Screen.CAMERA && vm.screen != Screen.LOGIN && !vm.busy) { vm.back() }
     val view = LocalView.current
     DisposableEffect(vm.screen) {
         view.keepScreenOn = vm.screen in listOf(Screen.CAMERA, Screen.AR)
@@ -70,12 +75,13 @@ fun App(vm: AppState) {
     Scaffold(topBar = {
         TopAppBar(title = { Column {
             Text(when (vm.screen) {
-            Screen.CAMERA -> "Деффектор"; Screen.LIST -> "Выбор оборудования"
+            Screen.CAMERA, Screen.LOGIN -> "Деффектор"; Screen.LIST -> "Выбор оборудования"
             Screen.EQUIPMENT -> vm.card?.id ?: "Оборудование"; Screen.AR -> "AR-осмотр"
             Screen.COMPONENT -> "Карточка узла"; Screen.INSPECTION -> "Регистрация осмотра"; Screen.SETTINGS -> "Настройки"
             }, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
             Text(when (vm.screen) {
-                Screen.CAMERA -> "Помощник инженера"
+                Screen.CAMERA -> vm.user?.let { it.name + " · " + it.role_name } ?: "Помощник инженера"
+                Screen.LOGIN -> "Вход в систему"
                 Screen.AR -> vm.card?.id.orEmpty() + " · Предварительный осмотр"
                 Screen.EQUIPMENT, Screen.COMPONENT -> "Цифровая карточка"
                 Screen.INSPECTION -> "История обслуживания"
@@ -83,7 +89,7 @@ fun App(vm: AppState) {
                 Screen.SETTINGS -> "Подключение и профиль"
             }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
         } }, navigationIcon = {
-            if (vm.screen != Screen.CAMERA) IconButton(enabled = !vm.busy, onClick = vm::back,
+            if (vm.screen != Screen.CAMERA && vm.screen != Screen.LOGIN) IconButton(enabled = !vm.busy, onClick = vm::back,
                 modifier = Modifier.semantics { contentDescription = "Назад" }) { UiIcon("back") }
         }, actions = {
             if (vm.screen != Screen.SETTINGS) IconButton(enabled = !vm.busy, onClick = { vm.go(Screen.SETTINGS) },
@@ -110,6 +116,7 @@ fun App(vm: AppState) {
                 Screen.CAMERA -> IdentifyScreen(vm)
                 Screen.LIST -> ManualScreen(vm)
                 Screen.SETTINGS -> SettingsScreen(vm)
+                Screen.LOGIN -> LoginScreen(vm)
                 Screen.EQUIPMENT -> EquipmentScreen(vm)
                 Screen.COMPONENT -> ComponentScreen(vm)
                 Screen.INSPECTION -> InspectionScreen(vm)
@@ -255,21 +262,50 @@ fun App(vm: AppState) {
     }
 }
 
+val permissionLabels = linkedMapOf("view" to "просмотр карточек оборудования", "inspect" to "осмотр и запись его результатов",
+    "report" to "выгрузка отчётов", "users" to "управление учётными записями")
+
+@Composable fun LoginScreen(vm: AppState) {
+    var email by rememberSaveableInput { "" }
+    var password by remember { mutableStateOf("") }   // пароль не сохраняется в состоянии Activity
+    val ready = !vm.busy && vm.server.isNotBlank() && email.isNotBlank() && password.isNotBlank()
+    Page {
+        Text("Вход в систему", style = MaterialTheme.typography.headlineSmall)
+        Text("Почта и пароль учётной записи. Права зависят от роли: инженер, мастер, администратор.",
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+        if (vm.server.isBlank()) {
+            Text("Сначала задайте адрес ПК в настройках.", color = MaterialTheme.colorScheme.error)
+            SecondaryAction("Открыть настройки") { vm.go(Screen.SETTINGS) }
+        }
+        OutlinedTextField(email, { email = it }, label = { Text("Почта") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email, imeAction = ImeAction.Next))
+        OutlinedTextField(password, { password = it }, label = { Text("Пароль") }, singleLine = true, modifier = Modifier.fillMaxWidth(),
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password, imeAction = ImeAction.Done),
+            keyboardActions = KeyboardActions(onDone = { if (ready) vm.login(email, password) }))
+        Action("Войти", ready) { vm.login(email, password) }
+        Text("Вход проверяет сервер на ПК в локальной сети. Интернет не требуется.", style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant)
+    }
+}
+
 @Composable fun SettingsScreen(vm: AppState) {
     var url by rememberSaveableInput { vm.server }
-    var name by rememberSaveableInput { vm.engineer }
     Page {
         Panel("Локальное подключение") {
             Text("Подключите телефон и ПК к одной локальной сети.", color = MaterialTheme.colorScheme.onSurfaceVariant)
             OutlinedTextField(url, { url = it }, label = { Text("Адрес ПК") }, placeholder = { Text("http://192.168.1.20:8000") },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true, modifier = Modifier.fillMaxWidth())
         }
-        Panel("Профиль инженера") {
-            OutlinedTextField(name, { name = it }, label = { Text("Имя инженера") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        }
-        Action("Сохранить", !vm.busy) { vm.saveSettings(url, name) }
+        Action("Сохранить", !vm.busy) { vm.saveSettings(url) }
         SecondaryAction("Проверить связь", !vm.busy && vm.server.isNotBlank(), vm::health)
         Text("Проверка связи использует сохранённый адрес. Интернет для работы не требуется.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        val user = vm.user
+        if (user != null) Panel("Учётная запись") {
+            Field("Пользователь", user.name); Field("Почта", user.email); Field("Роль", user.role_name)
+            Field("Права", user.permissions.joinToString { permissionLabels[it] ?: it })
+            SecondaryAction("Выйти", !vm.busy, vm::logout)
+        }
     }
 }
 
@@ -350,7 +386,7 @@ fun App(vm: AppState) {
                             Text(c.id + "  /  ОБОРУДОВАНИЕ", color = Mint, style = MaterialTheme.typography.labelMedium)
                             Text(c.name, color = Color.White, style = MaterialTheme.typography.headlineSmall)
                             c.model?.let { Text(it, color = Color(0xFFC3D5DE), style = MaterialTheme.typography.bodyMedium) }
-                            Button(onClick = vm::openAr, enabled = !vm.busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                            if (vm.can("inspect")) Button(onClick = vm::openAr, enabled = !vm.busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
                                 shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Mint, contentColor = Ink)) {
                                 UiIcon("scan"); Spacer(Modifier.width(10.dp)); Text("Начать AR-осмотр")
                             }
@@ -366,7 +402,8 @@ fun App(vm: AppState) {
                     }
                     if (c.characteristics.isNotEmpty()) Panel("Технические характеристики") { Characteristics(c.characteristics) }
                     NormativeBlock(c.normative, c.usage); ResourceBlock(c.resource)
-                    SecondaryAction("Зарегистрировать осмотр оборудования", !vm.busy) { vm.inspection(true) }
+                    if (vm.can("inspect")) SecondaryAction("Зарегистрировать осмотр оборудования", !vm.busy) { vm.inspection(true) }
+                    if (vm.can("report")) ReportPanel(vm, c.id)
                 }
                 "Состав" -> {
                     val ordered = mutableListOf<Pair<Component, Int>>()
@@ -395,6 +432,27 @@ fun App(vm: AppState) {
     }
 }
 
+// Выгрузка отчёта (PDF или Excel): файл формирует сервер, место сохранения выбирает пользователь.
+@Composable fun ReportPanel(vm: AppState, equipmentId: String) {
+    val context = LocalContext.current
+    val pdf = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument("application/pdf")) { uri ->
+        if (uri != null) vm.saveReport(uri, "pdf")
+    }
+    val excel = rememberLauncherForActivityResult(ActivityResultContracts.CreateDocument(Network.XLSX)) { uri ->
+        if (uri != null) vm.saveReport(uri, "xlsx")
+    }
+    Panel("Отчёт об осмотре") {
+        Text("Паспорт, состояние узлов, параметры и история осмотров — одним файлом.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        SecondaryAction("Выгрузить отчёт в PDF", !vm.busy) { pdf.launch("otchet-$equipmentId.pdf") }
+        SecondaryAction("Выгрузить отчёт в Excel", !vm.busy) { excel.launch("otchet-$equipmentId.xlsx") }
+        val saved = vm.savedReport
+        if (saved != null) Action("Открыть сохранённый отчёт", !vm.busy) {
+            val view = Intent(Intent.ACTION_VIEW).setDataAndType(saved.uri, saved.mime).addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+            runCatching { context.startActivity(view) }.onFailure { vm.reportNotOpened() }
+        }
+    }
+}
+
 @Composable fun ComponentScreen(vm: AppState) {
     val c = vm.component ?: return
     Page {
@@ -405,7 +463,7 @@ fun App(vm: AppState) {
         NormativeBlock(c.normative, c.usage); ResourceBlock(c.resource); VisualBlock(c.visual)
         Panel("Рекомендуемые действия") { Reasons(c.attention.reasons); Field("Рекомендуемое действие", c.attention.recommended_action) }
         Parameters(vm.card?.parameters.orEmpty().filter { it.id in c.parameters })
-        Action("Зарегистрировать осмотр", !vm.busy) { vm.inspection() }
+        if (vm.can("inspect")) Action("Зарегистрировать осмотр", !vm.busy) { vm.inspection() }
         Text("Предыдущие результаты проверок", style = MaterialTheme.typography.titleLarge)
         HistoryRows(c.previous_results, vm.card?.components.orEmpty())
     }
@@ -417,7 +475,7 @@ fun App(vm: AppState) {
     var attach by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     Page {
         Text(vm.component?.name ?: vm.card?.name.orEmpty(), style = MaterialTheme.typography.titleLarge)
-        Field("Инженер", vm.engineer.ifBlank { "укажите в настройках" })
+        Field("Выполняет", vm.user?.let { it.name + " · " + it.role_name } ?: "войдите в систему")
         inspectionTypes.filterKeys { it != "replacement" || vm.component != null }.forEach { (key, title) ->
             Surface(shape = RoundedCornerShape(14.dp), color = if (type == key) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
                 border = BorderStroke(1.dp, if (type == key) Teal else MaterialTheme.colorScheme.outlineVariant)) {

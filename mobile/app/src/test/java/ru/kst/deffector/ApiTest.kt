@@ -28,6 +28,35 @@ class ApiTest {
         assertNotEquals("not_analyzed", fixture<Component>("analyze").visual.category)
         assertEquals("defect", fixture<InspectionResult>("inspection").inspection.type)
         assertTrue(fixture<History>("history").items.any { it.comment == "Тест мобильного клиента" })
+        val login = fixture<LoginResult>("login")
+        assertTrue(login.token.isNotBlank())
+        assertEquals("master", login.user.role)
+        assertEquals(listOf("view", "inspect", "report"), fixture<User>("me").permissions)
+    }
+    @Test fun tokenIsSentOnlyAfterLogin() = runBlocking {
+        MockWebServer().use { server ->
+            val health = javaClass.classLoader!!.getResource("health.json")!!.readText()
+            repeat(2) { server.enqueue(MockResponse().setHeader("Content-Type", "application/json").setBody(health)) }
+            server.start()
+            var token: String? = null
+            val api = Network.create(server.url("/").newBuilder().host("127.0.0.1").build().toString()) { token }
+            api.health()
+            assertNull(server.takeRequest(2, TimeUnit.SECONDS)!!.getHeader("Authorization"))
+            token = "abc"
+            api.health()
+            assertEquals("Bearer abc", server.takeRequest(2, TimeUnit.SECONDS)!!.getHeader("Authorization"))
+        }
+    }
+    @Test fun reportIsDownloadedAsFile() = runBlocking {
+        MockWebServer().use { server ->
+            server.enqueue(MockResponse().setHeader("Content-Type", "application/pdf").setBody("%PDF-1.4 test"))
+            server.start()
+            val api = Network.create(server.url("/").newBuilder().host("127.0.0.1").build().toString()) { "abc" }
+            assertEquals("%PDF-1.4 test", api.report("PU-001", "pdf").use { it.string() })
+            val request = server.takeRequest(2, TimeUnit.SECONDS)!!
+            assertEquals("/api/equipment/PU-001/report?format=pdf", request.path)
+            assertEquals("Bearer abc", request.getHeader("Authorization"))
+        }
     }
     @Test fun localAddressOnly() {
         listOf("http://192.168.1.2:8000", "http://172.20.10.2:8000", "http://10.0.2.2:8000").forEach { Network.address(it) }
