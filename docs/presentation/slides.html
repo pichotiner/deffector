@@ -132,7 +132,35 @@
   .s3 .cap { font-size: 13.5px; color: #8fa8c8; margin-top: 12px; }
   .phone { position: absolute; right: 70px; top: 40px; width: 306px; border: 8px solid #0a131f; border-radius: 34px; background: #0a131f; overflow: hidden;
            box-shadow: 0 0 0 2px #29415f, 0 30px 70px rgba(0,0,0,.55), 0 0 120px rgba(47,125,225,.35); height: 636px; }
-  .phone img { display: block; width: 290px; margin-top: -12px; }
+  /* экран приложения собран здесь же: интерфейс и тексты — как в приложении, в окне камеры — фото агрегата */
+  .app { width: 290px; height: 620px; background: #f4f6f7; color: #17232c; display: flex; flex-direction: column; }
+  .app .bar { height: 58px; padding: 12px 14px 0; background: #fff; display: flex; align-items: center; gap: 12px; flex: none; }
+  .app .bar .ic { font-size: 18px; color: #17232c; }
+  .app .bar b { display: block; font-size: 14.5px; font-weight: 700; color: #17232c; line-height: 1.15; }
+  .app .bar small { display: block; font-size: 10.5px; color: #66757f; }
+  .app .cam { position: relative; height: 356px; flex: none; background: #0a131f url(ar-photo.jpg) center / cover no-repeat; }
+  .app .cam::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 96px; background: linear-gradient(180deg, rgba(8,16,26,.72), rgba(8,16,26,0)); }
+  .app .cam .hint { position: absolute; left: 14px; top: 12px; right: 14px; color: #fff; }
+  .app .cam .hint b { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 700; color: #fff; }
+  .app .cam .hint b .ic { font-size: 17px; }
+  .app .cam .hint span { display: block; font-size: 10.5px; color: #d6e0ea; margin-top: 3px; }
+  .app .box { position: absolute; left: 43px; top: 86px; width: 203px; height: 148px; border: 1.5px solid rgba(255,93,110,.75); border-radius: 4px;
+              background: rgba(255,93,110,.08); }
+  .app .box i { position: absolute; width: 20px; height: 20px; border: 0 solid #ff5d6e; }
+  .app .box i:nth-child(1) { left: -3px; top: -3px; border-left-width: 4px; border-top-width: 4px; border-radius: 6px 0 0 0; }
+  .app .box i:nth-child(2) { right: -3px; top: -3px; border-right-width: 4px; border-top-width: 4px; border-radius: 0 6px 0 0; }
+  .app .box i:nth-child(3) { left: -3px; bottom: -3px; border-left-width: 4px; border-bottom-width: 4px; border-radius: 0 0 0 6px; }
+  .app .box i:nth-child(4) { right: -3px; bottom: -3px; border-right-width: 4px; border-bottom-width: 4px; border-radius: 0 0 6px 0; }
+  .app .sheet { flex: 1; margin-top: -14px; position: relative; background: #f4f6f7; border-radius: 16px 16px 0 0; padding: 16px 14px 0; }
+  .app .sheet .hd { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
+  .app .sheet .hd b { font-size: 14.5px; font-weight: 700; color: #17232c; }
+  .app .sheet .hd span { font-size: 12px; font-weight: 700; color: #0f6b63; }
+  .app .need { border: 1.5px solid #f0b9c0; background: #fff7f8; border-radius: 12px; padding: 12px 12px 13px; }
+  .app .need b { display: block; font-size: 14.5px; font-weight: 750; color: #bd2435; margin-bottom: 6px; }
+  .app .need p { font-size: 11.5px; line-height: 1.34; color: #26333c; margin: 0 0 5px; }
+  .app .need p.go { font-size: 12.5px; font-weight: 600; color: #17232c; }
+  .app .need p.act { color: #66757f; margin: 0; }
+  .app .sheet::after { content: ""; position: absolute; left: 50%; bottom: 7px; width: 92px; height: 4px; margin-left: -46px; border-radius: 2px; background: #9aa5ad; }
 
   /* ---------- архитектура ---------- */
   .perimeter { border: 2px dashed #8fb2dc; border-radius: 20px; padding: 30px 22px 20px; position: relative; background: linear-gradient(180deg, #f8fbff, #fff); }
@@ -549,10 +577,33 @@
     <svg class="ic"><use href="#i-phone"/></svg>
     <div><b>Живой показ — Павел.</b> Телефон и сервер на ПК, мобильные данные выключены. Запасной вариант — видео.</div>
   </div>
-  <p class="cap" style="position:relative">Справа — снимок экрана телефона на стенде, настоящий ИИ.</p>
+  <p class="cap" style="position:relative">Справа — экран AR-осмотра: фото агрегата из материалов кейса, рамка и текст — как на стенде.</p>
 
-  <!-- Снимок экрана телефона Павла на стенде (screen.png, 590×1280); строка состояния обрезана -->
-  <div class="phone rise" style="--d:2"><img src="screen.png" alt="Экран AR-осмотра на телефоне"></div>
+  <!-- Экран AR-осмотра собран в разметке: интерфейс и тексты — как в приложении (запись сценария, 1:07),
+       в окне камеры — фото агрегата из материалов кейса (ar-photo.jpg — вырезка из demo/reference/PU-001/case_pump_01.jpg),
+       рамка двигателя — там же, где её поставил детектор на стенде. Прежний снимок экрана — screen.png. -->
+  <div class="phone rise" style="--d:2" role="img" aria-label="Экран AR-осмотра: рамка на электродвигателе и список «Требуют проверки»">
+    <div class="app">
+      <div class="bar">
+        <svg class="ic" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
+        <div style="flex:1"><b>AR-осмотр</b><small>PU-001 · Предварительный осмотр</small></div>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M6 4v16M12 4v16M18 4v16M4 9h4M10 15h4M16 8h4"/></svg>
+      </div>
+      <div class="cam">
+        <div class="hint"><b><svg class="ic"><use href="#i-scan"/></svg>Осмотр узлов</b><span>Нажмите на метку, чтобы открыть анализ</span></div>
+        <div class="box"><i></i><i></i><i></i><i></i></div>
+      </div>
+      <div class="sheet">
+        <div class="hd"><b>Требуют проверки</b><span>Все · 10</span></div>
+        <div class="need">
+          <b>✕ Электродвигатель 5,5 кВт</b>
+          <p>Обнаружены признаки возможного дефекта: следы коррозии на корпусе</p>
+          <p class="go">Наведите камеру на электродвигатель 5,5 кВт</p>
+          <p class="act">Осмотреть корпус и лапы крепления, оценить глубину коррозии</p>
+        </div>
+      </div>
+    </div>
+  </div>
 </section>
 
 <!-- 7. Соответствие ТЗ ============================================ -->
