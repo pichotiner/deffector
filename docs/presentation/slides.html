@@ -9,6 +9,7 @@
   Показ: открыть в браузере, F — во весь экран, ← → / пробел — листать, Home / End, A — все слайды списком.
   PDF: python docs/presentation/make_pdf.py (или в Chrome: Печать → Сохранить как PDF,
   поля «Нет», «Фон» включить).
+  Постановку задачи в презентации не показываем (требование организаторов); регламент — 7 минут: 3 на показ, 4 на вопросы.
   Анимация появления работает только в показе; в PDF и в режиме «все слайды» её нет.
 -->
 <style>
@@ -383,52 +384,10 @@
   </div>
 </section>
 
-<!-- 2 ============================================================ -->
-<section class="slide">
-  <p class="kicker">1 · Задача</p>
-  <h1>Вся информация об узле — у самого узла</h1>
-  <div class="before rise" style="--d:0">
-    <span class="lbl">Сейчас инженер сам</span>
-    <span class="x">определяет оборудование</span>
-    <span class="x">ищет данные в документах</span>
-    <span class="x">осматривает на глаз</span>
-    <span class="x">пишет результат отдельно</span>
-  </div>
-  <p class="flowlbl">С Deffector — один телефон</p>
-  <div class="flow">
-    <div class="step rise" style="--d:1">
-      <div class="ico big"><svg class="ic"><use href="#i-qr"/></svg></div>
-      <h2>Определил</h2>
-      <p>QR-код, табличка, номер или фото — оборудование найдено</p>
-    </div>
-    <div class="go"><svg class="ic"><use href="#i-play"/></svg></div>
-    <div class="step rise" style="--d:2">
-      <div class="ico big"><svg class="ic"><use href="#i-card"/></svg></div>
-      <h2>Открыл карточку</h2>
-      <p>Состав, параметры с уставками, ресурс, история</p>
-    </div>
-    <div class="go"><svg class="ic"><use href="#i-play"/></svg></div>
-    <div class="step rise" style="--d:3">
-      <div class="ico big"><svg class="ic"><use href="#i-scan"/></svg></div>
-      <h2>Навёл камеру</h2>
-      <p>ИИ находит узлы; метка — цвет, причина, что делать</p>
-    </div>
-    <div class="go"><svg class="ic"><use href="#i-play"/></svg></div>
-    <div class="step rise" style="--d:4">
-      <div class="ico big"><svg class="ic"><use href="#i-check"/></svg></div>
-      <h2>Записал</h2>
-      <p>Осмотр сразу в истории оборудования</p>
-    </div>
-  </div>
-  <p class="note" style="margin-top:auto; margin-bottom:12px">Для кого: инженеры эксплуатации и сервиса — обходы, плановые осмотры, ТО.
-    Паспорта, регламенты и замеры — из материалов заказчика; учёт эксплуатации — демонстрационный.</p>
-  <div class="foot"><span>Deffector · Кибер 102</span><span>2</span></div>
-</section>
-
 <!-- 3 ============================================================ -->
 <section class="slide dark s3">
   <div class="gridbg"></div>
-  <p class="kicker" style="position:relative">2 · Сценарий</p>
+  <p class="kicker" style="position:relative">1 · Сценарий</p>
   <h1 style="position:relative">10 шагов из ТЗ — подряд на телефоне</h1>
   <div class="steps" style="position:relative">
     <div class="st rise" style="--d:0"><span class="n">1</span><div><b>Камера</b><small>приложение открывается на ней</small></div></div>
@@ -454,7 +413,7 @@
 
 <!-- 4 ============================================================ -->
 <section class="slide">
-  <p class="kicker">3 · Архитектура</p>
+  <p class="kicker">2 · Архитектура</p>
   <h1>Всё в локальной сети — данные не уходят наружу</h1>
   <div class="perimeter rise" style="--d:0">
     <span class="tag"><svg class="ic"><use href="#i-nowifi"/></svg>Локальная сеть предприятия · без выхода в интернет</span>
@@ -497,12 +456,12 @@
       <p class="note rise" style="--d:6">Запись открывается по нажатию на превью слева.</p>
     </div>
   </div>
-  <div class="foot"><span>Deffector · Кибер 102</span><span>4</span></div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>3</span></div>
 </section>
 
 <!-- 5 ============================================================ -->
 <section class="slide">
-  <p class="kicker">4 · Технологии</p>
+  <p class="kicker">3 · Технологии</p>
   <h1>Проверенные компоненты — в одном инструменте</h1>
   <div class="tech">
     <div class="tcard rise" style="--d:0; --c:#1d5fae">
@@ -519,7 +478,7 @@
     </div>
     <div class="tcard rise" style="--d:2; --c:#4a55c9">
       <div class="head"><div class="ico soft"><svg class="ic"><use href="#i-chip"/></svg></div>
-        <div><p class="who">ИИ-сервис</p><h2>Python · модели на GPU</h2></div></div>
+        <div><p class="who">ИИ-сервис</p><h2>Python · на GPU</h2></div></div>
       <div class="tags"><span>OWLv2 base</span><span>Qwen2.5-VL 7B</span><span>CLIP ViT-B/32</span><span>Ollama</span></div>
       <p class="d">Узлы по текстовым названиям без разметки, признаки и объяснение, поиск по эталонным фото</p>
     </div>
@@ -529,12 +488,12 @@
     <div><b>Ничего не обучали с нуля — собрали готовое в один инструмент</b>
       <span>Стенд: один ПК с Windows и видеокартой, запуск одной командой · телефон в той же сети Wi-Fi</span></div>
   </div>
-  <div class="foot"><span>Deffector · Кибер 102</span><span>5</span></div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>4</span></div>
 </section>
 
 <!-- 6 ============================================================ -->
 <section class="slide">
-  <p class="kicker">5 · ИИ-анализ</p>
+  <p class="kicker">4 · ИИ-анализ</p>
   <h1>ИИ находит видимое — и честно говорит, чего не знает</h1>
   <div class="pipe rise" style="--d:0">
     <div class="pc"><div class="ico soft sm"><svg class="ic"><use href="#i-scan"/></svg></div>
@@ -558,12 +517,12 @@
     <div class="stat"><b>≈ 7,8 ГБ</b><span>видеопамять, три модели</span></div>
   </div>
   <p class="guard"><b>Замеры на RTX 5070.</b> Только видимое — внутренние неисправности не утверждаются. Уверенность анализа — оценка модели, не вероятность. Модели предобученные.</p>
-  <div class="foot"><span>Deffector · Кибер 102</span><span>6</span></div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>5</span></div>
 </section>
 
 <!-- 7 ============================================================ -->
 <section class="slide">
-  <p class="kicker">6 · Расчёт ресурса</p>
+  <p class="kicker">5 · Расчёт ресурса</p>
   <h1>Норматив, расчёт, факт — три раздельных блока</h1>
   <div class="three">
     <div class="tb rise" style="--d:0">
@@ -600,12 +559,12 @@
     <div><span class="chip grey">Недостаточно данных</span></div>
   </div>
   <p class="note" style="margin-top:12px; font-size:16px">Порог «приближается» — 80 % ресурса или 30 дней до ТО. Нет норматива — пишем «недостаточно данных», ресурс не придумываем.</p>
-  <div class="foot"><span>Deffector · Кибер 102</span><span>7</span></div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>6</span></div>
 </section>
 
 <!-- 8 ============================================================ -->
 <section class="slide">
-  <p class="kicker">7 · Соответствие ТЗ</p>
+  <p class="kicker">6 · Соответствие ТЗ</p>
   <h1>Как закрываем каждый пункт ТЗ</h1>
   <div class="tiles">
     <div class="tile rise" style="--d:0"><div class="top"><div class="ico sm soft"><svg class="ic"><use href="#i-qr"/></svg></div><span class="tag">4.1</span></div>
@@ -626,12 +585,12 @@
       <h2>Локальная сеть</h2><p>Работа подтверждена участниками, сохранена запись сценария</p></div>
   </div>
   <p class="note" style="margin-top:14px">Матрица по каждому подпункту и чем он подтверждён — <b>docs/coverage.md</b> в репозитории.</p>
-  <div class="foot"><span>Deffector · Кибер 102</span><span>8</span></div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>7</span></div>
 </section>
 
 <!-- 9 ============================================================ -->
 <section class="slide">
-  <p class="kicker">8 · Ограничения и риски</p>
+  <p class="kicker">7 · Ограничения и риски</p>
   <h1>Что прототип не умеет — говорим прямо</h1>
   <div class="lgroups rise" style="--d:0">
     <div class="lg"><p class="lt">Данные</p><ul>
@@ -654,12 +613,12 @@
     <div class="ico glass"><svg class="ic"><use href="#i-shield"/></svg></div>
     <b>Предварительный осмотр: ИИ подсказывает, решение всегда за инженером</b>
   </div>
-  <div class="foot"><span>Deffector · Кибер 102</span><span>9</span></div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>8</span></div>
 </section>
 
 <!-- 10 =========================================================== -->
 <section class="slide">
-  <p class="kicker">9 · Развитие</p>
+  <p class="kicker">8 · Развитие</p>
   <h1>Что дальше</h1>
   <div class="fut">
     <div class="ft rise" style="--d:0"><div class="ico soft sm"><svg class="ic"><use href="#i-db"/></svg></div><h2>Интеграция с ТОиР и датчиками</h2><p>Без ручного ввода, отклонения сразу</p></div>
@@ -677,7 +636,7 @@
     <div class="person"><div class="av">Т</div><div><b>Тимофей</b><span>ИИ и компьютерное зрение</span></div></div>
     <div class="person thx"><div><b>Спасибо!</b><span>Ответим на вопросы</span></div></div>
   </div>
-  <div class="foot"><span>Deffector · Кибер 102</span><span>10</span></div>
+  <div class="foot"><span>Deffector · Кибер 102</span><span>9</span></div>
 </section>
 
 </div>
