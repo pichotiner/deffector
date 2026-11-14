@@ -136,7 +136,7 @@ def test_slow_analyze_does_not_hold_other_requests(fake_ai):
     """Пока ИИ анализирует узел (секунды), рамки и карточка должны отвечать сразу."""
     fake_ai.delay, fake_ai.delay_path = 1.5, "/analyze"
     done = {}
-    with TestClient(app) as shared:  # один цикл событий на все запросы, как у сервера
+    with TestClient(app, headers=dict(client.headers)) as shared:  # один цикл событий, как у сервера
         def analyze():
             done["analyze"] = shared.post("/api/equipment/PU-001/components/C-05/analyze", files=JPEG)
         t = threading.Thread(target=analyze)

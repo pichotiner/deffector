@@ -1,0 +1,17 @@
+{
+  "token": "bbx6SYjr-uvbXxexzcuOAcdSnJEs8JsD4SQYXvxZYxI",
+  "expires_at": "2026-11-15T22:02:34+03:00",
+  "user": {
+    "id": 2,
+    "email": "master@kst.local",
+    "name": "Петров П. П.",
+    "role": "master",
+    "role_name": "Мастер",
+    "active": true,
+    "permissions": [
+      "view",
+      "inspect",
+      "report"
+    ]
+  }
+}

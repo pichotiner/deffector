@@ -184,6 +184,19 @@ data class InspectionResult(
 )
 
 @Serializable
+data class LoginIn(
+    val email: String,
+    val password: String
+)
+
+@Serializable
+data class LoginResult(
+    val token: String,
+    val expires_at: String,
+    val user: User
+)
+
+@Serializable
 data class LookupResult(
     val found: Boolean,
     val equipment_id: String? = null,
@@ -253,6 +266,38 @@ data class Suggestion(
 data class Usage(
     val operating_hours: Double? = null,
     val cycles: Double? = null
+)
+
+@Serializable
+data class User(
+    val id: Int,
+    val email: String,
+    val name: String,
+    val role: String,
+    val role_name: String,
+    val active: Boolean,
+    val permissions: List<String>
+)
+
+@Serializable
+data class UserCreate(
+    val email: String,
+    val name: String,
+    val role: String,
+    val password: String
+)
+
+@Serializable
+data class UserList(
+    val items: List<User>
+)
+
+@Serializable
+data class UserUpdate(
+    val name: String? = null,
+    val role: String? = null,
+    val active: Boolean? = null,
+    val password: String? = null
 )
 
 @Serializable

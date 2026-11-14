@@ -247,6 +247,51 @@ class Health(Strict):
     time: str
 
 
+# ---------- вход, роли, учётные записи ----------
+
+Role = Literal["engineer", "master", "admin"]
+Permission = Literal["view", "inspect", "report", "users"]
+
+
+class User(Strict):
+    id: int
+    email: str
+    name: str
+    role: Role
+    role_name: str
+    active: bool
+    permissions: list[Permission]
+
+
+class LoginIn(Strict):
+    email: str
+    password: str
+
+
+class LoginResult(Strict):
+    token: str
+    expires_at: str
+    user: User
+
+
+class UserList(Strict):
+    items: list[User]
+
+
+class UserCreate(Strict):
+    email: str
+    name: str
+    role: Role
+    password: str
+
+
+class UserUpdate(Strict):
+    name: str | None = None
+    role: Role | None = None
+    active: bool | None = None
+    password: str | None = None
+
+
 class ErrorBody(Strict):
     code: str
     message: str

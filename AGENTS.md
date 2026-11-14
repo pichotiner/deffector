@@ -69,8 +69,8 @@
 ```
 python stand.py                    # стенд: ИИ-сервис + бэкенд одной командой (docs/stand.md)
 python backend/run.py              # бэкенд: установка при первом запуске и запуск
-python backend/reset_db.py         # сброс базы к демо-данным
-python backend/check_scenario.py   # проверка всех 10 шагов сценария через бэкенд
+python backend/reset_db.py         # сброс базы к демо-данным; --users — и учётных записей
+python backend/check_scenario.py   # проверка входа, всех 10 шагов сценария и отчётов через бэкенд
 cd backend && python -m pytest     # тесты бэкенда (нужен requirements-dev.txt)
 cd backend && python -m app.export_openapi   # обновить openapi.json после правки schemas.py
 python docs/presentation/make_pdf.py          # slides.html → slides.pdf (Edge или Chrome)
@@ -86,7 +86,7 @@ python docs/video/make_video.py docs/video/scenario.json   # монтаж вид
 | `TEAM_MESSAGES.md` | сообщения команды — вместо группы в Telegram |
 | `TEAM_ROLES.md` | роли |
 | `plan/` | общий план, планы ролей, `future.md` |
-| `docs/tz/` | ТЗ и уточнения организаторов |
+| `docs/tz/` | ТЗ и уточнения организаторов; `organizers-qa.md` — их ответы на вопросы команд и что по каждому сделано |
 | `docs/meeting-stage0.md` | решения этапа 0, уточнения контракта |
 | `docs/component-types.md` | словарь типов узлов (`type` = `cv_class`), дефекты из перечня заказчика |
 | `docs/case/` | материалы кейса от заказчика: паспорта, регламенты, базы вибрации и температуры, фото; опись — `README.md` |

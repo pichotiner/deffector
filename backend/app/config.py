@@ -4,6 +4,9 @@ ai_mode: "stub" — ответы ИИ берутся из заглушки, "rea
 today: null — текущая дата по Москве; "2026-11-13" — зафиксировать дату (для отладки).
 telemetry_at: какое показание из баз вибрации и температуры заказчика считать текущим
 (app/telemetry.py); действует после python backend/reset_db.py.
+auth_required: true — все запросы, кроме /api/health и входа, требуют входа пользователя;
+false — запросы без токена принимаются (запасной режим стенда для сборки приложения без входа).
+auth_token_hours: сколько часов действует вход.
 Любой ключ можно переопределить переменной окружения DEFFECTOR_<КЛЮЧ>.
 """
 
@@ -27,6 +30,8 @@ _DEFAULTS = {
     "not_inspected_days": 180,
     "today": None,
     "telemetry_at": "2026-11-13 09:00",
+    "auth_required": True,
+    "auth_token_hours": 24,
 }
 
 
@@ -38,7 +43,12 @@ def _load():
     for key, default in _DEFAULTS.items():
         env = os.environ.get(f"DEFFECTOR_{key.upper()}")
         if env is not None:
-            s[key] = type(default)(env) if isinstance(default, (int, float)) else env
+            if isinstance(default, bool):
+                s[key] = env.strip().lower() in ("1", "true", "yes", "on")
+            elif isinstance(default, (int, float)):
+                s[key] = type(default)(env)
+            else:
+                s[key] = env
     return s
 
 

@@ -207,6 +207,7 @@ def banner(port, ai_text):
     if not addrs:
         say("  [!!] ПК не подключён к сети — телефон не сможет подключиться")
     say(f"  ИИ:                  {ai_text}")
+    say("  Вход в приложении:   master@kst.local / Master-102 (другие записи — backend/README.md)")
     say("  Проверить сценарий:  python backend/check_scenario.py --image <снимок>.jpg")
     say("  Сбросить базу:       python backend/reset_db.py")
     say("  Остановить всё:      Ctrl+C в этом окне")
