@@ -12,9 +12,9 @@
 
    | Кто | Роль | План | Папки |
    |---|---|---|---|
-   | Андрей | бэкенд, данные, цифровой двойник; тимлид, презентация | [plan/andrey-backend.md](plan/andrey-backend.md) | `backend/`, `docs/`, `demo/print/` |
+   | Андрей | бэкенд, данные, цифровой двойник; презентация | [plan/andrey-backend.md](plan/andrey-backend.md) | `backend/`, `docs/`, `demo/print/` |
    | Павел | Android-приложение и AR; стенд и показ на его ПК и телефоне | [plan/pavel-mobile-ar.md](plan/pavel-mobile-ar.md) | `mobile/` |
-   | Тимофей | ИИ и компьютерное зрение | [plan/timofey-ai.md](plan/timofey-ai.md) | `ai/`, `demo/photos/`, `demo/reference/` |
+   | Тимофей | ИИ и компьютерное зрение; тимлид | [plan/timofey-ai.md](plan/timofey-ai.md) | `ai/`, `demo/photos/`, `demo/reference/` |
 
 2. **Прочитай [TEAM_MESSAGES.md](TEAM_MESSAGES.md)** — это делается всегда, без напоминаний.
    В нём обращения людей друг к другу; задачи роли — в её плане (шаг 3), их не путай
