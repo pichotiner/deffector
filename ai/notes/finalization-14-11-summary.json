@@ -1,0 +1,194 @@
+{
+  "checked_msk": "2026-11-14T11:07:39.859928+03:00",
+  "baseline_head": "de225eecdad692664471f18aa8a5955f15bb97d0",
+  "first_status_commit": "a903bc8",
+  "pull_request": {"number": 30, "url": "https://github.com/pichotiner/deffector/pull/30", "draft": true, "merged": false},
+  "ci": {"run": 43575778227, "jobs_started": false, "reason": "GitHub сообщил ограничение оплаты/лимита аккаунта; это не результат выполнения тестов", "source": "https://github.com/pichotiner/deffector/actions/runs/43575778227"},
+  "pc": "Тимофей: Windows / RTX 5070 12 ГБ",
+  "pavel_access": "not_provided",
+  "runtime_unchanged_from": "2f0e022",
+  "temporary_stand_stopped": true,
+  "own_process_tree_pid": 2512,
+  "local_ports_8000_8001_free_after_check": true,
+  "ollama_gpu": {"model": "qwen2.5vl:7b", "size_vram": 5352781249, "context_length": 4096},
+  "local_link_targets": {"checked": 56, "missing": 0, "external_urls_and_anchors_checked": false},
+  "ai_install": {
+    "mode": "full",
+    "vlm": "qwen2.5vl:7b"
+  },
+  "ai_health": {
+    "status": "ok",
+    "ready": true,
+    "stub": false,
+    "device": "cuda:0",
+    "models": {
+      "detector": {
+        "name": "owlv2",
+        "ready": true,
+        "error": null,
+        "load_seconds": 3.6
+      },
+      "vlm": {
+        "name": "qwen2.5vl:7b",
+        "ready": true,
+        "error": null,
+        "load_seconds": 1.2
+      },
+      "identifier": {
+        "name": "clip",
+        "ready": true,
+        "error": null,
+        "load_seconds": 0.4
+      }
+    },
+    "classes": [
+      "electric_motor",
+      "pressure_gauge",
+      "valve",
+      "flange"
+    ],
+    "reference_photos": {
+      "PU-001": 4,
+      "PU-002": 3
+    },
+    "gpu": {
+      "name": "NVIDIA GeForce RTX 5070",
+      "memory_total_mb": 12227,
+      "memory_used_mb": 8966
+    }
+  },
+  "backend_health": {
+    "status": "ok",
+    "mode": "real",
+    "ai": {
+      "mode": "real",
+      "status": "ok"
+    },
+    "time": "2026-11-14T10:58:31+03:00"
+  },
+  "ai_ready_seconds": 11,
+  "backend_ready_seconds": 1,
+  "scenario": {
+    "command": "python backend/check_scenario.py --image demo/reference/PU-001/case_pump_01.jpg",
+    "exit_code": 0,
+    "warnings": [],
+    "internet_available": true,
+    "detect_mean_ms": 74,
+    "detect_requests": 5,
+    "analyze_component": "N-02",
+    "analyze_seconds": 1.8,
+    "image_sha256": "0203039d25a6b2e6bea6c1226f91ff0b93c65454b8deddc4e18e1fdc5a6c908b",
+    "image_size": [
+      960,
+      545
+    ],
+    "stdout_sha256": "5b1cbe31d60083b875f52ecbff296e35615d3c7cad8cfe1bde32fdeeab581ff3"
+  },
+  "identification_originals": [
+    {
+      "source": "demo/reference/PU-001/case_pump_01.jpg",
+      "expected": "PU-001",
+      "result": {
+        "recognized": true,
+        "candidates": [
+          {
+            "equipment_id": "PU-001",
+            "name": "Насосный агрегат",
+            "confidence": 0.999
+          },
+          {
+            "equipment_id": "PU-002",
+            "name": "Насосный агрегат винтовой",
+            "confidence": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "source": "demo/reference/PU-002/ams_manual_01.jpg",
+      "expected": "PU-002",
+      "result": {
+        "recognized": true,
+        "candidates": [
+          {
+            "equipment_id": "PU-002",
+            "name": "Насосный агрегат винтовой",
+            "confidence": 0.999
+          },
+          {
+            "equipment_id": "PU-001",
+            "name": "Насосный агрегат",
+            "confidence": 0.0
+          }
+        ]
+      }
+    },
+    {
+      "source": "demo/photos/other/room_01.jpg",
+      "expected": null,
+      "result": {
+        "recognized": false,
+        "candidates": [
+          {
+            "equipment_id": "PU-001",
+            "name": "Насосный агрегат",
+            "confidence": 0.0
+          },
+          {
+            "equipment_id": "PU-002",
+            "name": "Насосный агрегат винтовой",
+            "confidence": 0.0
+          }
+        ]
+      }
+    }
+  ],
+  "demo_after_reset": {
+    "n02_visual": "possible_defect",
+    "n02_attention": "defect",
+    "n02_visual_date": "2026-11-12T16:20:00+03:00",
+    "c03_used_percent": 89
+  },
+  "sheet9_original": {
+    "category": "no_visible_issues",
+    "attention": "unknown",
+    "resource": "insufficient_data",
+    "note": "Отсутствие видимых дефектов не подтверждает исправность оборудования"
+  },
+  "db_final": {
+    "equipment": 2,
+    "component": 20,
+    "inspection": 13,
+    "visual_result": 3,
+    "check_scenario_records": 0
+  },
+  "tests": {
+    "tests": 157,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "passed": 157,
+    "verified_code_commit": "11992ac",
+    "tested_code_unchanged": true,
+    "repeated": false
+  },
+  "offline_acceptance": {
+    "status": "accepted_by_timofey",
+    "accepted_msk": "2026-11-14T13:00:00+03:00",
+    "sources": ["Сообщение Павла 14.11, 12:34", "Подтверждения Тимофея в текущей сессии", "ai/notes/pavel-video-14-11-review.md"],
+    "video_recorded": true,
+    "source_delivered_to_andrey": true,
+    "cold_reboot_visible_in_uploaded_video": false,
+    "separate_cold_reboot_proof_required_for_submission": false,
+    "additional_cold_run_on_timofey_pc_required": false
+  },
+  "call_schedule": {"date": "2026-11-14", "after_msk": "18:00", "exact_time": null},
+  "not_confirmed": [
+    "Сценарий на телефоне Павла",
+    "Эталоны и контрольные кадры с телефона",
+    "Скорость на ПК Павла при звонке и трансляции",
+    "Окончательный коммит на ПК Павла",
+    "Личное чтение речи и независимый просмотр разметки человеком"
+  ],
+  "raw_evidence": "runs/finalization-14-11/ (локально, не включается в git)"
+}

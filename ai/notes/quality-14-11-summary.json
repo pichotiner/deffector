@@ -1,0 +1,456 @@
+{
+  "base_commit": "2f0e02269f25132d2bedacbfd5b963a89373fb2b",
+  "branch_commit": "eb84205191e8ae0fdd5141e16431e4ea6f4c53b9",
+  "decision": "rejected",
+  "final_tests": {"passed": 138, "failed": 0, "temporary_directory": "Новая уникальная папка в LOCALAPPDATA/Temp/opencode; стандартная папка pytest недоступна"},
+  "environment": {
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "torch": "2.11.0+cu128",
+    "transformers": "5.22.2",
+    "ollama_version": {
+      "version": "0.40.16"
+    },
+    "gpu": "NVIDIA GeForce RTX 5070 12 GB",
+    "vlm": {
+      "name": "qwen2.5vl:7b",
+      "model": "qwen2.5vl:7b",
+      "modified_at": "2026-11-13T18:19:18.0193457+03:00",
+      "size": 5969245856,
+      "digest": "5ced39dfa4bac325dc183dd1e4febaa1c46b3ea28bce48896c8e69c1e79611cc",
+      "details": {
+        "parent_model": "",
+        "format": "gguf",
+        "family": "qwen25vl",
+        "families": [
+          "qwen25vl"
+        ],
+        "parameter_size": "8.3B",
+        "quantization_level": "Q4_K_M",
+        "context_length": 128000,
+        "embedding_length": 3584,
+        "runner": "ggml"
+      },
+      "capabilities": [
+        "completion",
+        "vision"
+      ]
+    },
+    "classes": {
+      "electric_motor": {
+        "name": "Электродвигатель",
+        "prompts": [
+          "a photo of an electric motor"
+        ],
+        "threshold": 0.22
+      },
+      "pressure_gauge": {
+        "name": "Манометр",
+        "prompts": [
+          "a photo of a pressure gauge"
+        ],
+        "threshold": 0.27
+      },
+      "valve": {
+        "name": "Запорная арматура",
+        "prompts": [
+          "a photo of a gate valve",
+          "a photo of a ball valve"
+        ],
+        "threshold": 0.33
+      },
+      "flange": {
+        "name": "Фланцевое соединение",
+        "prompts": [
+          "a photo of a pipe flange",
+          "a photo of a flanged joint"
+        ],
+        "threshold": 0.3
+      }
+    }
+  },
+  "suites": {
+    "quality": {
+      "before": {
+        "requests": 63,
+        "median_s": 1.2475253999996312,
+        "max_s": 2.15572259999999,
+        "wrong_type_requests": 27,
+        "wrong_type_with_signs": 18,
+        "wrong_type_green": 3,
+        "explicit_type_rejections": 0
+      },
+      "after": {
+        "requests": 63,
+        "median_s": 1.1716141000001699,
+        "max_s": 1.941338000000087,
+        "wrong_type_requests": 27,
+        "wrong_type_with_signs": 9,
+        "wrong_type_green": 0,
+        "explicit_type_rejections": 18
+      }
+    },
+    "quality_chain": {
+      "before": {
+        "requests": 9,
+        "median_s": 0.9431996999996954,
+        "max_s": 1.6841622000001735,
+        "wrong_type_requests": 6,
+        "wrong_type_with_signs": 6,
+        "wrong_type_green": 0,
+        "explicit_type_rejections": 0
+      },
+      "after": {
+        "requests": 9,
+        "median_s": 1.2429898000000321,
+        "max_s": 1.9008559999997487,
+        "wrong_type_requests": 6,
+        "wrong_type_with_signs": 0,
+        "wrong_type_green": 0,
+        "explicit_type_rejections": 6
+      }
+    },
+    "quality_sim": {
+      "before": {
+        "requests": 57,
+        "median_s": 1.2171069999999418,
+        "max_s": 1.8016065000001618,
+        "wrong_type_requests": 27,
+        "wrong_type_with_signs": 14,
+        "wrong_type_green": 0,
+        "explicit_type_rejections": 0
+      },
+      "after": {
+        "requests": 57,
+        "median_s": 1.1733209999997598,
+        "max_s": 1.8215614999999161,
+        "wrong_type_requests": 27,
+        "wrong_type_with_signs": 6,
+        "wrong_type_green": 0,
+        "explicit_type_rejections": 10
+      }
+    }
+  },
+  "disputed": {
+    "before": [
+      {
+        "source": "pump_unit_01.jpg",
+        "repeat": 0,
+        "category": "no_visible_issues",
+        "signs": []
+      },
+      {
+        "source": "pump_unit_01.jpg",
+        "repeat": 1,
+        "category": "no_visible_issues",
+        "signs": []
+      },
+      {
+        "source": "pump_unit_01.jpg",
+        "repeat": 2,
+        "category": "no_visible_issues",
+        "signs": []
+      },
+      {
+        "source": "../../docs/case/Запорная арматура/1396430378_7447321.jpg",
+        "repeat": 0,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия",
+          "течь/подтёки"
+        ]
+      },
+      {
+        "source": "../../docs/case/Запорная арматура/1396430378_7447321.jpg",
+        "repeat": 1,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия",
+          "механическое повреждение"
+        ]
+      },
+      {
+        "source": "../../docs/case/Запорная арматура/1396430378_7447321.jpg",
+        "repeat": 2,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия",
+          "механическое повреждение"
+        ]
+      },
+      {
+        "source": "../../docs/case/ЭД/65d7bec338d641b8ab2a8718af266a74.png",
+        "repeat": 0,
+        "category": "possible_defect",
+        "signs": [
+          "следы перегрева",
+          "механическое повреждение"
+        ]
+      },
+      {
+        "source": "../../docs/case/ЭД/65d7bec338d641b8ab2a8718af266a74.png",
+        "repeat": 1,
+        "category": "possible_defect",
+        "signs": [
+          "следы перегрева",
+          "механическое повреждение"
+        ]
+      },
+      {
+        "source": "../../docs/case/ЭД/65d7bec338d641b8ab2a8718af266a74.png",
+        "repeat": 2,
+        "category": "possible_defect",
+        "signs": [
+          "следы перегрева",
+          "механическое повреждение"
+        ]
+      },
+      {
+        "source": "../../docs/case/Насосные агрегаты/td_010_02.png",
+        "repeat": 0,
+        "category": "possible_defect",
+        "signs": [
+          "механическое повреждение"
+        ]
+      },
+      {
+        "source": "../../docs/case/Насосные агрегаты/td_010_02.png",
+        "repeat": 1,
+        "category": "possible_defect",
+        "signs": [
+          "механическое повреждение"
+        ]
+      },
+      {
+        "source": "../../docs/case/Насосные агрегаты/td_010_02.png",
+        "repeat": 2,
+        "category": "possible_defect",
+        "signs": [
+          "механическое повреждение"
+        ]
+      }
+    ],
+    "after": [
+      {
+        "source": "pump_unit_01.jpg",
+        "repeat": 0,
+        "category": "check_recommended",
+        "signs": []
+      },
+      {
+        "source": "pump_unit_01.jpg",
+        "repeat": 1,
+        "category": "check_recommended",
+        "signs": []
+      },
+      {
+        "source": "pump_unit_01.jpg",
+        "repeat": 2,
+        "category": "check_recommended",
+        "signs": []
+      },
+      {
+        "source": "../../docs/case/Запорная арматура/1396430378_7447321.jpg",
+        "repeat": 0,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия"
+        ]
+      },
+      {
+        "source": "../../docs/case/Запорная арматура/1396430378_7447321.jpg",
+        "repeat": 1,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия"
+        ]
+      },
+      {
+        "source": "../../docs/case/Запорная арматура/1396430378_7447321.jpg",
+        "repeat": 2,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия"
+        ]
+      },
+      {
+        "source": "../../docs/case/ЭД/65d7bec338d641b8ab2a8718af266a74.png",
+        "repeat": 0,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия",
+          "механическое повреждение"
+        ]
+      },
+      {
+        "source": "../../docs/case/ЭД/65d7bec338d641b8ab2a8718af266a74.png",
+        "repeat": 1,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия",
+          "механическое повреждение"
+        ]
+      },
+      {
+        "source": "../../docs/case/ЭД/65d7bec338d641b8ab2a8718af266a74.png",
+        "repeat": 2,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия",
+          "механическое повреждение"
+        ]
+      },
+      {
+        "source": "../../docs/case/Насосные агрегаты/td_010_02.png",
+        "repeat": 0,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия"
+        ]
+      },
+      {
+        "source": "../../docs/case/Насосные агрегаты/td_010_02.png",
+        "repeat": 1,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия"
+        ]
+      },
+      {
+        "source": "../../docs/case/Насосные агрегаты/td_010_02.png",
+        "repeat": 2,
+        "category": "possible_defect",
+        "signs": [
+          "коррозия"
+        ]
+      }
+    ]
+  },
+  "boxes": {
+    "labels_sha256": "299b72837c62e6deb6715a84e41c637edcb0dc6b33e6372a442a26b1ab50e971",
+    "metrics": {
+      "electric_motor": {
+        "tp": 5,
+        "fp": 1,
+        "fn": 1,
+        "precision": 0.8333333333333334,
+        "recall": 0.8333333333333334
+      },
+      "pressure_gauge": {
+        "tp": 1,
+        "fp": 2,
+        "fn": 2,
+        "precision": 0.3333333333333333,
+        "recall": 0.3333333333333333
+      },
+      "valve": {
+        "tp": 0,
+        "fp": 3,
+        "fn": 5,
+        "precision": 0.0,
+        "recall": 0.0
+      },
+      "flange": {
+        "tp": 3,
+        "fp": 5,
+        "fn": 4,
+        "precision": 0.375,
+        "recall": 0.42857142857142855
+      }
+    },
+    "splits": {
+      "tune": {
+        "electric_motor": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "pressure_gauge": {
+          "tp": 1,
+          "fp": 0,
+          "fn": 0,
+          "precision": 1.0,
+          "recall": 1.0
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null
+        },
+        "flange": {
+          "tp": 0,
+          "fp": 0,
+          "fn": 0,
+          "precision": null,
+          "recall": null
+        }
+      },
+      "control": {
+        "electric_motor": {
+          "tp": 4,
+          "fp": 1,
+          "fn": 1,
+          "precision": 0.8,
+          "recall": 0.8
+        },
+        "pressure_gauge": {
+          "tp": 0,
+          "fp": 2,
+          "fn": 2,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "valve": {
+          "tp": 0,
+          "fp": 3,
+          "fn": 5,
+          "precision": 0.0,
+          "recall": 0.0
+        },
+        "flange": {
+          "tp": 3,
+          "fp": 5,
+          "fn": 4,
+          "precision": 0.375,
+          "recall": 0.42857142857142855
+        }
+      }
+    }
+  },
+  "limitations": [
+    "Нужен независимый просмотр границ разметки человеком.",
+    "Это не замеры на ПК/телефоне Павла и не холодный старт без сети.",
+    "Подробные ответы и изображения остались локально в runs/.",
+    "Вариант не устранил анализ манометра как двигателя и ухудшил чистые кадры и ожидаемый признак механического повреждения."
+  ],
+  "full_analysis": {
+    "before": {
+      "analyzed": 35,
+      "defects": 31,
+      "defect_green": 0,
+      "expected_sign_passed": 30,
+      "clean": 4,
+      "clean_green": 3,
+      "clean_possible_defect": 0,
+      "missed_sign_files": [
+        "../../docs/case/Запорная арматура/1396430378_7447321.jpg"
+      ]
+    },
+    "after": {
+      "analyzed": 35,
+      "defects": 31,
+      "defect_green": 0,
+      "expected_sign_passed": 29,
+      "clean": 4,
+      "clean_green": 0,
+      "clean_possible_defect": 0,
+      "missed_sign_files": [
+        "../../docs/case/Запорная арматура/1396430378_7447321.jpg",
+        "../../docs/case/Насосные агрегаты/td_010_02.png"
+      ]
+    }
+  }
+}

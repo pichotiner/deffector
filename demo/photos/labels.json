@@ -1,0 +1,503 @@
+{
+ "_comment": "Разметка тестового набора для ai/tools/evaluate.py. Ключ — путь к фото относительно demo/photos (фото заказчика лежат в docs/case). nodes — сколько узлов каждого типа видно на фото; skip — типы, которые на этом фото не считаем (их много или они спорные). analyze — проверка оценки дефектов: signs — ожидаемые признаки (corrosion, leak, mechanical_damage, overheating — только для электродвигателя); пустой список — ожидается «видимых проблем не обнаружено»; any_sign — достаточно любого из перечисленных.",
+ "photos": {
+  "pump_unit_01.jpg": {
+   "nodes": {
+    "electric_motor": 1,
+    "flange": 2
+   },
+   "analyze": {
+    "component_type": "electric_motor",
+    "component_name": "Электродвигатель насоса",
+    "signs": []
+   }
+  },
+  "pump_room_01.jpg": {
+   "nodes": {
+    "electric_motor": 2
+   }
+  },
+  "pump_unit_drawing_01.jpg": {
+   "nodes": {
+    "electric_motor": 1,
+    "flange": 2
+   }
+  },
+  "motor_corrosion_01.jpg": {
+   "nodes": {
+    "electric_motor": 1
+   },
+   "analyze": {
+    "component_type": "electric_motor",
+    "component_name": "Электродвигатель вентилятора",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "gauge_clean_01.jpg": {
+   "nodes": {
+    "pressure_gauge": 1
+   },
+   "analyze": {
+    "component_type": "pressure_gauge",
+    "component_name": "Манометр воздушной магистрали",
+    "signs": []
+   }
+  },
+  "gauge_clean_02.jpg": {
+   "nodes": {
+    "pressure_gauge": 1
+   },
+   "analyze": {
+    "component_type": "pressure_gauge",
+    "component_name": "Манометр тормозной магистрали",
+    "signs": []
+   }
+  },
+  "gauge_corrosion_01.jpg": {
+   "nodes": {
+    "pressure_gauge": 1
+   },
+   "analyze": {
+    "component_type": "pressure_gauge",
+    "component_name": "Манометр",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "valve_ball_01.jpg": {
+   "nodes": {
+    "valve": 1,
+    "pressure_gauge": 1
+   },
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Шаровой кран",
+    "signs": []
+   }
+  },
+  "valve_gate_01.jpg": {
+   "nodes": {
+    "valve": 2
+   }
+  },
+  "valve_leak_01.jpg": {
+   "nodes": {
+    "valve": 1
+   },
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Вентиль под мойкой",
+    "signs": [
+     "corrosion",
+     "leak"
+    ],
+    "any_sign": true
+   }
+  },
+  "flange_corrosion_01.jpg": {
+   "nodes": {
+    "flange": 1
+   },
+   "analyze": {
+    "component_type": "flange",
+    "component_name": "Фланцевое соединение",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "flange_corrosion_02.jpg": {
+   "nodes": {
+    "flange": 1
+   },
+   "analyze": {
+    "component_type": "flange",
+    "component_name": "Фланцевое соединение",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "other/room_01.jpg": {
+   "nodes": {}
+  },
+  "other/car_01.jpg": {
+   "nodes": {}
+  },
+  "../../docs/case/Насосные агрегаты/2c510abd88b648efb8841d297d432aee.png": {
+   "nodes": {
+    "electric_motor": 1
+   },
+   "skip": [
+    "valve",
+    "flange",
+    "pressure_gauge"
+   ],
+   "analyze": {
+    "component_type": "electric_motor",
+    "component_name": "Электродвигатель насосного агрегата",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Насосные агрегаты/насос.jpg": {
+   "nodes": {
+    "electric_motor": 1
+   },
+   "skip": [
+    "valve",
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "electric_motor",
+    "component_name": "Электродвигатель насосного агрегата",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Насосные агрегаты/photo_2026-11-13_12-46-46.jpg": {
+   "nodes": {
+    "valve": 2
+   },
+   "skip": [
+    "flange",
+    "electric_motor"
+   ]
+  },
+  "../../docs/case/Насосные агрегаты/obsledovanie-hvs-gvs-2.jpg": {
+   "nodes": {
+    "valve": 1
+   },
+   "skip": [
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Задвижка",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Запорная арматура/0831c2a9-3a2b-5bf7-b70f-05f1d51f5cdb (1).jpg": {
+   "nodes": {
+    "valve": 1
+   },
+   "skip": [
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Задвижка",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Запорная арматура/0831c2a9-3a2b-5bf7-b70f-05f1d51f5cdb.jpg": {
+   "nodes": {
+    "valve": 1
+   },
+   "skip": [
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Задвижка",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Запорная арматура/cca9d029-459e-5007-8f88-181843ed8665.jpg": {
+   "nodes": {
+    "valve": 1
+   },
+   "skip": [
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Шаровой кран",
+    "signs": [
+     "leak"
+    ]
+   }
+  },
+  "../../docs/case/Запорная арматура/Безымянный.png": {
+   "nodes": {
+    "valve": 1
+   },
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Вентиль",
+    "signs": [
+     "corrosion",
+     "leak",
+     "mechanical_damage"
+    ],
+    "any_sign": true
+   }
+  },
+  "../../docs/case/Запорная арматура/i.jpg": {
+   "nodes": {
+    "valve": 1
+   },
+   "skip": [
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Задвижка",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Запорная арматура/86.PNG": {
+   "nodes": {
+    "valve": 1
+   },
+   "skip": [
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Дисковый затвор",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Трубопровод/stock-photo-corroded-industrial-water-pump-flange-joint-covered-in-heavy-mineral-salt-2840981719.jpg": {
+   "nodes": {
+    "valve": 1
+   },
+   "skip": [
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Задвижка",
+    "signs": [
+     "leak",
+     "corrosion"
+    ],
+    "any_sign": true
+   }
+  },
+  "../../docs/case/Запорная арматура/1396430378_7447321.jpg": {
+   "nodes": {},
+   "skip": [
+    "valve",
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "valve",
+    "component_name": "Корпус арматуры",
+    "signs": [
+     "mechanical_damage"
+    ]
+   }
+  },
+  "../../docs/case/Трубопровод/stock-photo-corroded-flanged-joint-with-peeling-paint-and-oxidation-2738414417.jpg": {
+   "nodes": {
+    "flange": 1
+   },
+   "analyze": {
+    "component_type": "flange",
+    "component_name": "Фланцевое соединение",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Трубопровод/stock-photo-rusty-industrial-pipe-and-flange-connection-this-rusty-industrial-pipe-and-flange-connection-2733059369.jpg": {
+   "nodes": {
+    "flange": 1
+   },
+   "analyze": {
+    "component_type": "flange",
+    "component_name": "Фланцевое соединение",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Трубопровод/unnamed.jpg": {
+   "nodes": {
+    "flange": 1
+   },
+   "analyze": {
+    "component_type": "flange",
+    "component_name": "Фланцевое соединение",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Запорная арматура/IMG_20261113_142550.jpg": {
+   "nodes": {
+    "flange": 1
+   },
+   "skip": [
+    "valve"
+   ],
+   "analyze": {
+    "component_type": "flange",
+    "component_name": "Фланцевое соединение",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/Трубопровод/1corrsia.jpg": {
+   "nodes": {
+    "flange": 1
+   },
+   "analyze": {
+    "component_type": "flange",
+    "component_name": "Фланцевое соединение",
+    "signs": [
+     "leak"
+    ]
+   }
+  },
+  "../../docs/case/ЭД/81316b33970247cdbc980ceccd88cb9a.png": {
+   "nodes": {
+    "electric_motor": 1
+   },
+   "analyze": {
+    "component_type": "electric_motor",
+    "component_name": "Электродвигатель",
+    "signs": [
+     "corrosion"
+    ]
+   }
+  },
+  "../../docs/case/ЭД/65d7bec338d641b8ab2a8718af266a74.png": {
+   "nodes": {
+    "electric_motor": 1
+   },
+   "analyze": {
+    "component_type": "electric_motor",
+    "component_name": "Электродвигатель",
+    "signs": [
+     "mechanical_damage"
+    ]
+   }
+  },
+  "../../docs/case/Насосные агрегаты/td_010_02.png": {
+   "nodes": {},
+   "skip": [
+    "electric_motor",
+    "valve",
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "pump",
+    "component_name": "Корпус агрегата",
+    "signs": [
+     "mechanical_damage"
+    ]
+   }
+  },
+  "../../docs/case/Насосные агрегаты/60cb39e72d7e4bc38d47e945b66900f8.png": {
+   "nodes": {},
+   "skip": [
+    "electric_motor",
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "pump",
+    "component_name": "Узел уплотнения вала насоса",
+    "signs": [
+     "leak"
+    ]
+   }
+  },
+  "../../docs/case/Трубопровод/IMG_20261113_143116.jpg": {
+   "nodes": {},
+   "analyze": {
+    "component_type": "pipeline",
+    "component_name": "Трубопровод",
+    "signs": [
+     "mechanical_damage"
+    ]
+   }
+  },
+  "../../docs/case/Трубопровод/IMG_20261113_143112.jpg": {
+   "nodes": {},
+   "analyze": {
+    "component_type": "pipeline",
+    "component_name": "Трубопровод",
+    "signs": [
+     "mechanical_damage"
+    ]
+   }
+  },
+  "../../docs/case/Трубопровод/korroziya.png": {
+   "nodes": {},
+   "analyze": {
+    "component_type": "pipeline",
+    "component_name": "Трубопровод",
+    "signs": [
+     "corrosion",
+     "mechanical_damage"
+    ],
+    "any_sign": true
+   }
+  },
+  "../../docs/case/Насосные агрегаты/16c811b0db124c77b276a1a06bc1d3fb.png": {
+   "nodes": {},
+   "skip": [
+    "electric_motor"
+   ],
+   "analyze": {
+    "component_type": "electric_motor",
+    "component_name": "Клеммная коробка электродвигателя",
+    "signs": [
+     "overheating",
+     "mechanical_damage",
+     "corrosion"
+    ],
+    "any_sign": true
+   }
+  },
+  "../../docs/case/Насосные агрегаты/photo_2026-11-13_12-48-02.jpg": {
+   "nodes": {},
+   "skip": [
+    "electric_motor"
+   ],
+   "analyze": {
+    "component_type": "electric_motor",
+    "component_name": "Клеммная коробка электродвигателя",
+    "signs": [
+     "overheating",
+     "mechanical_damage",
+     "corrosion"
+    ],
+    "any_sign": true
+   }
+  },
+  "../../docs/case/Насосные агрегаты/Сниимок.PNG": {
+   "nodes": {},
+   "skip": [
+    "electric_motor",
+    "flange"
+   ],
+   "analyze": {
+    "component_type": "electric_motor",
+    "component_name": "Электродвигатель",
+    "signs": [
+     "overheating"
+    ]
+   }
+  }
+ }
+}

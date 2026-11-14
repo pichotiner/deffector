@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "source": "Ручная визуальная разметка исходников 14.11, без подбора по рамкам детектора. Пути от корня репозитория. Не кадры телефона. Правила — README.md рядом.",
+  "frames": {
+    "sheet01": {
+      "file": "demo/photos/pump_unit_drawing_01.jpg", "group": "drawing", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
+      "objects": [
+        {"cv_class": "electric_motor", "bbox": [0.045, 0.095, 0.43, 0.63]},
+        {"cv_class": "flange", "bbox": [0.675, 0.0, 0.155, 0.275]},
+        {"cv_class": "flange", "bbox": [0.86, 0.28, 0.14, 0.33]}
+      ],
+      "note": "Полумуфта между валами — не трубный фланец; рамка фланца на ней считается FP."
+    },
+    "sheet09": {
+      "file": "demo/photos/pump_unit_01.jpg", "group": "clean_pump", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
+      "objects": [
+        {"cv_class": "electric_motor", "bbox": [0.57, 0.035, 0.405, 0.665]},
+        {"cv_class": "flange", "bbox": [0.057, 0.46, 0.1, 0.235]},
+        {"cv_class": "flange", "bbox": [0.085, 0.325, 0.18, 0.09]}
+      ]
+    },
+    "sheet02": {
+      "file": "demo/photos/pump_room_01.jpg", "group": "pump_room", "split": "control",
+      "evaluated_classes": ["electric_motor"],
+      "objects": [
+        {"cv_class": "electric_motor", "bbox": [0.215, 0.4, 0.22, 0.3]},
+        {"cv_class": "electric_motor", "bbox": [0.625, 0.39, 0.225, 0.31]}
+      ],
+      "note": "Арматура и фланцы на заднем плане не размечены целиком; их предсказания не считаются ни TP, ни FP."
+    },
+    "sheet03": {
+      "file": "demo/photos/motor_corrosion_01.jpg", "group": "rusty_motor", "split": "tune",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
+      "objects": [{"cv_class": "electric_motor", "bbox": [0.285, 0.0, 0.455, 0.79]}]
+    },
+    "sheet04": {
+      "file": "demo/photos/gauge_corrosion_01.jpg", "group": "rusty_gauge", "split": "tune",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
+      "objects": [{"cv_class": "pressure_gauge", "bbox": [0.21, 0.205, 0.595, 0.485]}]
+    },
+    "gauge_clean01": {
+      "file": "demo/photos/gauge_clean_01.jpg", "group": "clean_gauge01", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
+      "objects": [{"cv_class": "pressure_gauge", "bbox": [0.365, 0.235, 0.265, 0.35]}]
+    },
+    "gauge_clean02": {
+      "file": "demo/photos/gauge_clean_02.jpg", "group": "clean_gauge02", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
+      "objects": [{"cv_class": "pressure_gauge", "bbox": [0.36, 0.25, 0.34, 0.355]}],
+      "ignore_regions": [{"cv_class": "pressure_gauge", "bbox": [0.26, 0.0, 0.44, 0.13], "reason": "Фрагмент второго прибора у края, шкала и корпус не видны целиком"}]
+    },
+    "valve_ball": {
+      "file": "demo/photos/valve_ball_01.jpg", "group": "ball_valve", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
+      "objects": [{"cv_class": "valve", "bbox": [0.3, 0.33, 0.435, 0.515]}],
+      "ignore_regions": [{"cv_class": "pressure_gauge", "bbox": [0.0, 0.0, 0.3, 0.43], "reason": "Частично обрезанный и размытый манометр, исключён из подсчёта"}],
+      "note": "Резьбовые накидные гайки не являются трубными фланцами."
+    },
+    "valve_gate": {
+      "file": "demo/photos/valve_gate_01.jpg", "group": "gate_valves", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve"],
+      "objects": [
+        {"cv_class": "valve", "bbox": [0.53, 0.19, 0.16, 0.505]},
+        {"cv_class": "valve", "bbox": [0.285, 0.5, 0.27, 0.2]}
+      ],
+      "note": "Фланцы здесь не размечены целиком и не оцениваются."
+    },
+    "sheet05": {
+      "file": "demo/photos/flange_corrosion_02.jpg", "group": "rusty_flange", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
+      "objects": [{"cv_class": "flange", "bbox": [0.0, 0.44, 1.0, 0.56]}],
+      "ignore_regions": [{"cv_class": "flange", "bbox": [0.72, 0.0, 0.28, 0.44], "reason": "Размытый фланец на заднем плане, исключён из подсчёта"}],
+      "note": "Эталон — видимая часть большой торцевой плиты, не отдельные болты."
+    },
+    "butterfly": {
+      "file": "docs/case/Запорная арматура/86.PNG", "group": "butterfly", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
+      "objects": [{"cv_class": "valve", "bbox": [0.0, 0.0, 1.0, 0.965]}],
+      "note": "Межфланцевый дисковый затвор: диск и проушины, не циферблат и не фланец трубопровода."
+    },
+    "sheet08": {
+      "file": "docs/case/Насосные агрегаты/photo_2026-11-13_12-48-02.jpg", "group": "terminal_box", "split": "control",
+      "evaluated_classes": ["pressure_gauge", "valve", "flange"], "objects": [],
+      "note": "Видна клеммная коробка как часть двигателя. Границы целого двигателя не видны: electric_motor не оценивается, это не отрицательный пример двигателя."
+    },
+    "referenceE1": {
+      "file": "demo/reference/PU-001/case_pump_01.jpg", "group": "reference_pump", "split": "control",
+      "evaluated_classes": ["electric_motor"],
+      "objects": [{"cv_class": "electric_motor", "bbox": [0.195, 0.23, 0.3, 0.425]}],
+      "note": "Другие типы на заднем плане не размечены целиком; в их метриках этот кадр не участвует."
+    },
+    "other_room": {
+      "file": "demo/photos/other/room_01.jpg", "group": "room", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"], "objects": []
+    },
+    "other_car": {
+      "file": "demo/photos/other/car_01.jpg", "group": "car", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"], "objects": [],
+      "note": "Видимые автомобильные приборы не размечаются как промышленные манометры; подкaпотная область закрыта."
+    },
+    "sheet06": {
+      "file": "docs/case/Запорная арматура/cca9d029-459e-5007-8f88-181843ed8665.jpg", "group": "leaking_valve", "split": "control",
+      "evaluated_classes": ["electric_motor", "pressure_gauge", "valve", "flange"],
+      "objects": [
+        {"cv_class": "valve", "bbox": [0.305, 0.055, 0.47, 0.71]},
+        {"cv_class": "flange", "bbox": [0.145, 0.315, 0.1, 0.455]},
+        {"cv_class": "flange", "bbox": [0.565, 0.31, 0.12, 0.475]}
+      ]
+    }
+  }
+}

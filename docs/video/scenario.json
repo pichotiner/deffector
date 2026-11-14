@@ -1,0 +1,24 @@
+{
+  "_": "Полное видео сценария. Вписать имена записей и время каждой вырезки (в записи экрана), затем: python docs/video/make_video.py docs/video/scenario.json",
+  "output": "../../demo/video/scenario.mp4",
+  "title": {"text": "Deffector", "sub": "AR-помощник инженера · локальная сеть, без интернета", "seconds": 3},
+  "clips": [
+    {"phone": "raw/phone.mp4", "side": "raw/side.mp4", "side_shift": 0, "from": "0:00", "to": "0:05",
+     "caption": "1. Запуск — сразу камера"},
+    {"phone": "raw/phone.mp4", "side": "raw/side.mp4", "side_shift": 0, "from": "0:05", "to": "0:20",
+     "caption": "2. Идентификация: QR, маркировка, серийный номер, фото, ручной выбор"},
+    {"phone": "raw/phone.mp4", "from": "0:20", "to": "0:38",
+     "caption": "3. Цифровая карточка и сигнализация по отклонениям"},
+    {"phone": "raw/phone.mp4", "from": "0:38", "to": "0:52",
+     "caption": "4–5. Узлы, требующие проверки, и подсказка"},
+    {"phone": "raw/phone.mp4", "side": "raw/side.mp4", "side_shift": 0, "from": "0:52", "to": "1:15",
+     "caption": "6, 8. Узлы в кадре и метки с причинами"},
+    {"phone": "raw/phone.mp4", "side": "raw/side.mp4", "side_shift": 0, "from": "1:15", "to": "1:45",
+     "caption": "6. ИИ-анализ видимых признаков"},
+    {"phone": "raw/phone.mp4", "from": "1:45", "to": "2:10",
+     "caption": "7, 9. Сопоставление с ресурсом и историей"},
+    {"phone": "raw/phone.mp4", "from": "2:10", "to": "2:35",
+     "caption": "10. Фиксация результата осмотра"}
+  ],
+  "final": {"text": "Все 10 шагов ТЗ", "sub": "работает без интернета", "seconds": 3}
+}

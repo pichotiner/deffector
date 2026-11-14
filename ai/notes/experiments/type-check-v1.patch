@@ -1,0 +1,83 @@
+--- a/ai/app/analyzer.py
++++ b/ai/app/analyzer.py
+@@ -21,0 +22 @@
++        "type_match": {"type": "string", "enum": ["matched", "mismatch", "uncertain"]},
+@@ -29 +30 @@
+-    "required": ["explanation", "image_quality", "signs", "category", "recommendation", "assessment_confidence"],
++    "required": ["type_match", "explanation", "image_quality", "signs", "category", "recommendation", "assessment_confidence"],
+@@ -33,0 +35,10 @@
++
++Перед оценкой проверь, соответствует ли видимый объект предполагаемому типу и выбранному узлу.
++Переданные название и тип — предположение пользователя, а не установленный факт.
++Внутреннее поле type_match:
++- "matched" — выбранный узел действительно различим; видимая часть узла (например, клеммная \
++коробка электродвигателя) также допустима. Другие объекты рядом не мешают соответствию;
++- "mismatch" — на снимке явно другой объект, а выбранного узла не видно;
++- "uncertain" — по видимой области определить соответствие нельзя.
++При mismatch или uncertain не приписывай признаки выбранному узлу: signs — [], \
++category — "check_recommended"; предложи уточнить выбор или переснять.
+@@ -43,0 +55 @@
++- type_match: "matched", "mismatch" или "uncertain", по правилам выше;
+@@ -67,2 +79,2 @@
+-        f"Узел: {component_name}. Тип узла: {component_type_name}. "
+-        "Оцени видимые признаки на снимке и ответь в формате JSON."
++        f"Выбранный узел: {component_name}. Предполагаемый тип: {component_type_name}. "
++        "Сначала проверь соответствие объекта выбранному узлу, затем оцени его видимые признаки. Ответь в формате JSON."
+@@ -157 +169,14 @@
+-                return rules.enforce(rules.parse_model_answer(raw), name, component_type)
++                assessment = rules.parse_model_answer(raw)
++                if assessment.image_quality == "poor":
++                    return rules.enforce(assessment, name, component_type)
++                match = raw.get("type_match")
++                if not isinstance(match, str) or match not in ("matched", "mismatch", "uncertain"):
++                    raise rules.FormatError("нет корректной проверки соответствия типа узла")
++                if match != "matched":
++                    assessment = rules.Assessment(
++                        category=rules.CHECK_RECOMMENDED,
++                        explanation=("Выбранный тип узла не подтверждён на снимке." if match == "mismatch" else
++                                     "По видимой области снимка нельзя подтвердить выбранный тип узла."),
++                        recommendation="Уточнить выбор узла или повторить съёмку ближе и при хорошем освещении.",
++                    )
++                return rules.enforce(assessment, name, component_type)
+--- a/ai/tests/test_analyzer.py
++++ b/ai/tests/test_analyzer.py
+@@ -11,0 +12 @@
++    "type_match": "matched",
+@@ -156,0 +158,37 @@
++
++
++@pytest.mark.parametrize("match", ["mismatch", "uncertain"])
++def test_unconfirmed_type_cannot_assign_signs_to_selected_component(match):
++    result = make_analyzer(lambda r: reply(dict(GOOD, type_match=match))).analyze(
++        sharp_image(), "electric_motor", "Двигатель")
++    assert result.category == "check_recommended"
++    assert result.signs == [] and result.assessment_confidence == 0
++    assert "тип узла" in result.explanation
++    assert "Уточнить выбор" in result.recommendation
++    assert result.image_quality == "ok"
++    assert "type_match" not in result.as_dict()
++
++
++@pytest.mark.parametrize("value", [None, True, [], {}, "yes", "", 1])
++def test_invalid_internal_type_check_is_not_confirmation(value):
++    calls = []
++    def handler(request):
++        calls.append(1)
++        return reply(dict(GOOD, type_match=value))
++    result = make_analyzer(handler).analyze(sharp_image(), "flange", "Фланец")
++    assert len(calls) == 2
++    assert result.explanation == "Автоматический анализ не выполнен."
++    assert result.signs == []
++
++
++def test_missing_internal_type_check_retries_then_falls_back():
++    answer = {key: value for key, value in GOOD.items() if key != "type_match"}
++    result = make_analyzer(lambda r: reply(answer)).analyze(sharp_image(), "flange", "Фланец")
++    assert result.explanation == "Автоматический анализ не выполнен."
++
++
++def test_poor_visibility_takes_precedence_over_type_mismatch():
++    answer = dict(GOOD, type_match="mismatch", image_quality="poor", explanation="На снимке узел закрыт.")
++    result = make_analyzer(lambda r: reply(answer)).analyze(sharp_image(), "flange", "Фланец")
++    assert result.category == "check_recommended" and result.image_quality == "poor"
++    assert result.signs == [] and "закрыт" in result.explanation

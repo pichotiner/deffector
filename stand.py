@@ -5,8 +5,8 @@
     python stand.py --reset --check --image demo/photos/pump.jpg   # и сразу проверить сценарий
     python stand.py --stub            # без ИИ-сервиса, с заглушкой — только для проверки приложения
 
-Порядок: ИИ-сервис (`ai/run.py`) → ждём, пока загрузит модели (`GET /health` = 200) →
-бэкенд (`backend/run.py`) в режиме настоящего ИИ → ждём `GET /api/health` → «СТЕНД ГОТОВ»
+Порядок: ИИ-сервис (`ai/run.py`) → ждём, пока загрузит модели (`GET /health`: `status` —
+`ok`; `failed` — останавливаемся сразу и показываем причину) → бэкенд (`backend/run.py`) в режиме настоящего ИИ → ждём `GET /api/health` → «СТЕНД ГОТОВ»
 и адрес для телефона. Дальше скрипт следит за обеими службами: если одна упала, пишет,
 какая, показывает конец её журнала и останавливает вторую.
 
@@ -32,7 +32,7 @@ ROOT = Path(__file__).resolve().parent
 BACKEND_RUN = ROOT / "backend" / "run.py"
 AI_RUN = ROOT / "ai" / "run.py"
 AI_INSTALL = ROOT / "ai" / "install.py"
-AI_VENV = ROOT / "ai" / ".venv"
+AI_INSTALLED = ROOT / "ai" / ".venv" / "installed.json"  # отметка ai/install.py о завершённой установке
 LOGS = ROOT / "logs"
 
 _OPENER = urllib.request.build_opener(urllib.request.ProxyHandler({}))  # только этот ПК
@@ -50,9 +50,29 @@ def http_get(url, timeout=2.0):
         with _OPENER.open(url, timeout=timeout) as r:
             return r.status, r.read()
     except urllib.error.HTTPError as e:
-        return e.code, b""
+        try:
+            return e.code, e.read()
+        except OSError:
+            return e.code, b""
     except OSError:
         return None, b""
+
+
+def ai_install_mode():
+    """"full", "stub" или None — что поставил ai/install.py (None — не ставили или установка оборвалась)."""
+    try:
+        return json.loads(AI_INSTALLED.read_text(encoding="utf-8")).get("mode")
+    except (OSError, ValueError, AttributeError):
+        return None
+
+
+def model_errors(health):
+    """Какие модели ИИ-сервиса не загрузились и почему — одной строкой."""
+    models = health.get("models")
+    if not isinstance(models, dict):
+        return ""
+    return "; ".join(f"{name}: {m.get('error') or 'не загружена'}" for name, m in models.items()
+                     if isinstance(m, dict) and not m.get("ready"))
 
 
 class Service:
@@ -62,6 +82,8 @@ class Service:
         self.env = env or {}
         self.tail = collections.deque(maxlen=15)
         self.proc = None
+        self.status = None   # поле status из /health ИИ-сервиса: ok, degraded, loading, failed
+        self.problem = ""    # какие модели не загрузились
         self.warned = False
 
     def start(self):
@@ -91,20 +113,28 @@ class Service:
 
     def ready(self):
         code, body = http_get(self.health_url)
-        if code != 200:
-            return False
         if self.name != "ИИ":
-            return True
-        # ИИ-сервис отвечает 200 и во время загрузки моделей: смотрим поле status
+            return code == 200
+        # ИИ-сервис (docs/ai-contract.md, /health): 200 — ok или degraded (часть моделей),
+        # 503 — loading (ждём) или failed (не загрузилась ни одна модель, ждать бесполезно)
         try:
             health = json.loads(body or b"{}")
         except ValueError:
-            return True
-        if health.get("status") == "degraded" and not self.warned:
+            health = {}
+        if not isinstance(health, dict):
+            health = {}
+        self.status = health.get("status") if code is not None else None
+        self.problem = model_errors(health)
+        if code != 200:
+            return False
+        if self.status == "degraded" and not self.warned:
             self.warned = True
-            say("[!!] ИИ-сервис загрузился не полностью: " + json.dumps(health.get("models", {}),
-                                                                        ensure_ascii=False))
-        return health.get("status") in (None, "ok", "degraded") and health.get("status") != "loading"
+            say(f"[!!] ИИ-сервис загрузился не полностью — {self.problem or 'см. logs/stand-ai.log'}")
+        return self.status != "loading"
+
+    def failed(self):
+        """ИИ-сервис сообщил, что не загрузил ни одной модели."""
+        return self.name == "ИИ" and self.status == "failed"
 
     def stop(self):
         if not self.alive():
@@ -142,6 +172,11 @@ def wait_ready(service, seconds):
         if service.ready():
             say(f"[OK] {service.name}: готов за {time.monotonic() - started:.0f} с")
             return True
+        if service.failed():
+            say(f"[XX] {service.name}: не загрузилась ни одна модель — "
+                f"{service.problem or 'причина в журнале'}. "
+                f"Журнал: {service.log_path.relative_to(ROOT)}")
+            return False
         waited = time.monotonic() - started
         if waited >= next_note:
             say(f"[..] {service.name}: ещё запускается, прошло {waited:.0f} с")
@@ -202,8 +237,11 @@ def main():
                 "Закройте то окно (или Ctrl+C в нём) и запустите снова.")
             return 1
 
-    if use_ai and not AI_VENV.exists():
-        say("Первый запуск ИИ-сервиса: ставлю библиотеки и модели (нужен интернет, только один раз) ...")
+    if use_ai and ai_install_mode() != "full":
+        # Отметка появляется только после полной установки: заглушка (install.py --stub)
+        # и оборванная установка — не в счёт, с ними ai/run.py не запустится.
+        say("ИИ-сервис не установлен полностью: ставлю библиотеки и модели "
+            "(нужен интернет; скачанное раньше повторно не качается) ...")
         if subprocess.call([sys.executable, str(AI_INSTALL)], cwd=str(ROOT)) != 0:
             say("[XX] Установка ИИ-сервиса не удалась — см. вывод выше и ai/README.md")
             return 1
@@ -236,8 +274,12 @@ def main():
 
         _, body = http_get(f"http://127.0.0.1:{args.port}/api/health")
         ai = json.loads(body or b"{}").get("ai", {})
+        ai_service = services[0] if use_ai else None
         if not use_ai:
             ai_text = "ЗАГЛУШКА — рамки и анализ ненастоящие, для показа не годится"
+        elif ai.get("status") == "ok" and ai_service.status == "degraded":
+            ai_text = (f"[!!] ЧАСТИЧНО — для показа не годится, {ai_url}\n"
+                       f"                       не загружено: {ai_service.problem or 'см. logs/stand-ai.log'}")
         elif ai.get("status") == "ok":
             ai_text = f"настоящий, {ai_url}"
         else:

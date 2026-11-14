@@ -19,6 +19,10 @@ class AiUnavailable(Exception):
     pass
 
 
+class AiBadImage(Exception):
+    """ИИ-сервис не смог прочитать снимок (его ответ 4xx с кодом bad_image)."""
+
+
 def mode():
     return config.SETTINGS["ai_mode"]
 
@@ -51,8 +55,19 @@ def _request(path, fields=None, image=None, timeout=None):
     try:
         with _OPENER.open(req, timeout=timeout) as r:
             return json.loads(r.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        if 400 <= e.code < 500 and _error_code(e) == "bad_image":
+            raise AiBadImage() from e
+        raise AiUnavailable(str(e)) from e
     except (urllib.error.URLError, TimeoutError, OSError, ValueError) as e:
         raise AiUnavailable(str(e)) from e
+
+
+def _error_code(http_error):
+    try:
+        return json.loads(http_error.read().decode("utf-8"))["error"]["code"]
+    except (OSError, ValueError, KeyError, TypeError):
+        return None
 
 
 def health():

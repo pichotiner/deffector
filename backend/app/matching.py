@@ -1,6 +1,8 @@
 """Сопоставление рамок ИИ с узлами цифровой карточки (ТЗ 4.2; правило — план Андрея, этап 2).
 
-  тип совпал, узел такого типа один ............ matched
+  узел такого типа в карточке один ............. matched — и когда рамок несколько: это тот же
+                                                 узел карточки («фланцы на входе и выходе»),
+                                                 выбирать пользователю не из чего
   узлов такого типа несколько .................. по порядку слева направо (order),
                                                  если число рамок = числу узлов; иначе ambiguous
   типа нет в карточке .......................... not_in_card
@@ -30,6 +32,8 @@ def match(card: Card, raw):
         dets = sorted(dets, key=lambda d: d["bbox"][0])  # слева направо
         if not cands:
             pairs = [(d, None, "not_in_card") for d in dets]
+        elif len(cands) == 1:
+            pairs = [(d, cands[0], "matched") for d in dets]
         elif len(cands) == len(dets):
             pairs = [(d, c, "matched") for d, c in zip(dets, cands)]
         else:
