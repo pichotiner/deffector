@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Deffector — презентация</title>
 <!--
-  Презентация к защите 15.11. Работает без интернета: шрифты системные, иконки и схемы — SVG прямо в файле.
+  Презентация к защите 15.11. Работает без интернета: шрифты системные (плюс локальный Roboto для экрана телефона —
+  fonts/), иконки и схемы — SVG прямо в файле.
   Показ: открыть в браузере, F — во весь экран, ← → / пробел — листать, Home / End, A — все слайды списком.
   PDF: python docs/presentation/make_pdf.py (или открыть slides.html?all&pdf в Chrome: Печать → Сохранить как PDF,
   поля «Нет», «Фон» включить).
@@ -132,35 +133,50 @@
   .s3 .cap { font-size: 13.5px; color: #8fa8c8; margin-top: 12px; }
   .phone { position: absolute; right: 70px; top: 40px; width: 306px; border: 8px solid #0a131f; border-radius: 34px; background: #0a131f; overflow: hidden;
            box-shadow: 0 0 0 2px #29415f, 0 30px 70px rgba(0,0,0,.55), 0 0 120px rgba(47,125,225,.35); height: 636px; }
-  /* экран приложения собран здесь же: интерфейс и тексты — как в приложении, в окне камеры — фото агрегата */
-  .app { width: 290px; height: 620px; background: #f4f6f7; color: #17232c; display: flex; flex-direction: column; }
-  .app .bar { height: 58px; padding: 12px 14px 0; background: #fff; display: flex; align-items: center; gap: 12px; flex: none; }
-  .app .bar .ic { font-size: 18px; color: #17232c; }
-  .app .bar b { display: block; font-size: 14.5px; font-weight: 700; color: #17232c; line-height: 1.15; }
-  .app .bar small { display: block; font-size: 10.5px; color: #66757f; }
-  .app .cam { position: relative; height: 356px; flex: none; background: #0a131f url(ar-photo.jpg) center / cover no-repeat; }
-  .app .cam::before { content: ""; position: absolute; left: 0; right: 0; top: 0; height: 96px; background: linear-gradient(180deg, rgba(8,16,26,.72), rgba(8,16,26,0)); }
-  .app .cam .hint { position: absolute; left: 14px; top: 12px; right: 14px; color: #fff; }
-  .app .cam .hint b { display: flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 700; color: #fff; }
-  .app .cam .hint b .ic { font-size: 17px; }
-  .app .cam .hint span { display: block; font-size: 10.5px; color: #d6e0ea; margin-top: 3px; }
-  .app .box { position: absolute; left: 43px; top: 86px; width: 203px; height: 148px; border: 1.5px solid rgba(255,93,110,.75); border-radius: 4px;
-              background: rgba(255,93,110,.08); }
-  .app .box i { position: absolute; width: 20px; height: 20px; border: 0 solid #ff5d6e; }
-  .app .box i:nth-child(1) { left: -3px; top: -3px; border-left-width: 4px; border-top-width: 4px; border-radius: 6px 0 0 0; }
-  .app .box i:nth-child(2) { right: -3px; top: -3px; border-right-width: 4px; border-top-width: 4px; border-radius: 0 6px 0 0; }
-  .app .box i:nth-child(3) { left: -3px; bottom: -3px; border-left-width: 4px; border-bottom-width: 4px; border-radius: 0 0 0 6px; }
-  .app .box i:nth-child(4) { right: -3px; bottom: -3px; border-right-width: 4px; border-bottom-width: 4px; border-radius: 0 0 6px 0; }
-  .app .sheet { flex: 1; margin-top: -14px; position: relative; background: #f4f6f7; border-radius: 16px 16px 0 0; padding: 16px 14px 0; }
-  .app .sheet .hd { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 10px; }
-  .app .sheet .hd b { font-size: 14.5px; font-weight: 700; color: #17232c; }
-  .app .sheet .hd span { font-size: 12px; font-weight: 700; color: #0f6b63; }
-  .app .need { border: 1.5px solid #f0b9c0; background: #fff7f8; border-radius: 12px; padding: 12px 12px 13px; }
-  .app .need b { display: block; font-size: 14.5px; font-weight: 750; color: #bd2435; margin-bottom: 6px; }
-  .app .need p { font-size: 11.5px; line-height: 1.34; color: #26333c; margin: 0 0 5px; }
-  .app .need p.go { font-size: 12.5px; font-weight: 600; color: #17232c; }
-  .app .need p.act { color: #66757f; margin: 0; }
-  .app .sheet::after { content: ""; position: absolute; left: 50%; bottom: 7px; width: 92px; height: 4px; margin-left: -46px; border-radius: 2px; background: #9aa5ad; }
+  /* Экран приложения собран в разметке по исходникам mobile/ (ArScreen.kt, Theme.kt, MainActivity.kt):
+     цвета темы, тексты, значки; размеры — в масштабе 1 dp = 0,755 px (экран 384 dp → 290 px),
+     промежутки между строками подогнаны по кадру записи сценария (около 1:07). */
+  /* Roboto — шрифт Android-приложения; файлы лежат рядом (fonts/, лицензия OFL 1.1), интернет не нужен.
+     Используется только на экране телефона; не загрузился — подставится системный шрифт. */
+  @font-face { font-family: "Roboto App"; font-weight: 400; src: url(fonts/roboto-cyrillic-400-normal.woff2) format("woff2");
+               unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+  @font-face { font-family: "Roboto App"; font-weight: 600; src: url(fonts/roboto-cyrillic-600-normal.woff2) format("woff2");
+               unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116; }
+  @font-face { font-family: "Roboto App"; font-weight: 400; src: url(fonts/roboto-latin-400-normal.woff2) format("woff2");
+               unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  @font-face { font-family: "Roboto App"; font-weight: 600; src: url(fonts/roboto-latin-600-normal.woff2) format("woff2");
+               unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329, U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD; }
+  .app { width: 290px; height: 620px; background: #f2f5f7; color: #152d39; display: flex; flex-direction: column;
+         font-family: "Roboto App", Roboto, "Segoe UI", Inter, "Helvetica Neue", Arial, sans-serif; }
+  .app .bar { height: 68px; padding-top: 20px; display: flex; align-items: center; flex: none; }
+  .app .bar .ic { font-size: 16.6px; color: #152d39; margin: 0 12.7px; }
+  .app .bar .t { flex: 1; min-width: 0; }
+  .app .bar b { display: block; font-size: 12.1px; font-weight: 600; color: #152d39; line-height: 17.4px; }
+  .app .bar small { display: block; font-size: 9.1px; line-height: 13.6px; color: #536976; margin-top: -3px; }
+  .app .cam { position: relative; height: 384px; flex: none; overflow: hidden; background: #000 url(ar-photo.jpg) center / cover no-repeat; }
+  .app .cam .hint { position: absolute; left: 0; top: 0; right: 0; padding: 15px; background: linear-gradient(180deg, rgba(16,37,47,.86), rgba(16,37,47,0)); }
+  .app .cam .hint b { display: flex; align-items: center; gap: 6px; font-size: 12.1px; font-weight: 600; line-height: 17.4px; color: #fff; }
+  .app .cam .hint b .ic { font-size: 16.6px; color: #bceedb; }
+  .app .cam .hint span { display: block; font-size: 9.1px; line-height: 13.6px; color: #d2e2e8; margin-top: .8px; }
+  .app .box { position: absolute; left: 35px; top: 92px; width: 219px; height: 159px; border: .8px solid rgba(255,125,140,.6); border-radius: 7.5px;
+              background: rgba(255,125,140,.07); }
+  .app .box i { position: absolute; width: 15px; height: 15px; border: 0 solid #ff7d8c; }
+  .app .box i:nth-child(1) { left: -1.6px; top: -1.6px; border-left-width: 2.3px; border-top-width: 2.3px; }
+  .app .box i:nth-child(2) { right: -1.6px; top: -1.6px; border-right-width: 2.3px; border-top-width: 2.3px; }
+  .app .box i:nth-child(3) { left: -1.6px; bottom: -1.6px; border-left-width: 2.3px; border-bottom-width: 2.3px; }
+  .app .box i:nth-child(4) { right: -1.6px; bottom: -1.6px; border-right-width: 2.3px; border-bottom-width: 2.3px; }
+  .app .sheet { flex: 1; position: relative; background: #fff; border-radius: 18px 18px 0 0; overflow: hidden; }
+  .app .sheet .in { height: 158px; overflow: hidden; padding: 9px 15px 0; }
+  .app .sheet .hd { display: flex; justify-content: space-between; align-items: center; height: 36px; margin-bottom: 7.5px; }
+  .app .sheet .hd b { font-size: 12.1px; font-weight: 600; color: #152d39; }
+  .app .sheet .hd span { font-size: 10.6px; font-weight: 600; color: #086d71; padding: 0 9px; }
+  .app .need { border: .8px solid rgba(189,36,53,.2); background: rgba(189,36,53,.045); border-radius: 12px; padding: 10.6px; }
+  .app .need b { display: block; font-size: 12.1px; font-weight: 600; line-height: 17.4px; color: #bd2435; }
+  .app .need p { font-size: 9.1px; line-height: 13.6px; color: #152d39; margin: 1.5px 0 0; }
+  .app .need p.go { font-size: 10.6px; line-height: 15.9px; }
+  .app .need p.act { color: #536976; }
+  .app .need p.more { font-size: 10.6px; font-weight: 600; line-height: 36px; color: #086d71; padding: 0 9px; }
+  .app .sheet::after { content: ""; position: absolute; left: 50%; bottom: 4px; width: 82px; height: 3px; margin-left: -41px; border-radius: 2px; background: #8a979e; }
 
   /* ---------- архитектура ---------- */
   .perimeter { border: 2px dashed #8fb2dc; border-radius: 20px; padding: 30px 22px 20px; position: relative; background: linear-gradient(180deg, #f8fbff, #fff); }
@@ -577,31 +593,34 @@
     <svg class="ic"><use href="#i-phone"/></svg>
     <div><b>Живой показ — Павел.</b> Телефон и сервер на ПК, мобильные данные выключены. Запасной вариант — видео.</div>
   </div>
-  <p class="cap" style="position:relative">Справа — экран AR-осмотра: фото агрегата из материалов кейса, рамка и текст — как на стенде.</p>
+  <p class="cap" style="position:relative">Справа — экран AR-осмотра приложения; в окне камеры — фото агрегата из материалов кейса.</p>
 
-  <!-- Экран AR-осмотра собран в разметке: интерфейс и тексты — как в приложении (запись сценария, 1:07),
-       в окне камеры — фото агрегата из материалов кейса (ar-photo.jpg — вырезка из demo/reference/PU-001/case_pump_01.jpg),
-       рамка двигателя — там же, где её поставил детектор на стенде. Прежний снимок экрана — screen.png. -->
+  <!-- Экран AR-осмотра собран в разметке по исходникам приложения (mobile/…/ArScreen.kt, Theme.kt, MainActivity.kt)
+       и сверен с кадром записи сценария (demo/video/scenario.mp4, около 1:07). Тексты карточки и счётчик «Все · 10» —
+       ответ бэкенда /api/equipment/PU-001/attention после сброса базы. В окне камеры — вырезка из фото агрегата
+       из материалов кейса (ar-photo.jpg ← demo/reference/PU-001/case_pump_01.jpg); рамка двигателя — в том же месте
+       фото, где её поставил детектор на стенде. Прежний снимок экрана — screen.png. -->
   <div class="phone rise" style="--d:2" role="img" aria-label="Экран AR-осмотра: рамка на электродвигателе и список «Требуют проверки»">
     <div class="app">
       <div class="bar">
-        <svg class="ic" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></svg>
-        <div style="flex:1"><b>AR-осмотр</b><small>PU-001 · Предварительный осмотр</small></div>
-        <svg class="ic" viewBox="0 0 24 24"><path d="M6 4v16M12 4v16M18 4v16M4 9h4M10 15h4M16 8h4"/></svg>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M19 12H5M5 12l6-6M5 12l6 6"/></svg>
+        <div class="t"><b>AR-осмотр</b><small>PU-001 · Предварительный осмотр</small></div>
+        <svg class="ic" viewBox="0 0 24 24"><path d="M6 3v4M6 11v10M12 3v11M12 18v3M18 3v2M18 9v12"/><circle cx="6" cy="9" r="2.2"/><circle cx="12" cy="16" r="2.2"/><circle cx="18" cy="7" r="2.2"/></svg>
       </div>
       <div class="cam">
-        <div class="hint"><b><svg class="ic"><use href="#i-scan"/></svg>Осмотр узлов</b><span>Нажмите на метку, чтобы открыть анализ</span></div>
+        <div class="hint"><b><svg class="ic" viewBox="0 0 24 24"><path d="M3 8V3h5M16 3h5v5M3 16v5h5M21 16v5h-5M7 12h10"/></svg>Осмотр узлов</b><span>Нажмите на метку, чтобы открыть анализ</span></div>
         <div class="box"><i></i><i></i><i></i><i></i></div>
       </div>
-      <div class="sheet">
+      <div class="sheet"><div class="in">
         <div class="hd"><b>Требуют проверки</b><span>Все · 10</span></div>
         <div class="need">
           <b>✕ Электродвигатель 5,5 кВт</b>
           <p>Обнаружены признаки возможного дефекта: следы коррозии на корпусе</p>
           <p class="go">Наведите камеру на электродвигатель 5,5 кВт</p>
           <p class="act">Осмотреть корпус и лапы крепления, оценить глубину коррозии</p>
+          <p class="more">Карточка узла  →</p>
         </div>
-      </div>
+      </div></div>
     </div>
   </div>
 </section>
