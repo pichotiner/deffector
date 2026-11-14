@@ -1,5 +1,8 @@
 # Тимофей: следующий этап улучшений ИИ, 14.11
 
+**Этап закрыт. Текущее задание — [finalization-14-11-tasks.md](finalization-14-11-tasks.md).**
+Этот документ сохраняет историю выполненного эксперимента, повторять его не требуется.
+
 **Задание агенту на GPU-ПК.** Продолжать в `plan/timofey-ai-quality-gpu` после
 `e25db59`. Перед началом прочитать `AGENTS.md`, актуальный `TEAM_MESSAGES.md`,
 `plan/README.md`, `plan/timofey-ai.md` и `ai/notes/quality-14-11-results.md`.

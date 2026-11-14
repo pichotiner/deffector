@@ -145,6 +145,8 @@
     .slide { display: flex !important; position: relative !important; left: auto !important; top: auto !important; transform: none !important;
              margin: 0 !important; box-shadow: none !important; break-after: page; page-break-after: always; }
   }
+  .shot { width: 222px; height: 456px; overflow: hidden; border: 7px solid #16202c; border-radius: 26px; background: #16202c; }
+  .shot img { display: block; width: 222px; margin-top: -24px; }
 </style>
 </head>
 <body>
@@ -223,43 +225,9 @@
       </div>
     </div>
     <div style="width:330px; flex:none; display:flex; flex-direction:column; align-items:center">
-      <!-- Схема экрана на демо-данных PU-001. Павел: можно заменить скриншотом <img src="screen.png"> -->
-      <svg viewBox="0 0 330 520" width="300" height="473" role="img" aria-label="Экран AR-осмотра">
-        <rect x="6" y="4" width="318" height="512" rx="34" fill="#16202c"/>
-        <rect x="18" y="18" width="294" height="484" rx="24" fill="#5b6672"/>
-        <!-- «оборудование» -->
-        <rect x="40" y="120" width="150" height="96" rx="10" fill="#7b8692"/>
-        <rect x="190" y="146" width="34" height="44" fill="#6c7782"/>
-        <circle cx="262" cy="168" r="40" fill="#8a949f"/>
-        <rect x="30" y="296" width="270" height="22" fill="#76818c"/>
-        <rect x="62" y="270" width="44" height="74" rx="6" fill="#88929c"/>
-        <rect x="220" y="270" width="44" height="74" rx="6" fill="#88929c"/>
-        <circle cx="160" cy="250" r="22" fill="#d9dde1"/><circle cx="160" cy="250" r="16" fill="#f4f5f6"/>
-        <line x1="160" y1="250" x2="170" y2="240" stroke="#333" stroke-width="2"/>
-        <!-- рамки -->
-        <rect x="34" y="114" width="196" height="108" rx="6" fill="none" stroke="#e0574f" stroke-width="3.5"/>
-        <rect x="34" y="78" width="196" height="34" rx="6" fill="#e0574f"/>
-        <text x="44" y="93" fill="#fff" font-size="11.5" font-weight="700" font-family="Segoe UI, Inter, Arial">✕ Электродвигатель 5,5 кВт</text>
-        <text x="44" y="106" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">признаки коррозии на корпусе</text>
-        <rect x="132" y="222" width="56" height="56" rx="6" fill="none" stroke="#e0574f" stroke-width="3.5"/>
-        <rect x="56" y="264" width="56" height="86" rx="6" fill="none" stroke="#e7b21e" stroke-width="3.5"/>
-        <rect x="214" y="264" width="56" height="86" rx="6" fill="none" stroke="#3cb371" stroke-width="3.5"/>
-        <rect x="30" y="360" width="128" height="34" rx="6" fill="#e7b21e"/>
-        <text x="38" y="375" fill="#2a2000" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">! Задвижка на входе</text>
-        <text x="38" y="388" fill="#2a2000" font-size="10.5" font-family="Segoe UI, Inter, Arial">89 % ресурса по циклам</text>
-        <rect x="172" y="360" width="128" height="34" rx="6" fill="#3cb371"/>
-        <text x="180" y="375" fill="#fff" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">✓ Задвижка на выходе</text>
-        <text x="180" y="388" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">видимых проблем нет</text>
-        <rect x="180" y="226" width="128" height="34" rx="6" fill="#e0574f"/>
-        <text x="188" y="241" fill="#fff" font-size="11" font-weight="700" font-family="Segoe UI, Inter, Arial">✕ Манометр МП-100</text>
-        <text x="188" y="254" fill="#fff" font-size="10.5" font-family="Segoe UI, Inter, Arial">давление 4,4 &gt; 4,0 бар</text>
-        <!-- подсказка -->
-        <rect x="30" y="430" width="270" height="52" rx="12" fill="#ffffff" opacity=".95"/>
-        <text x="44" y="452" fill="#13202f" font-size="12" font-weight="700" font-family="Segoe UI, Inter, Arial">Требуют проверки: 10</text>
-        <text x="44" y="470" fill="#44546a" font-size="11.5" font-family="Segoe UI, Inter, Arial">Наведите камеру на электродвигатель</text>
-      </svg>
-      <p class="small muted" style="text-align:center; margin-top:8px">Экран осмотра на демо-данных насосного агрегата
-        <span class="todo">Павел: скриншот</span></p>
+      <!-- Снимок экрана телефона Павла на стенде, настоящий ИИ (screen.png, 590×1280); строка состояния обрезана -->
+      <div class="shot"><img src="screen.png" alt="Экран AR-осмотра на телефоне"></div>
+      <p class="small muted" style="text-align:center; margin-top:8px">Снимок экрана телефона на стенде, настоящий ИИ</p>
     </div>
   </div>
   <div class="foot"><span>Deffector · Кибер 102</span><span>3</span></div>
@@ -362,7 +330,7 @@
     <div class="card">
       <p class="who">Бэкенд</p>
       <h2>Привязка к карточке</h2>
-      <p>Тип совпал — это узел из карточки; одинаковые — по порядку слева направо; иначе «неоднозначно» или «нет в карточке»</p>
+      <p>Тип совпал — это узел из карточки; подходит несколько узлов — инженер выбирает нужный; типа нет — «нет в карточке»</p>
     </div>
     <div class="to">→</div>
     <div class="card">
