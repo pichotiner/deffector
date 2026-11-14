@@ -143,7 +143,8 @@ fun App(vm: AppState) {
     Surface(shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface,
         border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = .65f)), modifier = Modifier.fillMaxWidth()) {
         Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium)
+            Text(title, style = MaterialTheme.typography.titleMedium, color = MaterialTheme.colorScheme.primary)
+            HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
             content()
         }
     }
@@ -152,9 +153,27 @@ fun App(vm: AppState) {
     Column(Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
 }
 @Composable fun Field(label: String, value: Any?) {
-    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+    Column(Modifier.fillMaxWidth().background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = .55f), RoundedCornerShape(10.dp))
+        .padding(horizontal = 12.dp, vertical = 10.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
         Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
-        Text(value?.toString() ?: "нет данных", style = MaterialTheme.typography.bodyLarge)
+        Text(value?.toString() ?: "нет данных", style = MaterialTheme.typography.bodyLarge, fontWeight = FontWeight.Medium)
+    }
+}
+@Composable fun SectionLabel(title: String) {
+    Column(Modifier.fillMaxWidth().padding(top = 6.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+        HorizontalDivider(color = MaterialTheme.colorScheme.outlineVariant)
+        Text(title, style = MaterialTheme.typography.titleSmall, color = MaterialTheme.colorScheme.primary)
+    }
+}
+@Composable fun Reasons(items: List<String>) {
+    if (items.isNotEmpty()) {
+        Text("Причины", style = MaterialTheme.typography.labelLarge, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        items.forEach { reason ->
+            Row(horizontalArrangement = Arrangement.spacedBy(10.dp)) {
+                Text("•", color = MaterialTheme.colorScheme.primary)
+                Text(reason, modifier = Modifier.weight(1f), style = MaterialTheme.typography.bodyMedium)
+            }
+        }
     }
 }
 
@@ -259,6 +278,7 @@ fun App(vm: AppState) {
     Panel("Нормативный срок службы") {
         Field("Годы", n.life_years); Field("Часы", n.life_hours); Field("Циклы", n.life_cycles)
         Field("Интервал обслуживания, дней", n.maintenance_interval_days)
+        SectionLabel("Фактическая наработка")
         Field("Наработка, ч", usage.operating_hours); Field("Рабочие циклы", usage.cycles)
     }
 }
@@ -273,10 +293,10 @@ fun App(vm: AppState) {
         }
         Field("Выработка, %", r.used_percent); Field("Остаток, лет", r.remaining.years)
         Field("Остаток, ч", r.remaining.hours); Field("Остаток, циклов", r.remaining.cycles)
-        Field("Ожидаемая дата", r.estimated_end_date); Text(r.basis)
+        Field("Ожидаемая дата", r.estimated_end_date); Field("Основание расчёта", r.basis)
         val names = mapOf("installed_at" to "дата установки", "operating_hours" to "наработка", "cycles" to "число циклов", "last_maintenance_at" to "дата обслуживания", "normative" to "норматив")
-        if (r.missing_data.isNotEmpty()) Text("Не хватает: " + r.missing_data.joinToString { names[it] ?: it })
-        r.maintenance?.let { Field("Следующее обслуживание", it.next_due_date); it.overdue_days?.let { days -> Field("Просрочка, дней", days) }; it.days_left?.let { days -> Field("До обслуживания, дней", days) } }
+        if (r.missing_data.isNotEmpty()) Field("Недостающие данные", r.missing_data.joinToString { names[it] ?: it })
+        r.maintenance?.let { SectionLabel("Обслуживание"); Field("Следующее обслуживание", it.next_due_date); it.overdue_days?.let { days -> Field("Просрочка, дней", days) }; it.days_left?.let { days -> Field("До обслуживания, дней", days) } }
     }
 }
 @Composable fun VisualBlock(v: Visual) {
@@ -294,15 +314,24 @@ fun App(vm: AppState) {
     items.forEach { p -> Panel((if (p.status == "deviation") "! " else "") + p.name) {
         Text("${p.value ?: "нет данных"} ${p.unit.orEmpty()}", style = MaterialTheme.typography.titleLarge, color = statusColor(p.status))
         Field("Нижняя уставка", p.setpoint_min); Field("Верхняя уставка", p.setpoint_max)
-        Field("Время замера", p.measured_at); Text(p.message, color = statusColor(p.status))
+        Field("Время замера", p.measured_at)
+        Surface(color = statusColor(p.status).copy(alpha = .10f), shape = RoundedCornerShape(10.dp), modifier = Modifier.fillMaxWidth()) {
+            Text(p.message, Modifier.padding(12.dp), style = MaterialTheme.typography.bodyMedium, color = statusColor(p.status))
+        }
     } }
 }
 @Composable fun HistoryRows(items: List<HistoryItem>, components: List<Component>) {
     if (items.isEmpty()) Text("Записей пока нет")
     items.sortedByDescending { it.performed_at }.forEach { h -> Panel(inspectionTypes[h.type] ?: h.type) {
         Field("Дата", h.performed_at); Field("Узел", components.find { it.id == h.component_id }?.name ?: h.component_id ?: "Оборудование")
-        Field("Комментарий", h.comment); Field("Выполнил", h.performed_by); h.recommendation?.let { Text(it) }
-        h.visual?.let { Text(visualLabel(it.category)); it.explanation?.let { e -> Text(e) }; it.recommendation?.let { r -> Text(r) } }
+        Field("Выполнил", h.performed_by); Field("Комментарий", h.comment)
+        h.recommendation?.let { Field("Рекомендация", it) }
+        h.visual?.let { visual ->
+            SectionLabel("Визуальный анализ")
+            Text(visualLabel(visual.category), color = statusColor(visual.category), fontWeight = FontWeight.SemiBold)
+            visual.explanation?.let { Field("Объяснение результата", it) }
+            visual.recommendation?.let { Field("Рекомендация по анализу", it) }
+        }
     } }
 }
 
@@ -330,9 +359,12 @@ fun App(vm: AppState) {
                     if (c.deviations_count > 0) StatusPill("! Параметров с отклонениями: ${c.deviations_count}", statusColor("defect"))
                     Panel("Паспорт оборудования") {
                         Field("Идентификатор", c.id); Field("Модель", c.model); Field("Изготовитель", c.manufacturer)
-                        Field("S/N", c.serial_number); Field("Маркировка", c.marking); Field("Расположение", c.location)
-                        Field("Ввод в эксплуатацию", c.commissioned_at); Characteristics(c.characteristics)
+                        Field("S/N", c.serial_number); Field("Маркировка", c.marking)
                     }
+                    Panel("Размещение и эксплуатация") {
+                        Field("Расположение", c.location); Field("Ввод в эксплуатацию", c.commissioned_at)
+                    }
+                    if (c.characteristics.isNotEmpty()) Panel("Технические характеристики") { Characteristics(c.characteristics) }
                     NormativeBlock(c.normative, c.usage); ResourceBlock(c.resource)
                     SecondaryAction("Зарегистрировать осмотр оборудования", !vm.busy) { vm.inspection(true) }
                 }
@@ -348,8 +380,9 @@ fun App(vm: AppState) {
                     ordered.forEach { (node, depth) ->
                         Column(Modifier.padding(start = (depth.coerceAtMost(3) * 12).dp)) {
                             Panel("${symbol(node.attention.level)} ${node.name}") {
-                                Text(node.type_name, color = statusColor(node.attention.level)); node.attention.reasons.forEach { Text(it) }
-                                Text(node.attention.recommended_action)
+                                StatusPill(node.type_name, statusColor(node.attention.level))
+                                Reasons(node.attention.reasons)
+                                Field("Рекомендуемое действие", node.attention.recommended_action)
                                 Action("Открыть ${node.id}", !vm.busy) { vm.openComponent(node.id) }
                             }
                         }
@@ -370,7 +403,7 @@ fun App(vm: AppState) {
         if (c.characteristics.isNotEmpty()) Panel("Характеристики") { Characteristics(c.characteristics) }
         Panel("Даты") { Field("Установка", c.installed_at); Field("Последняя замена", c.last_replaced_at); Field("Последнее обслуживание", c.last_maintenance_at) }
         NormativeBlock(c.normative, c.usage); ResourceBlock(c.resource); VisualBlock(c.visual)
-        Panel("Рекомендуемые действия") { c.attention.reasons.forEach { Text(it) }; Text(c.attention.recommended_action) }
+        Panel("Рекомендуемые действия") { Reasons(c.attention.reasons); Field("Рекомендуемое действие", c.attention.recommended_action) }
         Parameters(vm.card?.parameters.orEmpty().filter { it.id in c.parameters })
         Action("Зарегистрировать осмотр", !vm.busy) { vm.inspection() }
         Text("Предыдущие результаты проверок", style = MaterialTheme.typography.titleLarge)
@@ -389,7 +422,8 @@ fun App(vm: AppState) {
             Surface(shape = RoundedCornerShape(14.dp), color = if (type == key) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
                 border = BorderStroke(1.dp, if (type == key) Teal else MaterialTheme.colorScheme.outlineVariant)) {
                 Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).selectable(selected = type == key, role = Role.RadioButton, onClick = { type = key })
-                    .padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    .padding(horizontal = 16.dp, vertical = 12.dp), verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)) {
                     RadioButton(selected = type == key, onClick = null); Text(title, style = MaterialTheme.typography.bodyLarge)
                 }
             }
