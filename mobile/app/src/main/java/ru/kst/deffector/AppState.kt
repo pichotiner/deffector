@@ -37,6 +37,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
     var notice by mutableStateOf<String?>(null); private set
     var cameraError by mutableStateOf<String?>(null); private set
     var manualHint by mutableStateOf(false); private set
+    private var recognitionSeen = false
     private var latest: Bitmap? = null
     private var selectedFrame: DetectionFrame? = null
     private var retry: (() -> Unit)? = null
@@ -51,7 +52,8 @@ class AppState(app: Application) : AndroidViewModel(app) {
     fun go(next: Screen) {
         if (next == Screen.SETTINGS) settingsReturn = screen
         screen = next; error = null; notice = null; cameraError = null; selected = null; selectedFrame = null; frame = null; latest = null
-        if (next == Screen.CAMERA) { manualHint = false; seen.clear() }
+        manualHint = false; recognitionSeen = false
+        if (next == Screen.CAMERA) seen.clear()
     }
     fun back() = go(when (screen) {
         Screen.COMPONENT -> Screen.EQUIPMENT
@@ -61,7 +63,10 @@ class AppState(app: Application) : AndroidViewModel(app) {
         else -> Screen.CAMERA
     })
     fun cameraFailed(message: String) { cameraError = message }
-    fun suggestManual() { manualHint = true }
+    fun suggestManual() {
+        if (screen in listOf(Screen.CAMERA, Screen.AR) && !recognitionSeen && candidates.isEmpty()) manualHint = true
+    }
+    private fun recognitionFound() { recognitionSeen = true; manualHint = false }
     fun repeat() { error = null; retry?.invoke() }
     private fun task(allowRetry: Boolean = true, action: suspend () -> Unit) {
         if (busy) return
@@ -101,15 +106,16 @@ class AppState(app: Application) : AndroidViewModel(app) {
             else -> service().lookup(marking = value)
         }
         if (r.found && r.equipment_id != null) {
+            recognitionFound()
             val found = service().card(r.equipment_id)
             candidates = listOf(Candidate(found.id, found.name, r.match_confidence))
         } else {
             candidates = r.suggestions.orEmpty().map { Candidate(it.equipment_id, it.name, it.score) }
-            manualHint = true
+            if (candidates.isNotEmpty()) recognitionFound() else suggestManual()
         }
         return r.found
     }
-    fun dismissCandidates() { candidates = emptyList(); manualHint = true }
+    fun dismissCandidates() { candidates = emptyList(); suggestManual() }
     fun openEquipment(id: String) = task {
         val c = service().card(id)
         candidates = emptyList(); card = c; component = null; go(Screen.EQUIPMENT)
@@ -136,7 +142,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
         val image = latest ?: throw IllegalStateException("Дождитесь изображения с камеры")
         val result = service().identify(Network.image(withContext(Dispatchers.Default) { jpeg(image) }))
         candidates = result.candidates.map { Candidate(it.equipment_id, it.name, it.confidence) }
-        if (!result.recognized || candidates.isEmpty()) manualHint = true
+        if (candidates.isNotEmpty()) recognitionFound() else suggestManual()
     }
 
     // Вызывается последовательно анализатором CameraX. Bitmap уже обрезан и повёрнут.
@@ -150,7 +156,10 @@ class AppState(app: Application) : AndroidViewModel(app) {
                 val equipmentId = requireNotNull(card).id
                 val image = withContext(Dispatchers.Default) { jpeg(resize(bitmap, 640)) }
                 val result = service().detect(equipmentId, Network.image(image))
-                if (screen == Screen.AR && selected == null && !busy && card?.id == equipmentId) frame = DetectionFrame(result, bitmap)
+                if (screen == Screen.AR && selected == null && !busy && card?.id == equipmentId) {
+                    frame = DetectionFrame(result, bitmap)
+                    if (result.detections.isNotEmpty()) recognitionFound()
+                }
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) {
                 frame = null
@@ -162,9 +171,11 @@ class AppState(app: Application) : AndroidViewModel(app) {
             try {
                 val input = InputImage.fromBitmap(bitmap, 0)
                 val code = qr.process(input).await().firstOrNull()?.rawValue
+                if (!code.isNullOrBlank()) recognitionFound()
                 if (code != null && shouldLookup("qr:$code", now)) { find(code, "qr"); return }
                 val lines = text.process(input).await().textBlocks.flatMap { it.lines }.map { it.text.trim() }
                     .filter { it.length in 4..80 && it.any(Char::isDigit) }.take(4)
+                if (lines.isNotEmpty()) recognitionFound()
                 for (line in lines) {
                     if (screen != Screen.CAMERA || candidates.isNotEmpty()) break
                     if (shouldLookup(line, now)) {

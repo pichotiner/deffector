@@ -35,6 +35,7 @@ fun ArScreen(vm: AppState) {
     var expanded by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     val snapshot = vm.frame
     val density = LocalDensity.current
+    LaunchedEffect(Unit) { delay(10000); vm.suggestManual() }
     LaunchedEffect(snapshot) {
         if (snapshot != null) tracks = tracker.update(snapshot.result.detections, snapshot.at, snapshot.bitmap.width, snapshot.bitmap.height)
     }
