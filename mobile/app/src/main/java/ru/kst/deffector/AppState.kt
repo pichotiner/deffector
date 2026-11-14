@@ -38,6 +38,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
     var cameraError by mutableStateOf<String?>(null); private set
     var manualHint by mutableStateOf(false); private set
     private var latest: Bitmap? = null
+    private var selectedFrame: DetectionFrame? = null
     private var retry: (() -> Unit)? = null
     private var settingsReturn = Screen.CAMERA
     private var lastScan = 0L
@@ -49,7 +50,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
 
     fun go(next: Screen) {
         if (next == Screen.SETTINGS) settingsReturn = screen
-        screen = next; error = null; notice = null; cameraError = null; selected = null; frame = null; latest = null
+        screen = next; error = null; notice = null; cameraError = null; selected = null; selectedFrame = null; frame = null; latest = null
         if (next == Screen.CAMERA) { manualHint = false; seen.clear() }
     }
     fun back() = go(when (screen) {
@@ -124,8 +125,12 @@ class AppState(app: Application) : AndroidViewModel(app) {
     fun openAr() = task {
         attention = service().attention(requireNotNull(card).id).items; go(Screen.AR)
     }
-    fun choose(d: Detection) { selected = d }
-    fun clearSelection() { selected = null }
+    fun choose(d: Detection, source: DetectionFrame? = frame) {
+        if (source == null || busy) return
+        selectedFrame = source
+        selected = d
+    }
+    fun clearSelection() { selected = null; selectedFrame = null }
     fun selectCandidate(id: String) { selected = selected?.copy(component_id = id, match = "matched") }
     fun identify() = task {
         val image = latest ?: throw IllegalStateException("Дождитесь изображения с камеры")
@@ -139,12 +144,13 @@ class AppState(app: Application) : AndroidViewModel(app) {
         latest = bitmap
         val now = android.os.SystemClock.elapsedRealtime()
         if (busy || selected != null || candidates.isNotEmpty() || api == null) return
-        if (screen == Screen.AR && now - lastDetect > 180 && error == null) {
+        if (screen == Screen.AR && now - lastDetect >= ArTiming.DETECT_INTERVAL_MS && error == null) {
             lastDetect = now
             try {
+                val equipmentId = requireNotNull(card).id
                 val image = withContext(Dispatchers.Default) { jpeg(resize(bitmap, 640)) }
-                val result = service().detect(requireNotNull(card).id, Network.image(image))
-                if (screen == Screen.AR) frame = DetectionFrame(result, bitmap)
+                val result = service().detect(equipmentId, Network.image(image))
+                if (screen == Screen.AR && selected == null && !busy && card?.id == equipmentId) frame = DetectionFrame(result, bitmap)
             } catch (e: CancellationException) { throw e }
             catch (e: Exception) {
                 frame = null
@@ -176,7 +182,7 @@ class AppState(app: Application) : AndroidViewModel(app) {
     }
     fun analyze() = task {
         val d = selected ?: throw IllegalStateException("Выберите рамку узла")
-        val snapshot = frame ?: throw IllegalStateException("Дождитесь распознавания узла")
+        val snapshot = selectedFrame ?: throw IllegalStateException("Дождитесь распознавания узла")
         val id = d.component_id ?: throw IllegalStateException("Сначала выберите узел из карточки")
         val image = withContext(Dispatchers.Default) { jpeg(crop(snapshot.bitmap, d.bbox)) }
         component = service().analyze(requireNotNull(card).id, id, Network.image(image),

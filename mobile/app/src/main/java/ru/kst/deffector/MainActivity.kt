@@ -8,13 +8,23 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import kotlinx.coroutines.delay
@@ -24,8 +34,7 @@ class MainActivity : ComponentActivity() {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MaterialTheme(colorScheme = lightColorScheme(primary = Color(0xFF075F65), secondary = Color(0xFF48666A),
-                background = Color(0xFFF3F6F6), surface = Color.White)) {
+            DeffectorTheme {
                 App(viewModel())
             }
         }
@@ -59,13 +68,27 @@ fun App(vm: AppState) {
         onDispose { view.keepScreenOn = false }
     }
     Scaffold(topBar = {
-        TopAppBar(title = { Text(when (vm.screen) {
-            Screen.CAMERA -> "Деффектор · идентификация"; Screen.LIST -> "Выбор оборудования"
+        TopAppBar(title = { Column {
+            Text(when (vm.screen) {
+            Screen.CAMERA -> "Деффектор"; Screen.LIST -> "Выбор оборудования"
             Screen.EQUIPMENT -> vm.card?.id ?: "Оборудование"; Screen.AR -> "AR-осмотр"
             Screen.COMPONENT -> "Карточка узла"; Screen.INSPECTION -> "Регистрация осмотра"; Screen.SETTINGS -> "Настройки"
-        }, style = MaterialTheme.typography.titleMedium) }, navigationIcon = {
-            if (vm.screen != Screen.CAMERA) TextButton(enabled = !vm.busy, onClick = vm::back) { Text("Назад") }
-        }, actions = { if (vm.screen != Screen.SETTINGS) TextButton(enabled = !vm.busy, onClick = { vm.go(Screen.SETTINGS) }) { Text("Настройки") } })
+            }, style = MaterialTheme.typography.titleMedium, maxLines = 1, overflow = TextOverflow.Ellipsis)
+            Text(when (vm.screen) {
+                Screen.CAMERA -> "Помощник инженера"
+                Screen.AR -> vm.card?.id.orEmpty() + " · Предварительный осмотр"
+                Screen.EQUIPMENT, Screen.COMPONENT -> "Цифровая карточка"
+                Screen.INSPECTION -> "История обслуживания"
+                Screen.LIST -> "Цифровые карточки"
+                Screen.SETTINGS -> "Подключение и профиль"
+            }, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant, maxLines = 1, overflow = TextOverflow.Ellipsis)
+        } }, navigationIcon = {
+            if (vm.screen != Screen.CAMERA) IconButton(enabled = !vm.busy, onClick = vm::back,
+                modifier = Modifier.semantics { contentDescription = "Назад" }) { UiIcon("back") }
+        }, actions = {
+            if (vm.screen != Screen.SETTINGS) IconButton(enabled = !vm.busy, onClick = { vm.go(Screen.SETTINGS) },
+                modifier = Modifier.semantics { contentDescription = "Настройки" }) { UiIcon("settings") }
+        }, colors = TopAppBarDefaults.topAppBarColors(containerColor = MaterialTheme.colorScheme.background))
     }) { padding ->
         Column(Modifier.fillMaxSize().padding(padding)) {
             if (vm.busy) {
@@ -105,44 +128,67 @@ fun App(vm: AppState) {
 }
 
 @Composable fun Action(label: String, enabled: Boolean = true, onClick: () -> Unit) {
-    Button(onClick = onClick, enabled = enabled, modifier = Modifier.fillMaxWidth()) { Text(label) }
+    Button(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(14.dp),
+        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 14.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(label) }
+}
+@Composable fun SecondaryAction(label: String, enabled: Boolean = true, onClick: () -> Unit) {
+    OutlinedButton(onClick = onClick, enabled = enabled, shape = RoundedCornerShape(14.dp),
+        contentPadding = PaddingValues(horizontal = 18.dp, vertical = 14.dp),
+        modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp)) { Text(label) }
 }
 @Composable fun Panel(title: String, content: @Composable ColumnScope.() -> Unit) {
-    Surface(shape = RoundedCornerShape(16.dp), tonalElevation = 1.dp, modifier = Modifier.fillMaxWidth()) {
-        Column(Modifier.padding(16.dp), verticalArrangement = Arrangement.spacedBy(8.dp)) {
-            Text(title, style = MaterialTheme.typography.titleMedium, fontWeight = FontWeight.Bold)
+    Surface(shape = RoundedCornerShape(20.dp), color = MaterialTheme.colorScheme.surface,
+        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant.copy(alpha = .65f)), modifier = Modifier.fillMaxWidth()) {
+        Column(Modifier.padding(18.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+            Text(title, style = MaterialTheme.typography.titleMedium)
             content()
         }
     }
 }
 @Composable fun Page(content: @Composable ColumnScope.() -> Unit) {
-    Column(Modifier.fillMaxSize().verticalScroll(rememberScrollState()).padding(16.dp), verticalArrangement = Arrangement.spacedBy(12.dp), content = content)
+    Column(Modifier.fillMaxSize().imePadding().verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(16.dp), content = content)
 }
-@Composable fun Field(label: String, value: Any?) { Text("$label: ${value ?: "нет данных"}") }
+@Composable fun Field(label: String, value: Any?) {
+    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(2.dp)) {
+        Text(label, style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
+        Text(value?.toString() ?: "нет данных", style = MaterialTheme.typography.bodyLarge)
+    }
+}
 
 @Composable fun IdentifyScreen(vm: AppState) {
     var number by rememberSaveableInput { "" }
     var mode by rememberSaveableInput { "serial" }
+    var enterNumber by androidx.compose.runtime.saveable.rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(Unit) { delay(10000); vm.suggestManual() }
-    Column(Modifier.fillMaxSize()) {
+    Column(Modifier.fillMaxSize().imePadding()) {
         Box(Modifier.weight(1f).fillMaxWidth().background(Color.Black)) {
             CameraFeed(Modifier.fillMaxSize(), vm::onFrame, vm::cameraFailed)
-            Text("Наведите камеру на QR-код или табличку", color = Color.White,
-                modifier = Modifier.align(Alignment.TopCenter).background(Color.Black.copy(alpha = .65f)).padding(12.dp))
+            ScanGuide(Modifier.fillMaxSize())
+            CameraHeading("Найдите оборудование", "Наведите камеру на QR-код или табличку")
+            Surface(color = CameraGlass, shape = RoundedCornerShape(12.dp), modifier = Modifier.align(Alignment.BottomCenter).padding(16.dp)) {
+                Text("QR-код и текст считываются автоматически", color = Color.White,
+                    style = MaterialTheme.typography.bodySmall, modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp))
+            }
         }
-        Column(Modifier.heightIn(max = 330.dp).verticalScroll(rememberScrollState()).padding(12.dp), verticalArrangement = Arrangement.spacedBy(4.dp)) {
+        Column(Modifier.fillMaxWidth().heightIn(max = 360.dp).verticalScroll(rememberScrollState()).padding(20.dp), verticalArrangement = Arrangement.spacedBy(10.dp)) {
             vm.cameraError?.let { Text(it, color = MaterialTheme.colorScheme.error) }
             if (vm.server.isBlank()) Text("Задайте адрес ПК в настройках")
             if (vm.manualHint) Text("Не удалось определить? Выберите оборудование вручную.")
-            Action("Выбрать вручную", !vm.busy, vm::manual)
             Action("Определить по фото", !vm.busy && vm.server.isNotBlank(), vm::identify)
-            Row {
-                FilterChip(selected = mode == "serial", onClick = { mode = "serial" }, label = { Text("Серийный номер") })
-                Spacer(Modifier.width(8.dp))
-                FilterChip(selected = mode == "marking", onClick = { mode = "marking" }, label = { Text("Маркировка") })
+            SecondaryAction("Выбрать оборудование вручную", !vm.busy, vm::manual)
+            TextButton(onClick = { enterNumber = !enterNumber }, modifier = Modifier.align(Alignment.CenterHorizontally)) {
+                Text(if (enterNumber) "Скрыть ввод номера" else "Ввести номер с таблички")
             }
-            OutlinedTextField(value = number, onValueChange = { number = it }, label = { Text("Номер с таблички") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
-            Action("Найти по номеру", !vm.busy && number.isNotBlank()) { vm.lookup(number, mode) }
+            if (enterNumber) {
+                Row {
+                    FilterChip(selected = mode == "serial", onClick = { mode = "serial" }, label = { Text("Серийный номер") })
+                    Spacer(Modifier.width(8.dp))
+                    FilterChip(selected = mode == "marking", onClick = { mode = "marking" }, label = { Text("Маркировка") })
+                }
+                OutlinedTextField(value = number, onValueChange = { number = it }, label = { Text("Номер с таблички") }, modifier = Modifier.fillMaxWidth(), singleLine = true)
+                Action("Найти по номеру", !vm.busy && number.isNotBlank()) { vm.lookup(number, mode) }
+            }
         }
     }
 }
@@ -152,9 +198,14 @@ fun App(vm: AppState) {
 
 @Composable fun ManualScreen(vm: AppState) {
     var query by rememberSaveableInput { "" }
+    val keyboard = LocalSoftwareKeyboardController.current
+    val search = { keyboard?.hide(); vm.search(query) }
     Page {
-        OutlinedTextField(query, { query = it }, label = { Text("Название, модель или номер") }, modifier = Modifier.fillMaxWidth())
-        Action("Найти", !vm.busy) { vm.search(query) }
+        Text("Найдите оборудование", style = MaterialTheme.typography.headlineSmall)
+        Text("По названию, модели или номеру из карточки", color = MaterialTheme.colorScheme.onSurfaceVariant)
+        OutlinedTextField(query, { query = it }, label = { Text("Поиск оборудования") }, singleLine = true,
+            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Search), keyboardActions = KeyboardActions(onSearch = { search() }), modifier = Modifier.fillMaxWidth())
+        Action("Найти", !vm.busy, search)
         if (vm.items.isEmpty() && !vm.busy) Text("Оборудование не найдено")
         vm.items.forEach { item -> Panel("${item.id} · ${item.name}") {
             Field("Модель", item.model); Field("S/N", item.serial_number); Field("Маркировка", item.marking); Field("Расположение", item.location)
@@ -167,12 +218,17 @@ fun App(vm: AppState) {
     var url by rememberSaveableInput { vm.server }
     var name by rememberSaveableInput { vm.engineer }
     Page {
-        Text("Подключите телефон и ПК к одной локальной сети.")
-        OutlinedTextField(url, { url = it }, label = { Text("Адрес ПК") }, placeholder = { Text("http://192.168.1.20:8000") }, singleLine = true, modifier = Modifier.fillMaxWidth())
-        OutlinedTextField(name, { name = it }, label = { Text("Имя инженера") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        Panel("Локальное подключение") {
+            Text("Подключите телефон и ПК к одной локальной сети.", color = MaterialTheme.colorScheme.onSurfaceVariant)
+            OutlinedTextField(url, { url = it }, label = { Text("Адрес ПК") }, placeholder = { Text("http://192.168.1.20:8000") },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Uri), singleLine = true, modifier = Modifier.fillMaxWidth())
+        }
+        Panel("Профиль инженера") {
+            OutlinedTextField(name, { name = it }, label = { Text("Имя инженера") }, singleLine = true, modifier = Modifier.fillMaxWidth())
+        }
         Action("Сохранить", !vm.busy) { vm.saveSettings(url, name) }
-        Action("Проверить связь", !vm.busy && vm.server.isNotBlank(), vm::health)
-        Text("Проверка связи использует сохранённый адрес. Интернет для работы не требуется.")
+        SecondaryAction("Проверить связь", !vm.busy && vm.server.isNotBlank(), vm::health)
+        Text("Проверка связи использует сохранённый адрес. Интернет для работы не требуется.", style = MaterialTheme.typography.bodySmall, color = MaterialTheme.colorScheme.onSurfaceVariant)
     }
 }
 
@@ -188,6 +244,11 @@ fun App(vm: AppState) {
     Panel("Расчётная оценка остаточного ресурса") {
         if (r.status == "insufficient_data") Text("Недостаточно данных для оценки", fontWeight = FontWeight.Bold)
         Text(r.message, color = statusColor(r.status))
+        r.used_percent?.let { used ->
+            LinearProgressIndicator(progress = { (used / 100f).coerceIn(0f, 1f) },
+                color = statusColor(r.status), trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                modifier = Modifier.fillMaxWidth().height(6.dp))
+        }
         Field("Выработка, %", r.used_percent); Field("Остаток, лет", r.remaining.years)
         Field("Остаток, ч", r.remaining.hours); Field("Остаток, циклов", r.remaining.cycles)
         Field("Ожидаемая дата", r.estimated_end_date); Text(r.basis)
@@ -230,19 +291,28 @@ fun App(vm: AppState) {
         ScrollableTabRow(selectedTabIndex = listOf("Обзор", "Состав", "Параметры", "История").indexOf(tab), edgePadding = 0.dp) {
             listOf("Обзор", "Состав", "Параметры", "История").forEach { title -> Tab(selected = tab == title, onClick = { tab = title }, text = { Text(title + if (title == "Параметры" && c.deviations_count > 0) " (${c.deviations_count})" else "") }) }
         }
-        Page {
+        key(tab) { Page {
             when (tab) {
                 "Обзор" -> {
-                    Text(c.name, style = MaterialTheme.typography.headlineSmall)
-                    if (c.deviations_count > 0) Text("! Параметров с отклонениями: ${c.deviations_count}", color = statusColor("defect"))
-                    Action("Начать AR-осмотр", !vm.busy, vm::openAr)
+                    Surface(color = Ink, shape = RoundedCornerShape(24.dp)) {
+                        Column(Modifier.fillMaxWidth().padding(22.dp), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                            Text(c.id + "  /  ОБОРУДОВАНИЕ", color = Mint, style = MaterialTheme.typography.labelMedium)
+                            Text(c.name, color = Color.White, style = MaterialTheme.typography.headlineSmall)
+                            c.model?.let { Text(it, color = Color(0xFFC3D5DE), style = MaterialTheme.typography.bodyMedium) }
+                            Button(onClick = vm::openAr, enabled = !vm.busy, modifier = Modifier.fillMaxWidth().heightIn(min = 52.dp),
+                                shape = RoundedCornerShape(14.dp), colors = ButtonDefaults.buttonColors(containerColor = Mint, contentColor = Ink)) {
+                                UiIcon("scan"); Spacer(Modifier.width(10.dp)); Text("Начать AR-осмотр")
+                            }
+                        }
+                    }
+                    if (c.deviations_count > 0) StatusPill("! Параметров с отклонениями: ${c.deviations_count}", statusColor("defect"))
                     Panel("Паспорт оборудования") {
                         Field("Идентификатор", c.id); Field("Модель", c.model); Field("Изготовитель", c.manufacturer)
                         Field("S/N", c.serial_number); Field("Маркировка", c.marking); Field("Расположение", c.location)
                         Field("Ввод в эксплуатацию", c.commissioned_at); Characteristics(c.characteristics)
                     }
                     NormativeBlock(c.normative, c.usage); ResourceBlock(c.resource)
-                    Action("Зарегистрировать осмотр оборудования", !vm.busy) { vm.inspection(true) }
+                    SecondaryAction("Зарегистрировать осмотр оборудования", !vm.busy) { vm.inspection(true) }
                 }
                 "Состав" -> {
                     val ordered = mutableListOf<Pair<Component, Int>>()
@@ -266,7 +336,7 @@ fun App(vm: AppState) {
                 "Параметры" -> Parameters(c.parameters)
                 "История" -> { Action("Обновить", !vm.busy, vm::refresh); HistoryRows(c.history, c.components) }
             }
-        }
+        } }
     }
 }
 
@@ -274,7 +344,8 @@ fun App(vm: AppState) {
     val c = vm.component ?: return
     Page {
         Text(c.name, style = MaterialTheme.typography.headlineSmall)
-        Field("Идентификатор", c.id); Field("Тип", c.type_name); Characteristics(c.characteristics)
+        StatusPill(c.id + " · " + c.type_name, statusColor(c.attention.level))
+        if (c.characteristics.isNotEmpty()) Panel("Характеристики") { Characteristics(c.characteristics) }
         Panel("Даты") { Field("Установка", c.installed_at); Field("Последняя замена", c.last_replaced_at); Field("Последнее обслуживание", c.last_maintenance_at) }
         NormativeBlock(c.normative, c.usage); ResourceBlock(c.resource); VisualBlock(c.visual)
         Panel("Рекомендуемые действия") { c.attention.reasons.forEach { Text(it) }; Text(c.attention.recommended_action) }
@@ -293,8 +364,12 @@ fun App(vm: AppState) {
         Text(vm.component?.name ?: vm.card?.name.orEmpty(), style = MaterialTheme.typography.titleLarge)
         Field("Инженер", vm.engineer.ifBlank { "укажите в настройках" })
         inspectionTypes.filterKeys { it != "replacement" || vm.component != null }.forEach { (key, title) ->
-            Row(Modifier.fillMaxWidth().clickable { type = key }, verticalAlignment = Alignment.CenterVertically) {
-                RadioButton(selected = type == key, onClick = { type = key }); Text(title)
+            Surface(shape = RoundedCornerShape(14.dp), color = if (type == key) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+                border = BorderStroke(1.dp, if (type == key) Teal else MaterialTheme.colorScheme.outlineVariant)) {
+                Row(Modifier.fillMaxWidth().heightIn(min = 56.dp).selectable(selected = type == key, role = Role.RadioButton, onClick = { type = key })
+                    .padding(end = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+                    RadioButton(selected = type == key, onClick = null); Text(title, style = MaterialTheme.typography.bodyLarge)
+                }
             }
         }
         val required = type in listOf("defect", "remark")
