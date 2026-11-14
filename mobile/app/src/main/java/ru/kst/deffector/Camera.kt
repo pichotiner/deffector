@@ -40,12 +40,13 @@ fun CameraFeed(modifier: Modifier, onFrame: suspend (Bitmap) -> Unit, onError: (
         }
         return
     }
-    val previewView = remember { PreviewView(context).apply { scaleType = PreviewView.ScaleType.FIT_CENTER; implementationMode = PreviewView.ImplementationMode.COMPATIBLE } }
+    val previewView = remember { PreviewView(context).apply { scaleType = PreviewView.ScaleType.FILL_CENTER; implementationMode = PreviewView.ImplementationMode.COMPATIBLE } }
     AndroidView(factory = { previewView }, modifier = modifier)
     DisposableEffect(owner, previewView) {
         val executor = Executors.newSingleThreadExecutor()
         val scope = CoroutineScope(SupervisorJob() + Dispatchers.Main.immediate)
         val running = AtomicBoolean(false)
+        var lastFrameAt = 0L
         var disposed = false
         var provider: ProcessCameraProvider? = null
         var boundPreview: Preview? = null
@@ -63,8 +64,11 @@ fun CameraFeed(modifier: Modifier, onFrame: suspend (Bitmap) -> Unit, onError: (
                         .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST).build()
                     boundPreview = preview; boundAnalysis = analysis
                     analysis.setAnalyzer(executor) { proxy ->
-                        if (!running.compareAndSet(false, true)) { proxy.close() }
+                        val now = android.os.SystemClock.elapsedRealtime()
+                        // Не создаём полноразмерные Bitmap для каждого кадра живого превью.
+                        if (now - lastFrameAt < 150 || !running.compareAndSet(false, true)) { proxy.close() }
                         else {
+                            lastFrameAt = now
                             try {
                                 val raw = proxy.toBitmap()
                                 val rect = proxy.cropRect
